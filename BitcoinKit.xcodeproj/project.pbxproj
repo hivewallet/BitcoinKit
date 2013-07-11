@@ -1,0 +1,297 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		D91FE4F2178EB1F1001B37D8 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D91FE4F1178EB1F1001B37D8 /* Cocoa.framework */; };
+		D91FE4FC178EB1F1001B37D8 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D91FE4FA178EB1F1001B37D8 /* InfoPlist.strings */; };
+		D91FE500178EB1F1001B37D8 /* BitcoinKit.m in Sources */ = {isa = PBXBuildFile; fileRef = D91FE4FF178EB1F1001B37D8 /* BitcoinKit.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		D91FE4EE178EB1F1001B37D8 /* BitcoinKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = BitcoinKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D91FE4F1178EB1F1001B37D8 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		D91FE4F4178EB1F1001B37D8 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		D91FE4F5178EB1F1001B37D8 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		D91FE4F6178EB1F1001B37D8 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		D91FE4F9178EB1F1001B37D8 /* BitcoinKit-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "BitcoinKit-Info.plist"; sourceTree = "<group>"; };
+		D91FE4FB178EB1F1001B37D8 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		D91FE4FD178EB1F1001B37D8 /* BitcoinKit-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "BitcoinKit-Prefix.pch"; sourceTree = "<group>"; };
+		D91FE4FE178EB1F1001B37D8 /* BitcoinKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BitcoinKit.h; sourceTree = "<group>"; };
+		D91FE4FF178EB1F1001B37D8 /* BitcoinKit.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BitcoinKit.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D91FE4EA178EB1F1001B37D8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D91FE4F2178EB1F1001B37D8 /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D91FE4E4178EB1F1001B37D8 = {
+			isa = PBXGroup;
+			children = (
+				D91FE4F7178EB1F1001B37D8 /* BitcoinKit */,
+				D91FE4F0178EB1F1001B37D8 /* Frameworks */,
+				D91FE4EF178EB1F1001B37D8 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D91FE4EF178EB1F1001B37D8 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D91FE4EE178EB1F1001B37D8 /* BitcoinKit.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D91FE4F0178EB1F1001B37D8 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D91FE4F1178EB1F1001B37D8 /* Cocoa.framework */,
+				D91FE4F3178EB1F1001B37D8 /* Other Frameworks */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		D91FE4F3178EB1F1001B37D8 /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D91FE4F4178EB1F1001B37D8 /* AppKit.framework */,
+				D91FE4F5178EB1F1001B37D8 /* CoreData.framework */,
+				D91FE4F6178EB1F1001B37D8 /* Foundation.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		D91FE4F7178EB1F1001B37D8 /* BitcoinKit */ = {
+			isa = PBXGroup;
+			children = (
+				D91FE4FE178EB1F1001B37D8 /* BitcoinKit.h */,
+				D91FE4FF178EB1F1001B37D8 /* BitcoinKit.m */,
+				D91FE4F8178EB1F1001B37D8 /* Supporting Files */,
+			);
+			path = BitcoinKit;
+			sourceTree = "<group>";
+		};
+		D91FE4F8178EB1F1001B37D8 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				D91FE4F9178EB1F1001B37D8 /* BitcoinKit-Info.plist */,
+				D91FE4FA178EB1F1001B37D8 /* InfoPlist.strings */,
+				D91FE4FD178EB1F1001B37D8 /* BitcoinKit-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		D91FE4EB178EB1F1001B37D8 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		D91FE4ED178EB1F1001B37D8 /* BitcoinKit */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D91FE503178EB1F1001B37D8 /* Build configuration list for PBXNativeTarget "BitcoinKit" */;
+			buildPhases = (
+				D91FE4E9178EB1F1001B37D8 /* Sources */,
+				D91FE4EA178EB1F1001B37D8 /* Frameworks */,
+				D91FE4EB178EB1F1001B37D8 /* Headers */,
+				D91FE4EC178EB1F1001B37D8 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BitcoinKit;
+			productName = BitcoinKit;
+			productReference = D91FE4EE178EB1F1001B37D8 /* BitcoinKit.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D91FE4E5178EB1F1001B37D8 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0460;
+				ORGANIZATIONNAME = "Nova Project";
+			};
+			buildConfigurationList = D91FE4E8178EB1F1001B37D8 /* Build configuration list for PBXProject "BitcoinKit" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = D91FE4E4178EB1F1001B37D8;
+			productRefGroup = D91FE4EF178EB1F1001B37D8 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D91FE4ED178EB1F1001B37D8 /* BitcoinKit */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D91FE4EC178EB1F1001B37D8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D91FE4FC178EB1F1001B37D8 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D91FE4E9178EB1F1001B37D8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D91FE500178EB1F1001B37D8 /* BitcoinKit.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		D91FE4FA178EB1F1001B37D8 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D91FE4FB178EB1F1001B37D8 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		D91FE501178EB1F1001B37D8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		D91FE502178EB1F1001B37D8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		D91FE504178EB1F1001B37D8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_VERSION = A;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "BitcoinKit/BitcoinKit-Prefix.pch";
+				INFOPLIST_FILE = "BitcoinKit/BitcoinKit-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = framework;
+			};
+			name = Debug;
+		};
+		D91FE505178EB1F1001B37D8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_VERSION = A;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "BitcoinKit/BitcoinKit-Prefix.pch";
+				INFOPLIST_FILE = "BitcoinKit/BitcoinKit-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = framework;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D91FE4E8178EB1F1001B37D8 /* Build configuration list for PBXProject "BitcoinKit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D91FE501178EB1F1001B37D8 /* Debug */,
+				D91FE502178EB1F1001B37D8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D91FE503178EB1F1001B37D8 /* Build configuration list for PBXNativeTarget "BitcoinKit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D91FE504178EB1F1001B37D8 /* Debug */,
+				D91FE505178EB1F1001B37D8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D91FE4E5178EB1F1001B37D8 /* Project object */;
+}
