@@ -34,6 +34,7 @@ static boost::thread_group _threadGroup;
 @synthesize balance = _balance;
 @synthesize syncProgress = _syncProgress;
 @synthesize testingNetwork = _testingNetwork;
+@synthesize enableMining = _enableMining;
 @synthesize walletAddress;
 
 + (HIBitcoinManager *)defaultManager
@@ -58,6 +59,8 @@ static boost::thread_group _threadGroup;
         _connections = 0;
         _balance = 0;
         _syncProgress = 0;
+        _testingNetwork = NO;
+        _enableMining = NO;
         _isRunning = NO;
          _dataURL = [appSupportURL copy];
     }
@@ -72,24 +75,25 @@ static boost::thread_group _threadGroup;
     
     fHaveGUI = true;
     [[NSFileManager defaultManager] createDirectoryAtURL:_dataURL withIntermediateDirectories:YES attributes:0 error:NULL];
-    NSString *pathparam = [NSString stringWithFormat:@"-datadir=%@", _dataURL.path];    
-    if (!_testingNetwork)
+    NSString *pathparam = [NSString stringWithFormat:@"-datadir=%@", _dataURL.path];
+    const char *argv[4];
+    int argc = 2;
+    
+    argv[0] = NULL;
+    argv[1] = pathparam.UTF8String;
+    
+    if (_testingNetwork)
     {
-        const char *argv[2];
-        argv[0] = NULL;
-        argv[1] = pathparam.UTF8String;
-        // Now mimic argument settings
-        ParseParameters(2, argv);
+        argv[argc++] = "-testnet";
     }
-    else
+    
+    if (_enableMining)
     {
-        const char *argv[3];
-        argv[0] = NULL;
-        argv[1] = pathparam.UTF8String;
-        argv[2] = "-testnet";
-        // Now mimic argument settings
-        ParseParameters(3, argv);
+        argv[argc++] = "-gen";
     }
+    // Now mimic argument settings
+    ParseParameters(argc, argv);
+    
     _isStarting = YES;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
         if(AppInit2(_threadGroup))

@@ -18,7 +18,8 @@
     [[HIBitcoinManager defaultManager] addObserver:self forKeyPath:@"syncProgress" options:NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew context:NULL];
     [[HIBitcoinManager defaultManager] addObserver:self forKeyPath:@"isRunning" options:NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew context:NULL];
     [_progressIndicator startAnimation:self];
-    //    [HIBitcoinManager defaultManager].testingNetwork = YES;
+    [HIBitcoinManager defaultManager].testingNetwork = YES;
+    [HIBitcoinManager defaultManager].enableMining = YES;
     [[HIBitcoinManager defaultManager] start];
 
 }

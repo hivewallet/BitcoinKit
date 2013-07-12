@@ -19,6 +19,7 @@
 
 @property (nonatomic, copy) NSURL *dataURL;                                         //<<< Specifies an URL path to a directory where HIBitcoinManager should store its data. Warning! All changes to it has to be performed BEFORE start.
 @property (nonatomic, assign) BOOL testingNetwork;                                  //<<< Specifies if a manager is running on the testing network. Warning! All changes to it has to be performed BEFORE start.
+@property (nonatomic, assign) BOOL enableMining;                                    //<<< Specifies if a manager should try to mine bticoins. Warning! All changes to it has to be performed BEFORE start.
 @property (nonatomic, readonly) NSUInteger connections;                             //<<< Currently active connections to bitcoin network
 @property (nonatomic, readonly) BOOL isRunning;                                     //<<< Flag indicating if NPBitcoinManager is currently running and connecting with the network
 @property (nonatomic, readonly) uint64_t balance;                                   //<<< Actual balance of the wallet
