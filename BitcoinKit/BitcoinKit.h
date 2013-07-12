@@ -3,11 +3,7 @@
 //  BitcoinKit
 //
 //  Created by Bazyli Zygan on 11.07.2013.
-//  Copyright (c) 2013 Nova Project. All rights reserved.
+//  Copyright (c) 2013 Hive Developers. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-
-@interface BitcoinKit : NSObject
-
-@end
+#import <BitcoinKit/HIBitcoinManager.h>
