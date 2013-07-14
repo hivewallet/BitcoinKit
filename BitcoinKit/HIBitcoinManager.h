@@ -27,7 +27,7 @@ NSString * const kHIBitcoinManagerTransactionChanged = @"kHIBitcoinManagerTransa
 @property (nonatomic, readonly) uint64_t balance;                                   //<<< Actual balance of the wallet
 @property (nonatomic, readonly) NSUInteger syncProgress;                            //<<< Integer value indicating the progress of network sync. Values are from 0 to 10000.
 @property (nonatomic, readonly, getter = walletAddress) NSString *walletAddress;    //<<< Returns wallets main address. Creates one if none exists yet
-
+@property (nonatomic, readonly, getter = transactionCount) NSUInteger transactionCount;
 /** Class method returning application singleton to the manager.
  *
  * Please note not to create HIBitcoinManager objects in any other way.
@@ -54,5 +54,38 @@ NSString * const kHIBitcoinManagerTransactionChanged = @"kHIBitcoinManagerTransa
  */
 - (void)stop;
 
+/** Returns transaction definition based on transaction hash
+ *
+ * @param hash NSString representation of transaction hash
+ *
+ * @returns NSDictionary definition of found transansaction. nil if not found
+ */
+- (NSDictionary *)transactionForHash:(NSString *)hash;
+
+/** Returns transaction definition based on transaction hash
+ *
+ * WARNING: Because transaction are kept in maps in bitcoind the only way
+ * to find an element at requested index is to iterate through all of elements
+ * in front. DO NOT USE too often or your app will get absurdely slow
+ *
+ * @param index Index of the searched transaction
+ *
+ * @returns NSDictionary definition of found transansaction. nil if not found
+ */
+- (NSDictionary *)transactionAtIndex:(NSUInteger)index;
+
+/** Returns an array of definitions of all transactions 
+ *
+ * @returns Array of all transactions to this wallet
+ */
+- (NSArray *)allTransactions;
+
+/** Returns array of transactions from given range
+ *
+ * @param range Range of requested transactions
+ *
+ * @returns An array of transactions from requested range
+ */
+- (NSArray *)transactionsWithRange:(NSRange)range;
 
 @end

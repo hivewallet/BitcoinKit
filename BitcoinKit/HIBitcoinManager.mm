@@ -24,6 +24,7 @@ static boost::thread_group _threadGroup;
 
 - (void)checkTick:(NSTimer *)timer;
 - (void)wallet:(CWallet *)wallet changedTransaction:(uint256)hash change:(ChangeType)status;
+- (NSDictionary *)transactionFromWalletTx:(const CWalletTx)wtx;
 
 @end
 
@@ -191,25 +192,99 @@ static void NotifyTransactionChanged(HIBitcoinManager *manager, CWallet *wallet,
     return [NSString stringWithUTF8String:CBitcoinAddress(account.vchPubKey.GetID()).ToString().c_str()];
 }
 
-- (id)transactionAtIndex:(NSUInteger)index
+- (NSDictionary *)transactionFromWalletTx:(const CWalletTx)wtx
 {
-    std::list<CAccountingEntry> acentries;
-    CWallet::TxItems txOrdered = pwalletMain->OrderedTxItems(acentries, strAccount);
+    int64 nCredit = wtx.GetCredit();
+    int64 nDebit = wtx.GetDebit();
+    int64 nNet = nCredit - nDebit;
+    int64 nFee = (wtx.IsFromMe() ? GetValueOut(wtx) - nDebit : 0);
     
-    // iterate backwards until we have nCount items to return:
-//    for (CWallet::TxItems::reverse_iterator it = txOrdered.rbegin(); it != txOrdered.rend(); ++it)
-//    {
-//        CWalletTx *const pwtx = (*it).second.first;
-//        if (pwtx != 0)
-//            ListTransactions(*pwtx, strAccount, 0, true, ret);
-//        CAccountingEntry *const pacentry = (*it).second.second;
-//        if (pacentry != 0)
-//            AcentryToJSON(*pacentry, strAccount, ret);
-//        
-//        if ((int)ret.size() >= (nCount+nFrom)) break;
-//    }
+    NSMutableDictionary *transaction = [NSMutableDictionary dictionary];
+    
+    [transaction setObject:[NSNumber numberWithLongLong:(nNet-nFee)] forKey:@"amount"];
+    if (wtx.IsFromMe())
+        [transaction setObject:[NSNumber numberWithLongLong:nFee] forKey:@"fee"];
+    
+    [transaction setObject:[NSNumber numberWithInt:wtx.GetDepthInMainChain()] forKey:@"confirmations"];
+    
+    if (wtx.IsCoinBase())
+        [transaction setObject:[NSNumber numberWithBool:YES] forKey:@"generated"];
+    
+    if (wtx.GetDepthInMainChain() > 0)
+    {
+        [transaction setObject:[NSString stringWithUTF8String:wtx.hashBlock.GetHex().c_str()] forKey:@"blockhash"];
+        [transaction setObject:[NSNumber numberWithLongLong:wtx.nIndex] forKey:@"blockindex"];
+        [transaction setObject:[NSDate dateWithTimeIntervalSince1970:(boost::int64_t)(mapBlockIndex[wtx.hashBlock]->nTime)] forKey:@"blocktime"];
+    }
+    [transaction setObject:[NSString stringWithUTF8String:wtx.GetHash().GetHex().c_str()] forKey:@"txid"];
+    [transaction setObject:[NSDate dateWithTimeIntervalSince1970:(boost::int64_t)(wtx.GetTxTime())] forKey:@"time"];
+    [transaction setObject:[NSDate dateWithTimeIntervalSince1970:(boost::int64_t)(wtx.nTimeReceived)] forKey:@"timereceived"];
+    
+    BOOST_FOREACH(const PAIRTYPE(string,string)& item, wtx.mapValue)
+    [transaction setObject:[NSString stringWithUTF8String:item.second.c_str()] forKey:[NSString stringWithUTF8String:item.first.c_str()]];
+    
+    
+    //    Array details;
+    //    ListTransactions(wtx, "*", 0, false, details);
+    //    entry.push_back(Pair("details", details));
+    return transaction;    
 }
 
+- (NSDictionary *)transactionForHash:(NSString *)hash
+{
+    uint256 hashvalue;
+    hashvalue.SetHex(hash.UTF8String);
+    
+    if (!pwalletMain->mapWallet.count(hashvalue))
+        return nil;
+    
+    const CWalletTx& wtx = pwalletMain->mapWallet[hashvalue];
+    return [self transactionFromWalletTx:wtx];
+}
+
+- (NSUInteger)transactionCount
+{
+    return (NSUInteger)pwalletMain->mapWallet.size();
+}
+
+- (NSArray *)allTransactions
+{
+    return [self transactionsWithRange:NSMakeRange(0, self.transactionCount)];
+}
+
+- (NSDictionary *)transactionAtIndex:(NSUInteger)index
+{
+    NSArray *arr = [self transactionsWithRange:NSMakeRange(index, 1)];
+    if (arr.count == 1)
+        return [arr objectAtIndex:0];
+    else
+        return nil;
+}
+
+- (NSArray *)transactionsWithRange:(NSRange)range
+{
+    if (range.length == 0 || range.location + range.length > self.transactionCount)
+        return nil;
+    
+    NSMutableArray *arr = [NSMutableArray array];
+    int pos = 0;
+    // Note: maintaining indices in the database of (account,time) --> txid and (account, time) --> acentry
+    // would make this much faster for applications that do this a lot.
+    for (map<uint256, CWalletTx>::iterator it = pwalletMain->mapWallet.begin(); it != pwalletMain->mapWallet.end(); ++it)
+    {
+
+        if (pos >= range.location)
+        {
+            CWalletTx wtx = ((*it).second);
+            [arr addObject:[self transactionFromWalletTx:wtx]];
+        }
+        pos++;
+        if (pos > range.location + range.length)
+            break;
+    }
+    
+    return arr;
+}
 
 #pragma mark - Private methods
 

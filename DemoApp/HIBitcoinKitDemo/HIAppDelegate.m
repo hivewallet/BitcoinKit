@@ -68,6 +68,10 @@
             {
                 _stateLabel.stringValue = @"Synchronizing...";
                 _addressLabel.stringValue = [HIBitcoinManager defaultManager].walletAddress;
+                
+                // We have to refresh transaction list here
+                NSArray *transactions = [[HIBitcoinManager defaultManager] allTransactions];
+                NSLog(@"All transactions so far %@", transactions);
             }
         }
         else if ([keyPath compare:@"syncProgress"] == NSOrderedSame)
@@ -98,9 +102,9 @@
     }
 }
 
-- (void)transactionChanged:(NSNotification *)not
+- (void)transactionUpdated:(NSNotification *)not
 {
-    NSLog(@"Transaction changed %@", not.object);
+    NSLog(@"Transaction changed %@ %@", not.userInfo, not.object);
 }
 
 @end
