@@ -15,6 +15,8 @@
 		D91FE7DD17900FCC001B37D8 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = D91FE7DB17900FCC001B37D8 /* MainMenu.xib */; };
 		D91FE7ED17901086001B37D8 /* BitcoinKit.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = D91FE7E91790100A001B37D8 /* BitcoinKit.framework */; };
 		D91FE7F1179012ED001B37D8 /* BitcoinKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D91FE7E91790100A001B37D8 /* BitcoinKit.framework */; };
+		D9D0735A1793506E008B9CE0 /* HISendWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9D073581793506E008B9CE0 /* HISendWindowController.m */; };
+		D9D0735B1793506E008B9CE0 /* HISendWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D9D073591793506E008B9CE0 /* HISendWindowController.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -62,6 +64,9 @@
 		D91FE7D917900FCC001B37D8 /* HIAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HIAppDelegate.m; sourceTree = "<group>"; };
 		D91FE7DC17900FCC001B37D8 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		D91FE7E31790100A001B37D8 /* BitcoinKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = BitcoinKit.xcodeproj; path = ../BitcoinKit.xcodeproj; sourceTree = "<group>"; };
+		D9D073571793506E008B9CE0 /* HISendWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HISendWindowController.h; sourceTree = "<group>"; };
+		D9D073581793506E008B9CE0 /* HISendWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HISendWindowController.m; sourceTree = "<group>"; };
+		D9D073591793506E008B9CE0 /* HISendWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HISendWindowController.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -120,6 +125,9 @@
 				D91FE7D817900FCC001B37D8 /* HIAppDelegate.h */,
 				D91FE7D917900FCC001B37D8 /* HIAppDelegate.m */,
 				D91FE7DB17900FCC001B37D8 /* MainMenu.xib */,
+				D9D073571793506E008B9CE0 /* HISendWindowController.h */,
+				D9D073581793506E008B9CE0 /* HISendWindowController.m */,
+				D9D073591793506E008B9CE0 /* HISendWindowController.xib */,
 				D91FE7CD17900FCC001B37D8 /* Supporting Files */,
 			);
 			path = HIBitcoinKitDemo;
@@ -225,6 +233,7 @@
 				D91FE7D117900FCC001B37D8 /* InfoPlist.strings in Resources */,
 				D91FE7D717900FCC001B37D8 /* Credits.rtf in Resources */,
 				D91FE7DD17900FCC001B37D8 /* MainMenu.xib in Resources */,
+				D9D0735B1793506E008B9CE0 /* HISendWindowController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -237,6 +246,7 @@
 			files = (
 				D91FE7D317900FCC001B37D8 /* main.m in Sources */,
 				D91FE7DA17900FCC001B37D8 /* HIAppDelegate.m in Sources */,
+				D9D0735A1793506E008B9CE0 /* HISendWindowController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

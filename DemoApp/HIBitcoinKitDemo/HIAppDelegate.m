@@ -8,14 +8,16 @@
 
 #import <BitcoinKit/BitcoinKit.h>
 #import "HIAppDelegate.h"
+#import "HISendWindowController.h"
 
 @interface HIAppDelegate ()
 {
     NSArray *_transactions;
     NSDateFormatter *_dF;
+    HISendWindowController *_sendController;
 }
 - (void)transactionUpdated:(NSNotification *)not;
-
+- (void)sendClosed:(id)sender;
 @end
 
 @implementation HIAppDelegate
@@ -39,7 +41,7 @@
     [HIBitcoinManager defaultManager].testingNetwork = YES;
 //    [HIBitcoinManager defaultManager].enableMining = YES;
     [[HIBitcoinManager defaultManager] start];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(transactionUpdated:) name:kHIBitcoinManagerTransactionChanged object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(transactionUpdated:) name:kHIBitcoinManagerTransactionChangedNotification object:nil];
 }
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
@@ -79,7 +81,7 @@
             {
                 _stateLabel.stringValue = @"Synchronizing...";
                 _addressLabel.stringValue = [HIBitcoinManager defaultManager].walletAddress;
-                
+                [_sendMoneyBtn setEnabled:YES];
                 // We have to refresh transaction list here
                 _transactions = [[HIBitcoinManager defaultManager] allTransactions];
                 [_transactionList reloadData];
@@ -140,12 +142,19 @@
     else if ([[aTableColumn identifier] compare:@"address"] == NSOrderedSame)
         return transaction[@"details"][0][@"address"];
     else if ([[aTableColumn identifier] compare:@"time"] == NSOrderedSame)
-    {
-        NSLog(@"Trans is %@", transaction);
         return [_dF stringFromDate:transaction[@"time"]];
-    }
     return nil;
 }
 
 
+- (IBAction)sendMoneyClicked:(NSButton *)sender
+{
+    _sendController= [[HISendWindowController alloc] initWithWindowNibName:@"HISendWindowController"];
+    [NSApp beginSheet:_sendController.window modalForWindow:self.window modalDelegate:self didEndSelector:@selector(sendClosed:) contextInfo:NULL];
+}
+
+- (void)sendClosed:(id)sender
+{
+    _sendController = nil;
+}
 @end

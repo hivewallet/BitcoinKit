@@ -15,6 +15,7 @@
 
 static boost::thread_group _threadGroup;
 
+NSString * const kHIBitcoinManagerTransactionChangedNotification = @"kHIBitcoinManagerTransactionChangedNotification";
 
 @interface HIBitcoinManager ()
 
@@ -325,12 +326,45 @@ static void NotifyTransactionChanged(HIBitcoinManager *manager, CWallet *wallet,
     return arr;
 }
 
+- (BOOL)isAddressValid:(NSString *)address
+{
+    CBitcoinAddress addr(address.UTF8String);
+    return addr.IsValid();
+}
+
+- (BOOL)sendCoins:(uint64_t)coins toReceipent:(NSString *)receipent comment:(NSString *)comment
+{
+    if (coins == 0 || coins > self.balance)
+        return NO;
+    
+    CBitcoinAddress address(receipent.UTF8String);
+  
+    if (!address.IsValid())
+        return NO;
+        
+    CWalletTx wtx;
+    if (comment.length > 0)
+        wtx.mapValue["comment"] = string(comment.UTF8String);
+    
+    if (pwalletMain->IsLocked())
+        return NO;
+    
+    string strError = pwalletMain->SendMoneyToDestination(address.Get(), coins, wtx);
+
+    if (strError != "")
+        return NO;
+  
+    [[NSNotificationCenter defaultCenter] postNotificationName:kHIBitcoinManagerTransactionChangedNotification object:[NSString stringWithUTF8String:wtx.GetHash().GetHex().c_str()]];
+
+    return YES;
+}
+
 #pragma mark - Private methods
 
 - (void)wallet:(CWallet *)wallet changedTransaction:(uint256)hash change:(ChangeType)status
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [[NSNotificationCenter defaultCenter] postNotificationName:kHIBitcoinManagerTransactionChanged object:[NSString stringWithUTF8String:hash.GetHex().c_str()]];
+        [[NSNotificationCenter defaultCenter] postNotificationName:kHIBitcoinManagerTransactionChangedNotification object:[NSString stringWithUTF8String:hash.GetHex().c_str()]];
     });
 }
 

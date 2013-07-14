@@ -8,7 +8,9 @@
 
 #import <Foundation/Foundation.h>
 
-NSString * const kHIBitcoinManagerTransactionChanged = @"kHIBitcoinManagerTransactionChanged";
+extern NSString * const kHIBitcoinManagerTransactionChangedNotification; //<<< Transaction list update notification. Sent object is a NSString representation of the updated hash
+
+
 
 /** HIBitcoinManager is a class responsible for managing all Bitcoin actions app should do 
  *
@@ -87,5 +89,23 @@ NSString * const kHIBitcoinManagerTransactionChanged = @"kHIBitcoinManagerTransa
  * @returns An array of transactions from requested range
  */
 - (NSArray *)transactionsWithRange:(NSRange)range;
+
+/** Checks if given address is valid address
+ *
+ * @param address Address string to be checked
+ *
+ * @returns YES if address is valid. NO - otherwise
+ */
+- (BOOL)isAddressValid:(NSString *)address;
+
+/** Sends amount of coins to receipent
+ *
+ * @param coins Amount of coins to be sent in satoshis
+ * @param receipent Receipent address hash
+ * @param comment optional comment string that will be bound to the transaction
+ *
+ * @returns YES if send was successful, NO - otherwise
+ */
+- (BOOL)sendCoins:(uint64_t)coins toReceipent:(NSString *)receipent comment:(NSString *)comment;
 
 @end

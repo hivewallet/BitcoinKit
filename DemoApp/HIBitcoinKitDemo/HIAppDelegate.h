@@ -17,5 +17,7 @@
 @property (weak) IBOutlet NSProgressIndicator *progressIndicator;
 @property (weak) IBOutlet NSTextField *stateLabel;
 @property (weak) IBOutlet NSTableView *transactionList;
+@property (weak) IBOutlet NSButton *sendMoneyBtn;
+- (IBAction)sendMoneyClicked:(NSButton *)sender;
 
 @end
