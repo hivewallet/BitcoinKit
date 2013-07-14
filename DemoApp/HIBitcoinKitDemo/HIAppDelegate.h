@@ -8,7 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface HIAppDelegate : NSObject <NSApplicationDelegate>
+@interface HIAppDelegate : NSObject <NSApplicationDelegate, NSTableViewDataSource>
 
 @property (assign) IBOutlet NSWindow *window;
 @property (weak) IBOutlet NSTextField *addressLabel;
@@ -16,5 +16,6 @@
 @property (weak) IBOutlet NSTextField *connectionsLabel;
 @property (weak) IBOutlet NSProgressIndicator *progressIndicator;
 @property (weak) IBOutlet NSTextField *stateLabel;
+@property (weak) IBOutlet NSTableView *transactionList;
 
 @end

@@ -10,7 +10,10 @@
 #import "HIAppDelegate.h"
 
 @interface HIAppDelegate ()
-
+{
+    NSArray *_transactions;
+    NSDateFormatter *_dF;
+}
 - (void)transactionUpdated:(NSNotification *)not;
 
 @end
@@ -19,6 +22,14 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+    // Configure columns in tableview
+    _dF = [[NSDateFormatter alloc] init];
+    [_dF setDateStyle:NSDateFormatterFullStyle];
+    [_dF setTimeStyle:NSDateFormatterFullStyle];
+    [_transactionList.tableColumns[0] setIdentifier:@"category"];
+    [_transactionList.tableColumns[1] setIdentifier:@"amount"];
+    [_transactionList.tableColumns[2] setIdentifier:@"address"];
+    [_transactionList.tableColumns[3] setIdentifier:@"time"];
     
     [[HIBitcoinManager defaultManager] addObserver:self forKeyPath:@"connections" options:NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew context:NULL];
     [[HIBitcoinManager defaultManager] addObserver:self forKeyPath:@"balance" options:NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew context:NULL];
@@ -70,8 +81,8 @@
                 _addressLabel.stringValue = [HIBitcoinManager defaultManager].walletAddress;
                 
                 // We have to refresh transaction list here
-                NSArray *transactions = [[HIBitcoinManager defaultManager] allTransactions];
-                NSLog(@"All transactions so far %@", transactions);
+                _transactions = [[HIBitcoinManager defaultManager] allTransactions];
+                [_transactionList reloadData];
             }
         }
         else if ([keyPath compare:@"syncProgress"] == NSOrderedSame)
@@ -104,7 +115,37 @@
 
 - (void)transactionUpdated:(NSNotification *)not
 {
-    NSLog(@"Transaction changed %@ %@", not.userInfo, not.object);
+    // In here we simply reload all transactions.
+    // Real apps can do it in more inteligent fashion
+    _transactions = [[HIBitcoinManager defaultManager] allTransactions];
+    [_transactionList reloadData];
 }
+
+#pragma mark - TableView methods
+
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
+{
+    return _transactions.count;
+}
+
+- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
+{
+    NSDictionary *transaction = _transactions[rowIndex];
+    
+
+    if ([[aTableColumn identifier] compare:@"category"] == NSOrderedSame)
+        return transaction[@"details"][0][@"category"];
+    else if ([[aTableColumn identifier] compare:@"amount"] == NSOrderedSame)
+        return [NSString stringWithFormat:@"%.4f ฿", [((NSNumber *)transaction[@"amount"]) longLongValue] / 10000000.0];
+    else if ([[aTableColumn identifier] compare:@"address"] == NSOrderedSame)
+        return transaction[@"details"][0][@"address"];
+    else if ([[aTableColumn identifier] compare:@"time"] == NSOrderedSame)
+    {
+        NSLog(@"Trans is %@", transaction);
+        return [_dF stringFromDate:transaction[@"time"]];
+    }
+    return nil;
+}
+
 
 @end
