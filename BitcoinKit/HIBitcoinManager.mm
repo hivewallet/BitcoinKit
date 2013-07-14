@@ -222,12 +222,51 @@ static void NotifyTransactionChanged(HIBitcoinManager *manager, CWallet *wallet,
     
     BOOST_FOREACH(const PAIRTYPE(string,string)& item, wtx.mapValue)
     [transaction setObject:[NSString stringWithUTF8String:item.second.c_str()] forKey:[NSString stringWithUTF8String:item.first.c_str()]];
+
+    int64 nFee2;
+    string strSentAccount;
+    list<pair<CTxDestination, int64> > listReceived;
+    list<pair<CTxDestination, int64> > listSent;
     
+    wtx.GetAmounts(listReceived, listSent, nFee2, strSentAccount);
     
-    //    Array details;
-    //    ListTransactions(wtx, "*", 0, false, details);
-    //    entry.push_back(Pair("details", details));
-    return transaction;    
+    NSMutableArray *details = [NSMutableArray array];
+    // Sent
+    if ((!listSent.empty() || nFee2 != 0))
+    {
+        
+        BOOST_FOREACH(const PAIRTYPE(CTxDestination, int64)& s, listSent)
+        {
+            [details addObject:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithUTF8String:CBitcoinAddress(s.first).ToString().c_str()],
+                                @"address", @"send", @"category", nil]];
+        }
+    }
+    
+    // Received
+    if (listReceived.size() > 0)
+    {
+        BOOST_FOREACH(const PAIRTYPE(CTxDestination, int64)& r, listReceived)
+        {
+            NSString *category = nil;
+            if (wtx.IsCoinBase())
+            {
+                if (wtx.GetDepthInMainChain() < 1)
+                    category = @"orphan";
+                else if (wtx.GetBlocksToMaturity() > 0)
+                    category = @"immature";
+                else
+                    category = @"generate";
+            }
+            else
+                category = @"receive";
+            
+            [details addObject:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithUTF8String:CBitcoinAddress(r.first).ToString().c_str()],
+                                @"address", category, @"category", nil]];
+        }
+    }
+
+    [transaction setObject:details forKey:@"details"];
+    return transaction;
 }
 
 - (NSDictionary *)transactionForHash:(NSString *)hash
@@ -290,7 +329,9 @@ static void NotifyTransactionChanged(HIBitcoinManager *manager, CWallet *wallet,
 
 - (void)wallet:(CWallet *)wallet changedTransaction:(uint256)hash change:(ChangeType)status
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName:kHIBitcoinManagerTransactionChanged object:[NSString stringWithUTF8String:hash.GetHex().c_str()]];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:kHIBitcoinManagerTransactionChanged object:[NSString stringWithUTF8String:hash.GetHex().c_str()]];
+    });
 }
 
 - (void)checkTick:(NSTimer *)timer
