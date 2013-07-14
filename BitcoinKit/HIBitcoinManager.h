@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+NSString * const kHIBitcoinManagerTransactionChanged = @"kHIBitcoinManagerTransactionChanged";
+
 /** HIBitcoinManager is a class responsible for managing all Bitcoin actions app should do 
  *
  *  Word of warning. One should not create this object. All access should be done
@@ -51,5 +53,6 @@
  * This is due to bitcoind implementation that uses too many globals.
  */
 - (void)stop;
+
 
 @end

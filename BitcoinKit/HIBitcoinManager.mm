@@ -15,6 +15,7 @@
 
 static boost::thread_group _threadGroup;
 
+
 @interface HIBitcoinManager ()
 
 
@@ -22,7 +23,15 @@ static boost::thread_group _threadGroup;
 @property (nonatomic, readonly) BOOL    isStarting;
 
 - (void)checkTick:(NSTimer *)timer;
+- (void)wallet:(CWallet *)wallet changedTransaction:(uint256)hash change:(ChangeType)status;
+
 @end
+
+static void NotifyTransactionChanged(HIBitcoinManager *manager, CWallet *wallet, const uint256 &hash, ChangeType status)
+{
+    [manager wallet:wallet changedTransaction:hash change:status];
+}
+
 
 @implementation HIBitcoinManager
 
@@ -98,6 +107,7 @@ static boost::thread_group _threadGroup;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
         if(AppInit2(_threadGroup))
         {
+            pwalletMain->NotifyTransactionChanged.connect(boost::bind(NotifyTransactionChanged, self, _1, _2, _3));
             dispatch_async(dispatch_get_main_queue(), ^{
                 _isStarting = NO;
                 [self willChangeValueForKey:@"isRunning"];
@@ -114,6 +124,7 @@ static boost::thread_group _threadGroup;
     if (!_isRunning)
         return;
     
+    pwalletMain->NotifyTransactionChanged.disconnect(boost::bind(NotifyTransactionChanged, self, _1, _2, _3));
     [_checkTimer invalidate];
     _threadGroup.interrupt_all();
     _threadGroup.join_all();
@@ -180,7 +191,32 @@ static boost::thread_group _threadGroup;
     return [NSString stringWithUTF8String:CBitcoinAddress(account.vchPubKey.GetID()).ToString().c_str()];
 }
 
+- (id)transactionAtIndex:(NSUInteger)index
+{
+    std::list<CAccountingEntry> acentries;
+    CWallet::TxItems txOrdered = pwalletMain->OrderedTxItems(acentries, strAccount);
+    
+    // iterate backwards until we have nCount items to return:
+//    for (CWallet::TxItems::reverse_iterator it = txOrdered.rbegin(); it != txOrdered.rend(); ++it)
+//    {
+//        CWalletTx *const pwtx = (*it).second.first;
+//        if (pwtx != 0)
+//            ListTransactions(*pwtx, strAccount, 0, true, ret);
+//        CAccountingEntry *const pacentry = (*it).second.second;
+//        if (pacentry != 0)
+//            AcentryToJSON(*pacentry, strAccount, ret);
+//        
+//        if ((int)ret.size() >= (nCount+nFrom)) break;
+//    }
+}
+
+
 #pragma mark - Private methods
+
+- (void)wallet:(CWallet *)wallet changedTransaction:(uint256)hash change:(ChangeType)status
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName:kHIBitcoinManagerTransactionChanged object:[NSString stringWithUTF8String:hash.GetHex().c_str()]];
+}
 
 - (void)checkTick:(NSTimer *)timer
 {

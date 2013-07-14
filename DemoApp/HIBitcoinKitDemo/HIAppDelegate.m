@@ -9,19 +9,26 @@
 #import <BitcoinKit/BitcoinKit.h>
 #import "HIAppDelegate.h"
 
+@interface HIAppDelegate ()
+
+- (void)transactionUpdated:(NSNotification *)not;
+
+@end
+
 @implementation HIAppDelegate
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+    
     [[HIBitcoinManager defaultManager] addObserver:self forKeyPath:@"connections" options:NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew context:NULL];
     [[HIBitcoinManager defaultManager] addObserver:self forKeyPath:@"balance" options:NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew context:NULL];
     [[HIBitcoinManager defaultManager] addObserver:self forKeyPath:@"syncProgress" options:NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew context:NULL];
     [[HIBitcoinManager defaultManager] addObserver:self forKeyPath:@"isRunning" options:NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew context:NULL];
     [_progressIndicator startAnimation:self];
     [HIBitcoinManager defaultManager].testingNetwork = YES;
-    [HIBitcoinManager defaultManager].enableMining = YES;
+//    [HIBitcoinManager defaultManager].enableMining = YES;
     [[HIBitcoinManager defaultManager] start];
-
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(transactionUpdated:) name:kHIBitcoinManagerTransactionChanged object:nil];
 }
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
@@ -34,6 +41,7 @@
 
 - (void)applicationWillTerminate:(NSNotification *)notification
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [_progressIndicator stopAnimation:self];
     [[HIBitcoinManager defaultManager] stop];
     [[HIBitcoinManager defaultManager] removeObserver:self forKeyPath:@"connections"];
@@ -90,5 +98,9 @@
     }
 }
 
+- (void)transactionChanged:(NSNotification *)not
+{
+    NSLog(@"Transaction changed %@", not.object);
+}
 
 @end
