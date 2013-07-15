@@ -6,7 +6,7 @@ BitcoinKit.framework allows you to access and use bitcoin wallets in your applic
 About BitcoinKit.framework
 --------------------------
 
-The BitcoinKit.framework uses originam bitcoind sources to deliver functionality needed for managing bitcoin wallets. If your Mac application need the access to bitcoin network, this is what you need.
+The BitcoinKit.framework uses original bitcoind sources to deliver functionality needed for managing bitcoin wallets. If your Mac application need the access to bitcoin network, this is what you need.
 
 Build Instructions
 ------------------
