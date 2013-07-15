@@ -16,6 +16,8 @@
 static boost::thread_group _threadGroup;
 
 NSString * const kHIBitcoinManagerTransactionChangedNotification = @"kHIBitcoinManagerTransactionChangedNotification";
+NSString * const kHIBitcoinManagerStartedNotification = @"kHIBitcoinManagerStartedNotification";
+NSString * const kHIBitcoinManagerStoppedNotification = @"kHIBitcoinManagerStoppedNotification";
 
 @interface HIBitcoinManager ()
 
@@ -116,6 +118,7 @@ static void NotifyTransactionChanged(HIBitcoinManager *manager, CWallet *wallet,
                 _checkTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(checkTick:) userInfo:nil repeats:YES];
                 _isRunning = YES;
                 [self didChangeValueForKey:@"isRunning"];
+                [[NSNotificationCenter defaultCenter] postNotificationName:kHIBitcoinManagerStartedNotification object:self];                
             });
         }
     });
@@ -152,7 +155,7 @@ static void NotifyTransactionChanged(HIBitcoinManager *manager, CWallet *wallet,
         _syncProgress = 0;
         [self didChangeValueForKey:@"syncProgress"];
     }
-    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kHIBitcoinManagerStoppedNotification object:self];
 }
 
 - (NSString *)walletAddress

@@ -8,9 +8,9 @@
 
 #import <Foundation/Foundation.h>
 
-extern NSString * const kHIBitcoinManagerTransactionChangedNotification; //<<< Transaction list update notification. Sent object is a NSString representation of the updated hash
-
-
+extern NSString * const kHIBitcoinManagerTransactionChangedNotification;            //<<< Transaction list update notification. Sent object is a NSString representation of the updated hash
+extern NSString * const kHIBitcoinManagerStartedNotification;                       //<<< Manager start notification. Informs that manager is now ready to use
+extern NSString * const kHIBitcoinManagerStoppedNotification;                       //<<< Manager stop notification. Informs that manager is now stopped and can't be used anymore
 
 /** HIBitcoinManager is a class responsible for managing all Bitcoin actions app should do 
  *
@@ -30,6 +30,7 @@ extern NSString * const kHIBitcoinManagerTransactionChangedNotification; //<<< T
 @property (nonatomic, readonly) NSUInteger syncProgress;                            //<<< Integer value indicating the progress of network sync. Values are from 0 to 10000.
 @property (nonatomic, readonly, getter = walletAddress) NSString *walletAddress;    //<<< Returns wallets main address. Creates one if none exists yet
 @property (nonatomic, readonly, getter = transactionCount) NSUInteger transactionCount;
+
 /** Class method returning application singleton to the manager.
  *
  * Please note not to create HIBitcoinManager objects in any other way.
