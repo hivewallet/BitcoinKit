@@ -69,3 +69,8 @@ Demo App
 --------
 
 There's a demo application included with the sources. Start it up and check out how to use BitcoinKit.framework!
+
+License
+-------
+
+BitcoinKit.framework is available under the MIT license.
