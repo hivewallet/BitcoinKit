@@ -62,7 +62,7 @@
     }
     else
     {
-        if ([[HIBitcoinManager defaultManager] sendCoins:(amount * 10000000) toReceipent:address comment:nil])
+        if ([[HIBitcoinManager defaultManager] sendCoins:(amount * 10000000) toReceipent:address comment:nil] != nil)
         {
             [self cancelClicked:sender];
         }
