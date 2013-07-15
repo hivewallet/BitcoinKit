@@ -105,8 +105,8 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;                   
  * @param receipent Receipent address hash
  * @param comment optional comment string that will be bound to the transaction
  *
- * @returns YES if send was successful, NO - otherwise
+ * @returns Hash value of sending transaction. nil if sending failed
  */
-- (BOOL)sendCoins:(uint64_t)coins toReceipent:(NSString *)receipent comment:(NSString *)comment;
+- (NSString *)sendCoins:(uint64_t)coins toReceipent:(NSString *)receipent comment:(NSString *)comment;
 
 @end

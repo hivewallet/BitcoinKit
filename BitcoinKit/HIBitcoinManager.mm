@@ -335,31 +335,32 @@ static void NotifyTransactionChanged(HIBitcoinManager *manager, CWallet *wallet,
     return addr.IsValid();
 }
 
-- (BOOL)sendCoins:(uint64_t)coins toReceipent:(NSString *)receipent comment:(NSString *)comment
+- (NSString *)sendCoins:(uint64_t)coins toReceipent:(NSString *)receipent comment:(NSString *)comment
 {
     if (coins == 0 || coins > self.balance)
-        return NO;
+        return nil;
     
     CBitcoinAddress address(receipent.UTF8String);
   
     if (!address.IsValid())
-        return NO;
+        return nil;
         
     CWalletTx wtx;
     if (comment.length > 0)
         wtx.mapValue["comment"] = string(comment.UTF8String);
     
     if (pwalletMain->IsLocked())
-        return NO;
+        return nil;
     
     string strError = pwalletMain->SendMoneyToDestination(address.Get(), coins, wtx);
 
     if (strError != "")
-        return NO;
+        return nil;
   
-    [[NSNotificationCenter defaultCenter] postNotificationName:kHIBitcoinManagerTransactionChangedNotification object:[NSString stringWithUTF8String:wtx.GetHash().GetHex().c_str()]];
+    NSString *retHash = [NSString stringWithUTF8String:wtx.GetHash().GetHex().c_str()];
+    [[NSNotificationCenter defaultCenter] postNotificationName:kHIBitcoinManagerTransactionChangedNotification object:retHash];
 
-    return YES;
+    return retHash;
 }
 
 #pragma mark - Private methods
