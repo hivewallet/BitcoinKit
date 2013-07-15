@@ -19,6 +19,12 @@ In order to be able to compile this stuff you need to use homebrew and do the fo
 
 	brew link openssl --force
 
+And remember to fetch bitcoind sources!
+
+	git submodule update --init
+
+Now you're ready to go!
+
 How to use
 ----------
 
