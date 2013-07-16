@@ -196,6 +196,78 @@ static void NotifyTransactionChanged(HIBitcoinManager *manager, CWallet *wallet,
     return [NSString stringWithUTF8String:CBitcoinAddress(account.vchPubKey.GetID()).ToString().c_str()];
 }
 
+- (BOOL)isWalletEncrypted
+{
+    return pwalletMain->IsCrypted();
+}
+
+- (BOOL)isWalletLocked
+{
+    return pwalletMain->IsLocked();
+}
+
+- (BOOL)encryptWalletWith:(NSString *)passwd
+{
+    if (self.isWalletEncrypted)
+        return NO;
+
+    SecureString strWalletPass;
+    strWalletPass.reserve(100);
+    strWalletPass = passwd.UTF8String;
+    
+    if (strWalletPass.length() < 1)
+        return NO;
+    
+    if (!pwalletMain->EncryptWallet(strWalletPass))
+        return NO;
+    
+    return YES;
+}
+
+- (BOOL)changeWalletEncryptionKeyFrom:(NSString *)oldpasswd to:(NSString *)newpasswd
+{
+    if (!self.isWalletEncrypted)
+        return NO;
+    
+    // TODO: get rid of these .c_str() calls by implementing SecureString::operator=(std::string)
+    // Alternately, find a way to make params[0] mlock()'d to begin with.
+    SecureString strOldWalletPass;
+    strOldWalletPass.reserve(100);
+    strOldWalletPass = oldpasswd.UTF8String;
+    
+    SecureString strNewWalletPass;
+    strNewWalletPass.reserve(100);
+    strNewWalletPass = newpasswd.UTF8String;
+    
+    if (strOldWalletPass.length() < 1 || strNewWalletPass.length() < 1)
+        return NO;
+    
+    return pwalletMain->ChangeWalletPassphrase(strOldWalletPass, strNewWalletPass);
+}
+
+- (BOOL)unlockWalletWith:(NSString *)passwd
+{
+    if (!self.isWalletEncrypted)
+        return YES;
+    
+    SecureString strWalletPass;
+    strWalletPass.reserve(100);
+    strWalletPass = passwd.UTF8String;
+
+    if (strWalletPass.length() < 1 || !pwalletMain->Unlock(strWalletPass))
+        return NO;
+    
+    return YES;
+}
+
+- (void)lockWallet
+{
+    if (!self.isWalletEncrypted)
+        return;
+    
+    pwalletMain->Lock();
+}
+
 - (NSDictionary *)transactionFromWalletTx:(const CWalletTx)wtx
 {
     int64 nCredit = wtx.GetCredit();

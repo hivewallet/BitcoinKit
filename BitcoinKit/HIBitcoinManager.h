@@ -29,7 +29,9 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;                   
 @property (nonatomic, readonly) uint64_t balance;                                   //<<< Actual balance of the wallet
 @property (nonatomic, readonly) NSUInteger syncProgress;                            //<<< Integer value indicating the progress of network sync. Values are from 0 to 10000.
 @property (nonatomic, readonly, getter = walletAddress) NSString *walletAddress;    //<<< Returns wallets main address. Creates one if none exists yet
-@property (nonatomic, readonly, getter = transactionCount) NSUInteger transactionCount;
+@property (nonatomic, readonly, getter = isWalletEncrypted) BOOL isWalletEncrypted; //<<< Returns YES if wallet is encrypted. NO - otherwise
+@property (nonatomic, readonly, getter = isWalletLocked) BOOL isWalletLocked;       //<<< Returns YES if wallet is currently locked. NO - otherwise
+@property (nonatomic, readonly, getter = transactionCount) NSUInteger transactionCount; //<<< Returns global transaction cound for current wallet
 
 /** Class method returning application singleton to the manager.
  *
@@ -109,4 +111,32 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;                   
  */
 - (NSString *)sendCoins:(uint64_t)coins toReceipent:(NSString *)receipent comment:(NSString *)comment;
 
+/** Encrypts wallet with given passphrase
+ *
+ * @param passwd NSString value of the passphrase to encrypt wallet with
+ *
+ * @returns YES if encryption was successful, NO - otherwise
+ */
+- (BOOL)encryptWalletWith:(NSString *)passwd;
+
+/** Changes the encryption passphrase for the wallet
+ *
+ * @param oldpasswd Old passphrase that wallet is currently encrypted with
+ * @param newpasswd New passphrase that wallet should be encrypted with
+ *
+ * @returns YES if recryption was successful, NO - otherwise
+ */
+- (BOOL)changeWalletEncryptionKeyFrom:(NSString *)oldpasswd to:(NSString *)newpasswd;
+
+/** Unlocks wallet
+ *
+ * @param passwd Passphrase that wallet is locked with
+ *
+ * @returns YES if unlock was successful, NO - otherwise
+ */
+- (BOOL)unlockWalletWith:(NSString *)passwd;
+
+/** Locks wallet */
+- (void)lockWallet;
 @end
+ 
