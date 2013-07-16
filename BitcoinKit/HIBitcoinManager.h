@@ -146,5 +146,13 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;                   
  * @returns YES if dump was successful. NO - otherwise
  */
 - (BOOL)exportWalletTo:(NSURL *)exportURL;
+
+/** Import wallet from given file URL
+ *
+ * @param importURL NSURL to local file from which to import wallet data
+ *
+ * @returns YES if import was successful. NO - otherwise
+ */
+- (BOOL)importWalletFrom:(NSURL *)importURL;
 @end
  

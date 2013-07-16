@@ -14,7 +14,8 @@
 #include "checkpoints.h"
 
 static boost::thread_group _threadGroup;
-std::string static EncodeDumpString(const std::string &str) {
+
+static std::string HIEncodeDumpString(const std::string &str) {
     std::stringstream ret;
     BOOST_FOREACH(unsigned char c, str) {
         if (c <= 32 || c >= 128 || c == '%') {
@@ -22,6 +23,20 @@ std::string static EncodeDumpString(const std::string &str) {
         } else {
             ret << c;
         }
+    }
+    return ret.str();
+}
+
+static std::string HIDecodeDumpString(const std::string &str) {
+    std::stringstream ret;
+    for (unsigned int pos = 0; pos < str.length(); pos++) {
+        unsigned char c = str[pos];
+        if (c == '%' && pos+2 < str.length()) {
+            c = (((str[pos+1]>>6)*9+((str[pos+1]-'0')&15)) << 4) |
+            ((str[pos+2]>>6)*9+((str[pos+2]-'0')&15));
+            pos += 2;
+        }
+        ret << c;
     }
     return ret.str();
 }
@@ -316,7 +331,7 @@ static void NotifyTransactionChanged(HIBitcoinManager *manager, CWallet *wallet,
         CKey key;
         if (pwalletMain->GetKey(keyid, key)) {
             if (pwalletMain->mapAddressBook.count(keyid)) {
-                [dumpData appendData:[[NSString stringWithFormat:@"%s %@ label=%s # addr=%s\n", CBitcoinSecret(key).ToString().c_str(), dateString, EncodeDumpString(pwalletMain->mapAddressBook[keyid]).c_str(), strAddr.c_str()] dataUsingEncoding:NSUTF8StringEncoding]];
+                [dumpData appendData:[[NSString stringWithFormat:@"%s %@ label=%s # addr=%s\n", CBitcoinSecret(key).ToString().c_str(), dateString, HIEncodeDumpString(pwalletMain->mapAddressBook[keyid]).c_str(), strAddr.c_str()] dataUsingEncoding:NSUTF8StringEncoding]];
             } else if (setKeyPool.count(keyid)) {
                 [dumpData appendData:[[NSString stringWithFormat:@"%s %@ reserve=1 # addr=%s\n", CBitcoinSecret(key).ToString().c_str(), dateString, strAddr.c_str()] dataUsingEncoding:NSUTF8StringEncoding]];
             } else {
@@ -326,8 +341,89 @@ static void NotifyTransactionChanged(HIBitcoinManager *manager, CWallet *wallet,
     }
     [dumpData appendData:[@"\n# End of dump\n" dataUsingEncoding:NSUTF8StringEncoding]];
     BOOL writeStatus = [dumpData writeToURL:exportURL atomically:NO];
+    [dumpData release];
     [dF release];
     return writeStatus;
+}
+
+- (BOOL)importWalletFrom:(NSURL *)importURL
+{
+    if (self.isWalletLocked || ![importURL isFileURL])
+        return NO;
+    
+    NSData *walletData = [[NSData alloc] initWithContentsOfURL:importURL];
+    if (!walletData || walletData.length < 20)
+        return NO;
+    
+    int64 nTimeBegin = pindexBest->nTime;
+    
+    BOOL fGood = YES;
+    NSString *walletString = [[NSString alloc] initWithData:walletData encoding:NSUTF8StringEncoding];
+    NSArray *lines = [walletString componentsSeparatedByString:@"\n"];
+    [walletString release];
+    NSDateFormatter *dF = [[NSDateFormatter alloc] init];
+    dF.dateFormat = @"YYYY'-'mm'-'dd'T'HH':'MM':'SSZ";
+    
+    int curLine = 0;
+    while (curLine < lines.count)
+    {
+        NSString *line = [lines objectAtIndex:curLine++];
+        
+        if (line.length == 0 || [line characterAtIndex:0] == L'#')
+            continue;
+        
+        NSArray *vstr = [line componentsSeparatedByString:@" "];
+        if ([vstr count] < 2)
+            continue;
+        
+        CBitcoinSecret vchSecret;
+        if (!vchSecret.SetString(string([[vstr objectAtIndex:0] UTF8String])))
+            continue;
+        CKey key = vchSecret.GetKey();
+        CPubKey pubkey = key.GetPubKey();
+        CKeyID keyid = pubkey.GetID();
+        if (pwalletMain->HaveKey(keyid)) {
+//            printf("Skipping import of %s (key already present)\n", CBitcoinAddress(keyid).ToString().c_str());
+            continue;
+        }
+        int64 nTime = [[dF dateFromString:[vstr objectAtIndex:1]] timeIntervalSince1970];
+        std::string strLabel;
+        bool fLabel = true;
+        for (unsigned int nStr = 2; nStr < vstr.count; nStr++) {
+            if ([[vstr objectAtIndex:nStr] characterAtIndex:0] == L'#')
+                break;
+            if ([(NSString *)[vstr objectAtIndex:nStr] compare:@"change=1"] == NSOrderedSame)
+                fLabel = false;
+            if ([(NSString *)[vstr objectAtIndex:nStr] compare:@"reserve=1"] == NSOrderedSame)
+                fLabel = false;
+            if ([[vstr objectAtIndex:nStr] hasPrefix:@"label="]) {
+                strLabel = HIDecodeDumpString(string([[[vstr objectAtIndex:nStr] substringFromIndex:6] UTF8String]));
+                fLabel = true;
+            }
+        }
+//        NSLog(@"Importing %s...\n", CBitcoinAddress(keyid).ToString().c_str());
+        if (!pwalletMain->AddKeyPubKey(key, pubkey)) {
+            fGood = NO;
+            continue;
+        }
+        pwalletMain->mapKeyMetadata[keyid].nCreateTime = nTime;
+        if (fLabel)
+            pwalletMain->SetAddressBookName(keyid,strLabel);
+        nTimeBegin = std::min(nTimeBegin, nTime);
+    }
+    
+    CBlockIndex *pindex = pindexBest;
+    while (pindex && pindex->pprev && pindex->nTime > nTimeBegin - 7200)
+        pindex = pindex->pprev;
+    
+//    NSLog(@"Rescanning last %i blocks\n", pindexBest->nHeight - pindex->nHeight + 1);
+    pwalletMain->ScanForWalletTransactions(pindex);
+    pwalletMain->ReacceptWalletTransactions();
+    pwalletMain->MarkDirty();
+    
+    [dF release];
+    
+    return fGood;
 }
 
 #pragma mark - Transaction methods

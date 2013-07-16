@@ -1410,7 +1410,7 @@
 											<string key="NSFrame">{{77, 52}, {352, 17}}</string>
 											<reference key="NSSuperview" ref="76030978"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="610690351"/>
+											<reference key="NSNextKeyView" ref="874447988"/>
 											<string key="NSReuseIdentifierKey">_NS:1535</string>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="563199363">
@@ -1450,22 +1450,47 @@
 											</object>
 											<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 										</object>
-										<object class="NSButton" id="610690351">
+										<object class="NSButton" id="874447988">
 											<reference key="NSNextResponder" ref="76030978"/>
 											<int key="NSvFlags">268</int>
 											<string key="NSFrame">{{12, 7}, {82, 32}}</string>
 											<reference key="NSSuperview" ref="76030978"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="46636267"/>
+											<reference key="NSNextKeyView" ref="528027662"/>
 											<string key="NSReuseIdentifierKey">_NS:9</string>
 											<bool key="NSEnabled">YES</bool>
-											<object class="NSButtonCell" key="NSCell" id="107904521">
-												<int key="NSCellFlags">67108864</int>
+											<object class="NSButtonCell" key="NSCell" id="256210150">
+												<int key="NSCellFlags">603979776</int>
 												<int key="NSCellFlags2">134217728</int>
 												<string key="NSContents">Export</string>
 												<reference key="NSSupport" ref="1046638188"/>
 												<string key="NSCellIdentifier">_NS:9</string>
-												<reference key="NSControlView" ref="610690351"/>
+												<reference key="NSControlView" ref="874447988"/>
+												<int key="NSButtonFlags">-2038284288</int>
+												<int key="NSButtonFlags2">129</int>
+												<string key="NSAlternateContents"/>
+												<string key="NSKeyEquivalent"/>
+												<int key="NSPeriodicDelay">200</int>
+												<int key="NSPeriodicInterval">25</int>
+											</object>
+											<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+										</object>
+										<object class="NSButton" id="528027662">
+											<reference key="NSNextResponder" ref="76030978"/>
+											<int key="NSvFlags">268</int>
+											<string key="NSFrame">{{86, 7}, {83, 32}}</string>
+											<reference key="NSSuperview" ref="76030978"/>
+											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView" ref="46636267"/>
+											<string key="NSReuseIdentifierKey">_NS:9</string>
+											<bool key="NSEnabled">YES</bool>
+											<object class="NSButtonCell" key="NSCell" id="463714272">
+												<int key="NSCellFlags">603979776</int>
+												<int key="NSCellFlags2">134217728</int>
+												<string key="NSContents">Import</string>
+												<reference key="NSSupport" ref="1046638188"/>
+												<string key="NSCellIdentifier">_NS:9</string>
+												<reference key="NSControlView" ref="528027662"/>
 												<int key="NSButtonFlags">-2038284288</int>
 												<int key="NSButtonFlags2">129</int>
 												<string key="NSAlternateContents"/>
@@ -1929,7 +1954,7 @@
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="432366787"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1680, 1028}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1920, 1058}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
 			</object>
@@ -2690,9 +2715,33 @@
 					<object class="IBActionConnection" key="connection">
 						<string key="label">exportWalletClicked:</string>
 						<reference key="source" ref="976324537"/>
-						<reference key="destination" ref="610690351"/>
+						<reference key="destination" ref="874447988"/>
 					</object>
 					<int key="connectionID">589</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">importWalletClicked:</string>
+						<reference key="source" ref="976324537"/>
+						<reference key="destination" ref="528027662"/>
+					</object>
+					<int key="connectionID">592</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">importBtn</string>
+						<reference key="source" ref="976324537"/>
+						<reference key="destination" ref="528027662"/>
+					</object>
+					<int key="connectionID">593</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">exportBtn</string>
+						<reference key="source" ref="976324537"/>
+						<reference key="destination" ref="874447988"/>
+					</object>
+					<int key="connectionID">594</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -3715,7 +3764,8 @@
 							<reference ref="342869199"/>
 							<reference ref="340310018"/>
 							<reference ref="46636267"/>
-							<reference ref="610690351"/>
+							<reference ref="874447988"/>
+							<reference ref="528027662"/>
 						</array>
 						<reference key="parent" ref="439893737"/>
 					</object>
@@ -3938,16 +3988,29 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">587</int>
-						<reference key="object" ref="610690351"/>
+						<reference key="object" ref="874447988"/>
 						<array class="NSMutableArray" key="children">
-							<reference ref="107904521"/>
+							<reference ref="256210150"/>
 						</array>
 						<reference key="parent" ref="432366787"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">588</int>
-						<reference key="object" ref="107904521"/>
-						<reference key="parent" ref="610690351"/>
+						<reference key="object" ref="256210150"/>
+						<reference key="parent" ref="874447988"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">590</int>
+						<reference key="object" ref="528027662"/>
+						<array class="NSMutableArray" key="children">
+							<reference ref="463714272"/>
+						</array>
+						<reference key="parent" ref="432366787"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">591</int>
+						<reference key="object" ref="463714272"/>
+						<reference key="parent" ref="528027662"/>
 					</object>
 				</array>
 			</object>
@@ -4130,6 +4193,8 @@
 				<string key="584.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="587.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="588.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="590.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="591.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="72.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="73.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="74.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -4146,7 +4211,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">589</int>
+			<int key="maxID">594</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -4155,11 +4220,16 @@
 					<string key="superclassName">NSObject</string>
 					<dictionary class="NSMutableDictionary" key="actions">
 						<string key="exportWalletClicked:">NSButton</string>
+						<string key="importWalletClicked:">NSButton</string>
 						<string key="sendMoneyClicked:">NSButton</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="actionInfosByName">
 						<object class="IBActionInfo" key="exportWalletClicked:">
 							<string key="name">exportWalletClicked:</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBActionInfo" key="importWalletClicked:">
+							<string key="name">importWalletClicked:</string>
 							<string key="candidateClassName">NSButton</string>
 						</object>
 						<object class="IBActionInfo" key="sendMoneyClicked:">
@@ -4171,6 +4241,8 @@
 						<string key="addressLabel">NSTextField</string>
 						<string key="balanceLabel">NSTextField</string>
 						<string key="connectionsLabel">NSTextField</string>
+						<string key="exportBtn">NSButton</string>
+						<string key="importBtn">NSButton</string>
 						<string key="progressIndicator">NSProgressIndicator</string>
 						<string key="sendMoneyBtn">NSButton</string>
 						<string key="stateLabel">NSTextField</string>
@@ -4189,6 +4261,14 @@
 						<object class="IBToOneOutletInfo" key="connectionsLabel">
 							<string key="name">connectionsLabel</string>
 							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="exportBtn">
+							<string key="name">exportBtn</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="importBtn">
+							<string key="name">importBtn</string>
+							<string key="candidateClassName">NSButton</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="progressIndicator">
 							<string key="name">progressIndicator</string>

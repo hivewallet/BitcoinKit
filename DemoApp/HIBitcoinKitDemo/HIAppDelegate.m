@@ -82,6 +82,9 @@
                 _stateLabel.stringValue = @"Synchronizing...";
                 _addressLabel.stringValue = [HIBitcoinManager defaultManager].walletAddress;
                 [_sendMoneyBtn setEnabled:YES];
+                [_importBtn setEnabled:YES];
+                [_exportBtn setEnabled:YES];
+                
                 // We have to refresh transaction list here
                 _transactions = [[HIBitcoinManager defaultManager] allTransactions];
                 [_transactionList reloadData];
@@ -172,6 +175,30 @@
             [alert setInformativeText:@"Export has failed"];                        
         }
         [alert addButtonWithTitle:@"Ok"];        
+        [alert runModal];
+    }
+
+}
+
+- (IBAction)importWalletClicked:(NSButton *)sender
+{
+    NSOpenPanel *op = [NSOpenPanel openPanel];
+    op.title = @"Select dump file to import";
+    op.prompt = @"Import";
+    op.allowedFileTypes = @[@"dat"];
+    if (NSFileHandlingPanelOKButton == [op runModal])
+    {
+        NSAlert *alert = [[NSAlert alloc] init];
+        [alert setMessageText:@"Wallet import"];
+        if ([[HIBitcoinManager defaultManager] importWalletFrom:op.URL])
+        {
+            [alert setInformativeText:@"Import has been successful"];
+        }
+        else
+        {
+            [alert setInformativeText:@"Import has failed"];
+        }
+        [alert addButtonWithTitle:@"Ok"];
         [alert runModal];
     }
 }
