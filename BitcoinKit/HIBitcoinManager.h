@@ -138,5 +138,13 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;                   
 
 /** Locks wallet */
 - (void)lockWallet;
+
+/** Exports wallet to given file URL
+ *
+ * @param exportURL NSURL to local file where wallet should be dumped to
+ *
+ * @returns YES if dump was successful. NO - otherwise
+ */
+- (BOOL)exportWalletTo:(NSURL *)exportURL;
 @end
  

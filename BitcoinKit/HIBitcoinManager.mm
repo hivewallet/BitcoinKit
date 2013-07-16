@@ -14,7 +14,17 @@
 #include "checkpoints.h"
 
 static boost::thread_group _threadGroup;
-
+std::string static EncodeDumpString(const std::string &str) {
+    std::stringstream ret;
+    BOOST_FOREACH(unsigned char c, str) {
+        if (c <= 32 || c >= 128 || c == '%') {
+            ret << '%' << HexStr(&c, &c + 1);
+        } else {
+            ret << c;
+        }
+    }
+    return ret.str();
+}
 NSString * const kHIBitcoinManagerTransactionChangedNotification = @"kHIBitcoinManagerTransactionChangedNotification";
 NSString * const kHIBitcoinManagerStartedNotification = @"kHIBitcoinManagerStartedNotification";
 NSString * const kHIBitcoinManagerStoppedNotification = @"kHIBitcoinManagerStoppedNotification";
@@ -196,6 +206,8 @@ static void NotifyTransactionChanged(HIBitcoinManager *manager, CWallet *wallet,
     return [NSString stringWithUTF8String:CBitcoinAddress(account.vchPubKey.GetID()).ToString().c_str()];
 }
 
+#pragma mark - Wallet methods
+
 - (BOOL)isWalletEncrypted
 {
     return pwalletMain->IsCrypted();
@@ -267,6 +279,58 @@ static void NotifyTransactionChanged(HIBitcoinManager *manager, CWallet *wallet,
     
     pwalletMain->Lock();
 }
+
+- (BOOL)exportWalletTo:(NSURL *)exportURL
+{
+    if (self.isWalletLocked || ![exportURL isFileURL])
+        return NO;
+    
+
+    NSMutableData *dumpData = [[NSMutableData alloc] init];
+    NSDateFormatter *dF = [[NSDateFormatter alloc] init];
+    dF.dateFormat = @"YYYY'-'mm'-'dd'T'HH':'MM':'SSZ";
+    
+    std::map<CKeyID, int64> mapKeyBirth;
+    std::set<CKeyID> setKeyPool;
+    pwalletMain->GetKeyBirthTimes(mapKeyBirth);
+    pwalletMain->GetAllReserveKeys(setKeyPool);
+    
+    // sort time/key pairs
+    std::vector<std::pair<int64, CKeyID> > vKeyBirth;
+    for (std::map<CKeyID, int64>::const_iterator it = mapKeyBirth.begin(); it != mapKeyBirth.end(); it++) {
+        vKeyBirth.push_back(std::make_pair(it->second, it->first));
+    }
+    mapKeyBirth.clear();
+    std::sort(vKeyBirth.begin(), vKeyBirth.end());
+    
+    // produce output
+    [dumpData appendData:[[NSString stringWithFormat:@"# Wallet dump created by Bitcoin %s (%s)\n", CLIENT_BUILD.c_str(), CLIENT_DATE.c_str()] dataUsingEncoding:NSUTF8StringEncoding]];
+    [dumpData appendData:[[NSString stringWithFormat:@"# * Created on %@\n", [dF stringFromDate:[NSDate dateWithTimeIntervalSinceNow:0]]] dataUsingEncoding:NSUTF8StringEncoding]];
+    [dumpData appendData:[[NSString stringWithFormat:@"# * Best block at time of backup was %i (%s),\n", nBestHeight, hashBestChain.ToString().c_str()] dataUsingEncoding:NSUTF8StringEncoding]];
+    [dumpData appendData:[[NSString stringWithFormat:@"#   mined on %@\n\n", [dF stringFromDate:[NSDate dateWithTimeIntervalSince1970:pindexBest->nTime]]] dataUsingEncoding:NSUTF8StringEncoding]];
+
+    for (std::vector<std::pair<int64, CKeyID> >::const_iterator it = vKeyBirth.begin(); it != vKeyBirth.end(); it++) {
+        const CKeyID &keyid = it->second;
+        NSString *dateString = [dF stringFromDate:[NSDate dateWithTimeIntervalSince1970:it->first]];
+        std::string strAddr = CBitcoinAddress(keyid).ToString();
+        CKey key;
+        if (pwalletMain->GetKey(keyid, key)) {
+            if (pwalletMain->mapAddressBook.count(keyid)) {
+                [dumpData appendData:[[NSString stringWithFormat:@"%s %@ label=%s # addr=%s\n", CBitcoinSecret(key).ToString().c_str(), dateString, EncodeDumpString(pwalletMain->mapAddressBook[keyid]).c_str(), strAddr.c_str()] dataUsingEncoding:NSUTF8StringEncoding]];
+            } else if (setKeyPool.count(keyid)) {
+                [dumpData appendData:[[NSString stringWithFormat:@"%s %@ reserve=1 # addr=%s\n", CBitcoinSecret(key).ToString().c_str(), dateString, strAddr.c_str()] dataUsingEncoding:NSUTF8StringEncoding]];
+            } else {
+                [dumpData appendData:[[NSString stringWithFormat:@"%s %@ change=1 # addr=%s\n", CBitcoinSecret(key).ToString().c_str(), dateString, strAddr.c_str()] dataUsingEncoding:NSUTF8StringEncoding]];
+            }
+        }
+    }
+    [dumpData appendData:[@"\n# End of dump\n" dataUsingEncoding:NSUTF8StringEncoding]];
+    BOOL writeStatus = [dumpData writeToURL:exportURL atomically:NO];
+    [dF release];
+    return writeStatus;
+}
+
+#pragma mark - Transaction methods
 
 - (NSDictionary *)transactionFromWalletTx:(const CWalletTx)wtx
 {

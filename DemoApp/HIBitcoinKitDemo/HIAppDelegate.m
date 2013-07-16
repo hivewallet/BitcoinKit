@@ -153,6 +153,29 @@
     [NSApp beginSheet:_sendController.window modalForWindow:self.window modalDelegate:self didEndSelector:@selector(sendClosed:) contextInfo:NULL];
 }
 
+- (IBAction)exportWalletClicked:(NSButton *)sender
+{
+    NSSavePanel *sp = [NSSavePanel savePanel];
+    sp.title = @"Select where to save your wallet dump";
+    sp.prompt = @"Dump";
+    sp.allowedFileTypes = @[@"dat"];
+    if (NSFileHandlingPanelOKButton == [sp runModal])
+    {
+        NSAlert *alert = [[NSAlert alloc] init];
+        [alert setMessageText:@"Wallet export"];
+        if ([[HIBitcoinManager defaultManager] exportWalletTo:sp.URL])
+        {
+            [alert setInformativeText:@"Export has been successful"];
+        }
+        else
+        {
+            [alert setInformativeText:@"Export has failed"];                        
+        }
+        [alert addButtonWithTitle:@"Ok"];        
+        [alert runModal];
+    }
+}
+
 - (void)sendClosed:(id)sender
 {
     _sendController = nil;

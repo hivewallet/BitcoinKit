@@ -1410,7 +1410,7 @@
 											<string key="NSFrame">{{77, 52}, {352, 17}}</string>
 											<reference key="NSSuperview" ref="76030978"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="46636267"/>
+											<reference key="NSNextKeyView" ref="610690351"/>
 											<string key="NSReuseIdentifierKey">_NS:1535</string>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="563199363">
@@ -1441,6 +1441,31 @@
 												<reference key="NSSupport" ref="1046638188"/>
 												<string key="NSCellIdentifier">_NS:9</string>
 												<reference key="NSControlView" ref="46636267"/>
+												<int key="NSButtonFlags">-2038284288</int>
+												<int key="NSButtonFlags2">129</int>
+												<string key="NSAlternateContents"/>
+												<string key="NSKeyEquivalent"/>
+												<int key="NSPeriodicDelay">200</int>
+												<int key="NSPeriodicInterval">25</int>
+											</object>
+											<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+										</object>
+										<object class="NSButton" id="610690351">
+											<reference key="NSNextResponder" ref="76030978"/>
+											<int key="NSvFlags">268</int>
+											<string key="NSFrame">{{12, 7}, {82, 32}}</string>
+											<reference key="NSSuperview" ref="76030978"/>
+											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView" ref="46636267"/>
+											<string key="NSReuseIdentifierKey">_NS:9</string>
+											<bool key="NSEnabled">YES</bool>
+											<object class="NSButtonCell" key="NSCell" id="107904521">
+												<int key="NSCellFlags">67108864</int>
+												<int key="NSCellFlags2">134217728</int>
+												<string key="NSContents">Export</string>
+												<reference key="NSSupport" ref="1046638188"/>
+												<string key="NSCellIdentifier">_NS:9</string>
+												<reference key="NSControlView" ref="610690351"/>
 												<int key="NSButtonFlags">-2038284288</int>
 												<int key="NSButtonFlags2">129</int>
 												<string key="NSAlternateContents"/>
@@ -2662,6 +2687,14 @@
 					<int key="connectionID">586</int>
 				</object>
 				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">exportWalletClicked:</string>
+						<reference key="source" ref="976324537"/>
+						<reference key="destination" ref="610690351"/>
+					</object>
+					<int key="connectionID">589</int>
+				</object>
+				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">dataSource</string>
 						<reference key="source" ref="1042270395"/>
@@ -3682,6 +3715,7 @@
 							<reference ref="342869199"/>
 							<reference ref="340310018"/>
 							<reference ref="46636267"/>
+							<reference ref="610690351"/>
 						</array>
 						<reference key="parent" ref="439893737"/>
 					</object>
@@ -3902,6 +3936,19 @@
 						<reference key="object" ref="246984876"/>
 						<reference key="parent" ref="46636267"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">587</int>
+						<reference key="object" ref="610690351"/>
+						<array class="NSMutableArray" key="children">
+							<reference ref="107904521"/>
+						</array>
+						<reference key="parent" ref="432366787"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">588</int>
+						<reference key="object" ref="107904521"/>
+						<reference key="parent" ref="610690351"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -4081,6 +4128,8 @@
 				<string key="58.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="583.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="584.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="587.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="588.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="72.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="73.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="74.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -4097,24 +4146,27 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">586</int>
+			<int key="maxID">589</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
 				<object class="IBPartialClassDescription">
 					<string key="className">HIAppDelegate</string>
 					<string key="superclassName">NSObject</string>
-					<object class="NSMutableDictionary" key="actions">
-						<string key="NS.key.0">sendMoneyClicked:</string>
-						<string key="NS.object.0">NSButton</string>
-					</object>
-					<object class="NSMutableDictionary" key="actionInfosByName">
-						<string key="NS.key.0">sendMoneyClicked:</string>
-						<object class="IBActionInfo" key="NS.object.0">
+					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="exportWalletClicked:">NSButton</string>
+						<string key="sendMoneyClicked:">NSButton</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="exportWalletClicked:">
+							<string key="name">exportWalletClicked:</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBActionInfo" key="sendMoneyClicked:">
 							<string key="name">sendMoneyClicked:</string>
 							<string key="candidateClassName">NSButton</string>
 						</object>
-					</object>
+					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="addressLabel">NSTextField</string>
 						<string key="balanceLabel">NSTextField</string>

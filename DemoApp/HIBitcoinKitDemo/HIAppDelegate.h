@@ -19,5 +19,6 @@
 @property (weak) IBOutlet NSTableView *transactionList;
 @property (weak) IBOutlet NSButton *sendMoneyBtn;
 - (IBAction)sendMoneyClicked:(NSButton *)sender;
+- (IBAction)exportWalletClicked:(NSButton *)sender;
 
 @end
