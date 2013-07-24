@@ -73,7 +73,9 @@ static void NotifyTransactionChanged(HIBitcoinManager *manager, CWallet *wallet,
 @synthesize syncProgress = _syncProgress;
 @synthesize testingNetwork = _testingNetwork;
 @synthesize enableMining = _enableMining;
-@synthesize walletAddress;
+@synthesize walletAddress = _walletAddress;
+@synthesize proxyAddress = _proxyAddress;
+@synthesize disableListening = _disableListening;
 
 + (HIBitcoinManager *)defaultManager
 {
@@ -114,7 +116,7 @@ static void NotifyTransactionChanged(HIBitcoinManager *manager, CWallet *wallet,
     fHaveGUI = true;
     [[NSFileManager defaultManager] createDirectoryAtURL:_dataURL withIntermediateDirectories:YES attributes:0 error:NULL];
     NSString *pathparam = [NSString stringWithFormat:@"-datadir=%@", _dataURL.path];
-    const char *argv[4];
+    const char *argv[6];
     int argc = 2;
     
     argv[0] = NULL;
@@ -129,6 +131,17 @@ static void NotifyTransactionChanged(HIBitcoinManager *manager, CWallet *wallet,
     {
         argv[argc++] = "-gen";
     }
+    
+    if (_disableListening)
+    {
+        argv[argc++] = "-nolisten";
+    }
+    
+    if (_proxyAddress)
+    {
+        argv[argc++] = [[NSString stringWithFormat:@"-proxy=%@", _proxyAddress] UTF8String];
+    }
+    
     // Now mimic argument settings
     ParseParameters(argc, argv);
     
@@ -634,6 +647,8 @@ static void NotifyTransactionChanged(HIBitcoinManager *manager, CWallet *wallet,
 
 - (void)dealloc
 {
+    [_walletAddress release];
+    [_proxyAddress release];
     [self stop];
     [super dealloc];
 }

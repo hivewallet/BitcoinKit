@@ -32,6 +32,8 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;                   
 @property (nonatomic, readonly, getter = isWalletEncrypted) BOOL isWalletEncrypted; //<<< Returns YES if wallet is encrypted. NO - otherwise
 @property (nonatomic, readonly, getter = isWalletLocked) BOOL isWalletLocked;       //<<< Returns YES if wallet is currently locked. NO - otherwise
 @property (nonatomic, readonly, getter = transactionCount) NSUInteger transactionCount; //<<< Returns global transaction cound for current wallet
+@property (nonatomic, copy) NSString *proxyAddress;                                 //<<< Proxy server in address:port format. Default is nil (no proxy). Warning! All changes to it has to be performed BEFORE start.
+@property (nonatomic, assign) BOOL disableListening;                                //<<< Flag disabling listening on public IP address. To be used i.e. with tor proxy not to reveal real IP address. Warning! All changes to it has to be performed BEFORE start.
 
 /** Class method returning application singleton to the manager.
  *
