@@ -5,7 +5,11 @@
 //  Created by Bazyli Zygan on 14.07.2013.
 //  Copyright (c) 2013 Hive Developers. All rights reserved.
 //
+#ifdef USE_BITCOINJ
+#import <BitcoinJKit/BitcoinJKit.h>
+#else
 #import <BitcoinKit/BitcoinKit.h>
+#endif //USE_BITCOINJ
 #import "HISendWindowController.h"
 
 

@@ -189,6 +189,19 @@
 		D91FE769178EC170001B37D8 /* HIBitcoinManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE767178EC170001B37D8 /* HIBitcoinManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D91FE76A178EC170001B37D8 /* HIBitcoinManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = D91FE768178EC170001B37D8 /* HIBitcoinManager.mm */; };
 		D91FE7B5178FED10001B37D8 /* BitcoinKit.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE4FE178EB1F1001B37D8 /* BitcoinKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D958B09E17A29B0500B0EDD5 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D91FE4F1178EB1F1001B37D8 /* Cocoa.framework */; };
+		D958B0A417A29B0500B0EDD5 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D958B0A217A29B0500B0EDD5 /* InfoPlist.strings */; };
+		D958B0AF17A29CE200B0EDD5 /* jni_md.h in Headers */ = {isa = PBXBuildFile; fileRef = D958B0AD17A29CE200B0EDD5 /* jni_md.h */; };
+		D958B0B017A29CE200B0EDD5 /* jni.h in Headers */ = {isa = PBXBuildFile; fileRef = D958B0AE17A29CE200B0EDD5 /* jni.h */; };
+		D958B0B217A29D0200B0EDD5 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D958B0B117A29D0200B0EDD5 /* libz.dylib */; };
+		D958B0B417A29D0A00B0EDD5 /* libc++abi.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D958B0B317A29D0A00B0EDD5 /* libc++abi.dylib */; };
+		D958B0B617A29DFB00B0EDD5 /* libavian.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D958B0B517A29DFB00B0EDD5 /* libavian.a */; };
+		D958B0B817A2A11000B0EDD5 /* boot-jar.o in Frameworks */ = {isa = PBXBuildFile; fileRef = D958B0B717A2A11000B0EDD5 /* boot-jar.o */; };
+		D958B0BC17A2A40600B0EDD5 /* HIBitcoinManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D958B0BA17A2A40600B0EDD5 /* HIBitcoinManager.m */; };
+		D958B0BD17A2A41800B0EDD5 /* HIBitcoinManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE767178EC170001B37D8 /* HIBitcoinManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D958B0BE17A2A41A00B0EDD5 /* BitcoinJKit.h in Headers */ = {isa = PBXBuildFile; fileRef = D958B0A617A29B0500B0EDD5 /* BitcoinJKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D958B0C117A2A50A00B0EDD5 /* HIJavaBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = D958B0BF17A2A50A00B0EDD5 /* HIJavaBridge.h */; };
+		D958B0C217A2A50A00B0EDD5 /* HIJavaBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = D958B0C017A2A50A00B0EDD5 /* HIJavaBridge.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -398,6 +411,20 @@
 		D91FE705178EB8C5001B37D8 /* bitcoin.cp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = bitcoin.cp; sourceTree = "<group>"; };
 		D91FE767178EC170001B37D8 /* HIBitcoinManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HIBitcoinManager.h; sourceTree = "<group>"; };
 		D91FE768178EC170001B37D8 /* HIBitcoinManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = HIBitcoinManager.mm; sourceTree = "<group>"; };
+		D958B09D17A29B0500B0EDD5 /* BitcoinJKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = BitcoinJKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D958B0A117A29B0500B0EDD5 /* BitcoinJKit-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "BitcoinJKit-Info.plist"; sourceTree = "<group>"; };
+		D958B0A317A29B0500B0EDD5 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		D958B0A517A29B0500B0EDD5 /* BitcoinJKit-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "BitcoinJKit-Prefix.pch"; sourceTree = "<group>"; };
+		D958B0A617A29B0500B0EDD5 /* BitcoinJKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BitcoinJKit.h; sourceTree = "<group>"; };
+		D958B0AD17A29CE200B0EDD5 /* jni_md.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jni_md.h; sourceTree = "<group>"; };
+		D958B0AE17A29CE200B0EDD5 /* jni.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jni.h; sourceTree = "<group>"; };
+		D958B0B117A29D0200B0EDD5 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
+		D958B0B317A29D0A00B0EDD5 /* libc++abi.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++abi.dylib"; path = "usr/lib/libc++abi.dylib"; sourceTree = SDKROOT; };
+		D958B0B517A29DFB00B0EDD5 /* libavian.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavian.a; path = "avian/build/darwin-x86_64/libavian.a"; sourceTree = "<group>"; };
+		D958B0B717A2A11000B0EDD5 /* boot-jar.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "boot-jar.o"; sourceTree = SOURCE_ROOT; };
+		D958B0BA17A2A40600B0EDD5 /* HIBitcoinManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HIBitcoinManager.m; sourceTree = "<group>"; };
+		D958B0BF17A2A50A00B0EDD5 /* HIJavaBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HIJavaBridge.h; sourceTree = "<group>"; };
+		D958B0C017A2A50A00B0EDD5 /* HIJavaBridge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HIJavaBridge.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -418,6 +445,18 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D958B09917A29B0500B0EDD5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D958B0B617A29DFB00B0EDD5 /* libavian.a in Frameworks */,
+				D958B0B417A29D0A00B0EDD5 /* libc++abi.dylib in Frameworks */,
+				D958B0B217A29D0200B0EDD5 /* libz.dylib in Frameworks */,
+				D958B09E17A29B0500B0EDD5 /* Cocoa.framework in Frameworks */,
+				D958B0B817A2A11000B0EDD5 /* boot-jar.o in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -427,6 +466,7 @@
 				D91FE6FE178EB8C5001B37D8 /* bitcoin */,
 				D91FE506178EB346001B37D8 /* bitcoind */,
 				D91FE4F7178EB1F1001B37D8 /* BitcoinKit */,
+				D958B09F17A29B0500B0EDD5 /* BitcoinJKit */,
 				D91FE4F0178EB1F1001B37D8 /* Frameworks */,
 				D91FE4EF178EB1F1001B37D8 /* Products */,
 			);
@@ -437,6 +477,7 @@
 			children = (
 				D91FE4EE178EB1F1001B37D8 /* BitcoinKit.framework */,
 				D91FE6FD178EB8C5001B37D8 /* bitcoin.a */,
+				D958B09D17A29B0500B0EDD5 /* BitcoinJKit.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -444,6 +485,9 @@
 		D91FE4F0178EB1F1001B37D8 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D958B0B517A29DFB00B0EDD5 /* libavian.a */,
+				D958B0B317A29D0A00B0EDD5 /* libc++abi.dylib */,
+				D958B0B117A29D0200B0EDD5 /* libz.dylib */,
 				D91FE6CA178EB53A001B37D8 /* libsqlite3.dylib */,
 				D91FE4F1178EB1F1001B37D8 /* Cocoa.framework */,
 				D91FE4F3178EB1F1001B37D8 /* Other Frameworks */,
@@ -769,6 +813,31 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		D958B09F17A29B0500B0EDD5 /* BitcoinJKit */ = {
+			isa = PBXGroup;
+			children = (
+				D958B0B717A2A11000B0EDD5 /* boot-jar.o */,
+				D958B0AD17A29CE200B0EDD5 /* jni_md.h */,
+				D958B0AE17A29CE200B0EDD5 /* jni.h */,
+				D958B0A617A29B0500B0EDD5 /* BitcoinJKit.h */,
+				D958B0BF17A2A50A00B0EDD5 /* HIJavaBridge.h */,
+				D958B0C017A2A50A00B0EDD5 /* HIJavaBridge.m */,
+				D958B0BA17A2A40600B0EDD5 /* HIBitcoinManager.m */,
+				D958B0A017A29B0500B0EDD5 /* Supporting Files */,
+			);
+			path = BitcoinJKit;
+			sourceTree = "<group>";
+		};
+		D958B0A017A29B0500B0EDD5 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				D958B0A117A29B0500B0EDD5 /* BitcoinJKit-Info.plist */,
+				D958B0A217A29B0500B0EDD5 /* InfoPlist.strings */,
+				D958B0A517A29B0500B0EDD5 /* BitcoinJKit-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -885,6 +954,18 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D958B09A17A29B0500B0EDD5 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D958B0BD17A2A41800B0EDD5 /* HIBitcoinManager.h in Headers */,
+				D958B0BE17A2A41A00B0EDD5 /* BitcoinJKit.h in Headers */,
+				D958B0AF17A29CE200B0EDD5 /* jni_md.h in Headers */,
+				D958B0B017A29CE200B0EDD5 /* jni.h in Headers */,
+				D958B0C117A2A50A00B0EDD5 /* HIJavaBridge.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
@@ -924,6 +1005,25 @@
 			productReference = D91FE6FD178EB8C5001B37D8 /* bitcoin.a */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
+		D958B09C17A29B0500B0EDD5 /* BitcoinJKit */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D958B0AB17A29B0500B0EDD5 /* Build configuration list for PBXNativeTarget "BitcoinJKit" */;
+			buildPhases = (
+				D958B0AC17A29C2C00B0EDD5 /* ShellScript */,
+				D958B09817A29B0500B0EDD5 /* Sources */,
+				D958B09917A29B0500B0EDD5 /* Frameworks */,
+				D958B09A17A29B0500B0EDD5 /* Headers */,
+				D958B09B17A29B0500B0EDD5 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BitcoinJKit;
+			productName = BitcoinJKit;
+			productReference = D958B09D17A29B0500B0EDD5 /* BitcoinJKit.framework */;
+			productType = "com.apple.product-type.framework";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -947,6 +1047,7 @@
 			targets = (
 				D91FE4ED178EB1F1001B37D8 /* BitcoinKit */,
 				D91FE6FC178EB8C5001B37D8 /* bitcoin */,
+				D958B09C17A29B0500B0EDD5 /* BitcoinJKit */,
 			);
 		};
 /* End PBXProject section */
@@ -960,7 +1061,31 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D958B09B17A29B0500B0EDD5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D958B0A417A29B0500B0EDD5 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		D958B0AC17A29C2C00B0EDD5 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\ncd ${SRCROOT}\n\n# Check if we have the classes compiled with avian\n\nif [ ! -f boot-jar.o ]; then\n\n# Build avian first\ncd avian\nexport JAVA_HOME=/Library/Java/Home\nmake\n\n# Build bitcoinj now\ncd ../bitcoinj/core\nmvn package -Dmaven.test.skip=true\n\n# Ok, now we need to build a boot.jar so we need to combine two jars\ncd ../../\nmkdir tmp\n\n(cd tmp; jar -xf ../avian/build/darwin-x86_64/classpath.jar)\n(cd tmp; jar -xf ../bitcoinj/core/target/bitcoinj-0.10-SNAPSHOT.jar)\njar -cvf boot.jar -C tmp .\n\n# Now we have to make it an object, so...\navian/build/darwin-x86_64/binaryToObject/binaryToObject boot.jar boot-jar.o _binary_boot_jar_start _binary_boot_jar_end darwin x86_64\n\nrm -rf tmp\n\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		D91FE4E9178EB1F1001B37D8 /* Sources */ = {
@@ -1056,6 +1181,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D958B09817A29B0500B0EDD5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D958B0BC17A2A40600B0EDD5 /* HIBitcoinManager.m in Sources */,
+				D958B0C217A2A50A00B0EDD5 /* HIJavaBridge.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -1071,6 +1205,14 @@
 			isa = PBXVariantGroup;
 			children = (
 				D91FE4FB178EB1F1001B37D8 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		D958B0A217A29B0500B0EDD5 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D958B0A317A29B0500B0EDD5 /* en */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -1277,6 +1419,44 @@
 			};
 			name = Release;
 		};
+		D958B0A917A29B0500B0EDD5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_VERSION = A;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "BitcoinJKit/BitcoinJKit-Prefix.pch";
+				INFOPLIST_FILE = "BitcoinJKit/BitcoinJKit-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/avian/build/darwin-x86_64\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = framework;
+			};
+			name = Debug;
+		};
+		D958B0AA17A29B0500B0EDD5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_VERSION = A;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "BitcoinJKit/BitcoinJKit-Prefix.pch";
+				INFOPLIST_FILE = "BitcoinJKit/BitcoinJKit-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/avian/build/darwin-x86_64\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = framework;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1303,6 +1483,15 @@
 			buildConfigurations = (
 				D91FE708178EB8C5001B37D8 /* Debug */,
 				D91FE709178EB8C5001B37D8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D958B0AB17A29B0500B0EDD5 /* Build configuration list for PBXNativeTarget "BitcoinJKit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D958B0A917A29B0500B0EDD5 /* Debug */,
+				D958B0AA17A29B0500B0EDD5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

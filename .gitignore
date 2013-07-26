@@ -26,6 +26,11 @@ profile
 # SourceTree (Mac) Configuration Files
 sourcetreeconfig
 
+# bitcoinj/aviary compilation temps
+boot-jar.o
+boot.jar
+tmp 
+
 # Podfiles
 Podfile.lock
 Pods/*

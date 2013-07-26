@@ -15,6 +15,15 @@
 		D91FE7DD17900FCC001B37D8 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = D91FE7DB17900FCC001B37D8 /* MainMenu.xib */; };
 		D91FE7ED17901086001B37D8 /* BitcoinKit.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = D91FE7E91790100A001B37D8 /* BitcoinKit.framework */; };
 		D91FE7F1179012ED001B37D8 /* BitcoinKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D91FE7E91790100A001B37D8 /* BitcoinKit.framework */; };
+		D958B0C917A2A8FD00B0EDD5 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D91FE7C617900FCC001B37D8 /* Cocoa.framework */; };
+		D958B0CF17A2A8FD00B0EDD5 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D958B0CD17A2A8FD00B0EDD5 /* InfoPlist.strings */; };
+		D958B0D117A2A8FD00B0EDD5 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D958B0D017A2A8FD00B0EDD5 /* main.m */; };
+		D958B0D517A2A8FD00B0EDD5 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = D958B0D317A2A8FD00B0EDD5 /* Credits.rtf */; };
+		D958B0E417A2A91300B0EDD5 /* BitcoinJKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D958B0E217A2A8FD00B0EDD5 /* BitcoinJKit.framework */; };
+		D958B0E617A2A92300B0EDD5 /* BitcoinJKit.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = D958B0E217A2A8FD00B0EDD5 /* BitcoinJKit.framework */; };
+		D958B0E717A2A92B00B0EDD5 /* HIAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D91FE7D917900FCC001B37D8 /* HIAppDelegate.m */; };
+		D958B0E817A2A93000B0EDD5 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = D91FE7DB17900FCC001B37D8 /* MainMenu.xib */; };
+		D958B0E917A2A93600B0EDD5 /* HISendWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9D073581793506E008B9CE0 /* HISendWindowController.m */; };
 		D9D0735A1793506E008B9CE0 /* HISendWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9D073581793506E008B9CE0 /* HISendWindowController.m */; };
 		D9D0735B1793506E008B9CE0 /* HISendWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D9D073591793506E008B9CE0 /* HISendWindowController.xib */; };
 /* End PBXBuildFile section */
@@ -34,6 +43,27 @@
 			remoteGlobalIDString = D91FE6FD178EB8C5001B37D8;
 			remoteInfo = bitcoin;
 		};
+		D958B0E117A2A8FD00B0EDD5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D91FE7E31790100A001B37D8 /* BitcoinKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D958B09D17A29B0500B0EDD5;
+			remoteInfo = BitcoinJKit;
+		};
+		D958B0EA17A2AA0600B0EDD5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D91FE7E31790100A001B37D8 /* BitcoinKit.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = D958B09C17A29B0500B0EDD5;
+			remoteInfo = BitcoinJKit;
+		};
+		D958B0EC17A2AA0D00B0EDD5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D91FE7E31790100A001B37D8 /* BitcoinKit.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = D91FE4ED178EB1F1001B37D8;
+			remoteInfo = BitcoinKit;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -44,6 +74,16 @@
 			dstSubfolderSpec = 10;
 			files = (
 				D91FE7ED17901086001B37D8 /* BitcoinKit.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		D958B0E517A2A91B00B0EDD5 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 8;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				D958B0E617A2A92300B0EDD5 /* BitcoinJKit.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
@@ -64,6 +104,12 @@
 		D91FE7D917900FCC001B37D8 /* HIAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HIAppDelegate.m; sourceTree = "<group>"; };
 		D91FE7DC17900FCC001B37D8 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		D91FE7E31790100A001B37D8 /* BitcoinKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = BitcoinKit.xcodeproj; path = ../BitcoinKit.xcodeproj; sourceTree = "<group>"; };
+		D958B0C817A2A8FD00B0EDD5 /* HIBitcoinJKitDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HIBitcoinJKitDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D958B0CC17A2A8FD00B0EDD5 /* HIBitcoinJKitDemo-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "HIBitcoinJKitDemo-Info.plist"; sourceTree = "<group>"; };
+		D958B0CE17A2A8FD00B0EDD5 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		D958B0D017A2A8FD00B0EDD5 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		D958B0D217A2A8FD00B0EDD5 /* HIBitcoinJKitDemo-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "HIBitcoinJKitDemo-Prefix.pch"; sourceTree = "<group>"; };
+		D958B0D417A2A8FD00B0EDD5 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
 		D9D073571793506E008B9CE0 /* HISendWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HISendWindowController.h; sourceTree = "<group>"; };
 		D9D073581793506E008B9CE0 /* HISendWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HISendWindowController.m; sourceTree = "<group>"; };
 		D9D073591793506E008B9CE0 /* HISendWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HISendWindowController.xib; sourceTree = "<group>"; };
@@ -79,6 +125,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D958B0C517A2A8FD00B0EDD5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D958B0E417A2A91300B0EDD5 /* BitcoinJKit.framework in Frameworks */,
+				D958B0C917A2A8FD00B0EDD5 /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -86,6 +141,7 @@
 			isa = PBXGroup;
 			children = (
 				D91FE7CC17900FCC001B37D8 /* HIBitcoinKitDemo */,
+				D958B0CA17A2A8FD00B0EDD5 /* HIBitcoinJKitDemo */,
 				D91FE7C517900FCC001B37D8 /* Frameworks */,
 				D91FE7C417900FCC001B37D8 /* Products */,
 			);
@@ -95,6 +151,7 @@
 			isa = PBXGroup;
 			children = (
 				D91FE7C317900FCC001B37D8 /* HIBitcoinKitDemo.app */,
+				D958B0C817A2A8FD00B0EDD5 /* HIBitcoinJKitDemo.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -150,8 +207,29 @@
 			children = (
 				D91FE7E91790100A001B37D8 /* BitcoinKit.framework */,
 				D91FE7EB1790100A001B37D8 /* bitcoin.a */,
+				D958B0E217A2A8FD00B0EDD5 /* BitcoinJKit.framework */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		D958B0CA17A2A8FD00B0EDD5 /* HIBitcoinJKitDemo */ = {
+			isa = PBXGroup;
+			children = (
+				D958B0CB17A2A8FD00B0EDD5 /* Supporting Files */,
+			);
+			path = HIBitcoinJKitDemo;
+			sourceTree = "<group>";
+		};
+		D958B0CB17A2A8FD00B0EDD5 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				D958B0CC17A2A8FD00B0EDD5 /* HIBitcoinJKitDemo-Info.plist */,
+				D958B0CD17A2A8FD00B0EDD5 /* InfoPlist.strings */,
+				D958B0D017A2A8FD00B0EDD5 /* main.m */,
+				D958B0D217A2A8FD00B0EDD5 /* HIBitcoinJKitDemo-Prefix.pch */,
+				D958B0D317A2A8FD00B0EDD5 /* Credits.rtf */,
+			);
+			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -169,10 +247,30 @@
 			buildRules = (
 			);
 			dependencies = (
+				D958B0ED17A2AA0D00B0EDD5 /* PBXTargetDependency */,
 			);
 			name = HIBitcoinKitDemo;
 			productName = HIBitcoinKitDemo;
 			productReference = D91FE7C317900FCC001B37D8 /* HIBitcoinKitDemo.app */;
+			productType = "com.apple.product-type.application";
+		};
+		D958B0C717A2A8FD00B0EDD5 /* HIBitcoinJKitDemo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D958B0E317A2A8FD00B0EDD5 /* Build configuration list for PBXNativeTarget "HIBitcoinJKitDemo" */;
+			buildPhases = (
+				D958B0C417A2A8FD00B0EDD5 /* Sources */,
+				D958B0C517A2A8FD00B0EDD5 /* Frameworks */,
+				D958B0C617A2A8FD00B0EDD5 /* Resources */,
+				D958B0E517A2A91B00B0EDD5 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D958B0EB17A2AA0600B0EDD5 /* PBXTargetDependency */,
+			);
+			name = HIBitcoinJKitDemo;
+			productName = HIBitcoinJKitDemo;
+			productReference = D958B0C817A2A8FD00B0EDD5 /* HIBitcoinJKitDemo.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -204,6 +302,7 @@
 			projectRoot = "";
 			targets = (
 				D91FE7C217900FCC001B37D8 /* HIBitcoinKitDemo */,
+				D958B0C717A2A8FD00B0EDD5 /* HIBitcoinJKitDemo */,
 			);
 		};
 /* End PBXProject section */
@@ -223,6 +322,13 @@
 			remoteRef = D91FE7EA1790100A001B37D8 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		D958B0E217A2A8FD00B0EDD5 /* BitcoinJKit.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = BitcoinJKit.framework;
+			remoteRef = D958B0E117A2A8FD00B0EDD5 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
@@ -234,6 +340,16 @@
 				D91FE7D717900FCC001B37D8 /* Credits.rtf in Resources */,
 				D91FE7DD17900FCC001B37D8 /* MainMenu.xib in Resources */,
 				D9D0735B1793506E008B9CE0 /* HISendWindowController.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D958B0C617A2A8FD00B0EDD5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D958B0CF17A2A8FD00B0EDD5 /* InfoPlist.strings in Resources */,
+				D958B0D517A2A8FD00B0EDD5 /* Credits.rtf in Resources */,
+				D958B0E817A2A93000B0EDD5 /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -250,7 +366,30 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D958B0C417A2A8FD00B0EDD5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D958B0D117A2A8FD00B0EDD5 /* main.m in Sources */,
+				D958B0E717A2A92B00B0EDD5 /* HIAppDelegate.m in Sources */,
+				D958B0E917A2A93600B0EDD5 /* HISendWindowController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D958B0EB17A2AA0600B0EDD5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = BitcoinJKit;
+			targetProxy = D958B0EA17A2AA0600B0EDD5 /* PBXContainerItemProxy */;
+		};
+		D958B0ED17A2AA0D00B0EDD5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = BitcoinKit;
+			targetProxy = D958B0EC17A2AA0D00B0EDD5 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		D91FE7CF17900FCC001B37D8 /* InfoPlist.strings */ = {
@@ -275,6 +414,22 @@
 				D91FE7DC17900FCC001B37D8 /* en */,
 			);
 			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+		D958B0CD17A2A8FD00B0EDD5 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D958B0CE17A2A8FD00B0EDD5 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		D958B0D317A2A8FD00B0EDD5 /* Credits.rtf */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D958B0D417A2A8FD00B0EDD5 /* en */,
+			);
+			name = Credits.rtf;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -365,6 +520,30 @@
 			};
 			name = Release;
 		};
+		D958B0DC17A2A8FD00B0EDD5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "HIBitcoinJKitDemo/HIBitcoinJKitDemo-Prefix.pch";
+				INFOPLIST_FILE = "HIBitcoinJKitDemo/HIBitcoinJKitDemo-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		D958B0DD17A2A8FD00B0EDD5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "HIBitcoinJKitDemo/HIBitcoinJKitDemo-Prefix.pch";
+				INFOPLIST_FILE = "HIBitcoinJKitDemo/HIBitcoinJKitDemo-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -385,6 +564,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		D958B0E317A2A8FD00B0EDD5 /* Build configuration list for PBXNativeTarget "HIBitcoinJKitDemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D958B0DC17A2A8FD00B0EDD5 /* Debug */,
+				D958B0DD17A2A8FD00B0EDD5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};
