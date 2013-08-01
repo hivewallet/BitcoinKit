@@ -62,7 +62,7 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
 
 - (void)start
 {
-    
+    //TODO: heck!
 }
 
 - (void)stop

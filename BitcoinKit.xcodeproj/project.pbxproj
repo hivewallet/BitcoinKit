@@ -1083,7 +1083,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\ncd ${SRCROOT}\n\n# Check if we have the classes compiled with avian\n\nif [ ! -f boot-jar.o ]; then\n\n# Build avian first\ncd avian\nexport JAVA_HOME=/Library/Java/Home\nmake\n\n# Build bitcoinj now\ncd ../bitcoinj/core\nmvn package -Dmaven.test.skip=true\n\n# Ok, now we need to build a boot.jar so we need to combine two jars\ncd ../../\nmkdir tmp\n\n(cd tmp; jar -xf ../avian/build/darwin-x86_64/classpath.jar)\n(cd tmp; jar -xf ../bitcoinj/core/target/bitcoinj-0.10-SNAPSHOT.jar)\njar -cvf boot.jar -C tmp .\n\n# Now we have to make it an object, so...\navian/build/darwin-x86_64/binaryToObject/binaryToObject boot.jar boot-jar.o _binary_boot_jar_start _binary_boot_jar_end darwin x86_64\n\nrm -rf tmp\n\nfi\n";
+			shellScript = "\ncd ${SRCROOT}\n\n# Check if we have the classes compiled with avian\n\nif [ ! -f boot-jar.o ]; then\n\n# Build avian first\ncd avian\nexport JAVA_HOME=/Library/Java/Home\nmake use-clang=true\n\n# Build bitcoinj now\ncd ../bitcoinj/core\nmvn package -Dmaven.test.skip=true\n\n# Ok, now we need to build a boot.jar so we need to combine two jars\ncd ../../\nmkdir tmp\n\n(cd tmp; jar -xf ../avian/build/darwin-x86_64/classpath.jar)\n(cd tmp; jar -xf ../bitcoinj/core/target/bitcoinj-0.10-SNAPSHOT.jar)\njar -cvf boot.jar -C tmp .\n\n# Now we have to make it an object, so...\navian/build/darwin-x86_64/binaryToObject/binaryToObject boot.jar boot-jar.o _binary_boot_jar_start _binary_boot_jar_end darwin x86_64\n\nrm -rf tmp\n\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1428,6 +1428,7 @@
 				FRAMEWORK_VERSION = A;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BitcoinJKit/BitcoinJKit-Prefix.pch";
+				GCC_VERSION = "";
 				INFOPLIST_FILE = "BitcoinJKit/BitcoinJKit-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1447,6 +1448,7 @@
 				FRAMEWORK_VERSION = A;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BitcoinJKit/BitcoinJKit-Prefix.pch";
+				GCC_VERSION = "";
 				INFOPLIST_FILE = "BitcoinJKit/BitcoinJKit-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",

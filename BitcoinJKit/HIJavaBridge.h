@@ -7,9 +7,21 @@
 //
 
 #import <Foundation/Foundation.h>
+#include "jni.h"
+
+@protocol HIJavaObject <NSObject>
+
+- (jobject)jobject;
+
+@end
 
 @interface HIJavaBridge : NSObject
 
+@property (nonatomic, readonly, getter = jniEnvironment) JNIEnv *jniEnvironment;
+
 + (HIJavaBridge *)sharedBridge;
 
+- (jclass)jClassForClass:(NSString *)class;
+
+- (jobject)createObjectOfClass:(NSString *)class params:(NSArray *)params;
 @end
