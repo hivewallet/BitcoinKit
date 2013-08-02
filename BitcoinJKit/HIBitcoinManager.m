@@ -126,6 +126,8 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
 
 - (void)start
 {
+    [[NSFileManager defaultManager] createDirectoryAtURL:_dataURL withIntermediateDirectories:YES attributes:0 error:NULL];
+    
     jclass mgrClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];
     
     if (_testingNetwork)
@@ -137,6 +139,12 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
             return;
         
         (*_jniEnv)->CallVoidMethod(_jniEnv, _managerObject, testingM, true);
+        if ((*_jniEnv)->ExceptionCheck(_jniEnv))
+        {
+            (*_jniEnv)->ExceptionDescribe(_jniEnv);
+            (*_jniEnv)->ExceptionClear(_jniEnv);
+        }
+        
     }
     
     // Now set the folder
@@ -145,7 +153,12 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
         return;
     
     (*_jniEnv)->CallVoidMethod(_jniEnv, _managerObject, folderM, (*_jniEnv)->NewStringUTF(_jniEnv, _dataURL.path.UTF8String));
-    
+    if ((*_jniEnv)->ExceptionCheck(_jniEnv))
+    {
+        (*_jniEnv)->ExceptionDescribe(_jniEnv);
+        (*_jniEnv)->ExceptionClear(_jniEnv);
+    }
+
     
     // We're ready! Let's start
     jmethodID startM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "start", "()V");
@@ -154,7 +167,11 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
         return;
     
     (*_jniEnv)->CallVoidMethod(_jniEnv, _managerObject, startM);
-    
+    if ((*_jniEnv)->ExceptionCheck(_jniEnv))
+    {
+        (*_jniEnv)->ExceptionDescribe(_jniEnv);
+        (*_jniEnv)->ExceptionClear(_jniEnv);
+    }
     
 }
 
