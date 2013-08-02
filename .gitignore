@@ -30,6 +30,10 @@ sourcetreeconfig
 boot-jar.o
 boot.jar
 tmp 
+*core*
+*tmp*
+*target*
+classpath.jar
 
 # Podfiles
 Podfile.lock

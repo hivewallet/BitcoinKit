@@ -57,13 +57,6 @@
 			remoteGlobalIDString = D91FE4ED178EB1F1001B37D8;
 			remoteInfo = BitcoinKit;
 		};
-		D958B10B17A6817300B0EDD5 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = D91FE7E31790100A001B37D8 /* BitcoinKit.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = D958B0F817A6810C00B0EDD5;
-			remoteInfo = bitcoinj;
-		};
 		D958B11717A681FF00B0EDD5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D91FE7E31790100A001B37D8 /* BitcoinKit.xcodeproj */;
@@ -117,7 +110,6 @@
 		D958B0D017A2A8FD00B0EDD5 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		D958B0D217A2A8FD00B0EDD5 /* HIBitcoinJKitDemo-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "HIBitcoinJKitDemo-Prefix.pch"; sourceTree = "<group>"; };
 		D958B0D417A2A8FD00B0EDD5 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
-		D958B11A17A6821600B0EDD5 /* boot-jar.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = "boot-jar.o"; path = "../boot-jar.o"; sourceTree = "<group>"; };
 		D9D073571793506E008B9CE0 /* HISendWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HISendWindowController.h; sourceTree = "<group>"; };
 		D9D073581793506E008B9CE0 /* HISendWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HISendWindowController.m; sourceTree = "<group>"; };
 		D9D073591793506E008B9CE0 /* HISendWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HISendWindowController.xib; sourceTree = "<group>"; };
@@ -148,7 +140,6 @@
 		D91FE7BA17900FCC001B37D8 = {
 			isa = PBXGroup;
 			children = (
-				D958B11A17A6821600B0EDD5 /* boot-jar.o */,
 				D91FE7CC17900FCC001B37D8 /* HIBitcoinKitDemo */,
 				D958B0CA17A2A8FD00B0EDD5 /* HIBitcoinJKitDemo */,
 				D91FE7C517900FCC001B37D8 /* Frameworks */,
@@ -217,7 +208,6 @@
 				D91FE7E91790100A001B37D8 /* BitcoinKit.framework */,
 				D91FE7EB1790100A001B37D8 /* bitcoin.a */,
 				D958B0E217A2A8FD00B0EDD5 /* BitcoinJKit.framework */,
-				D958B10C17A6817300B0EDD5 /* libbitcoinj.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -337,13 +327,6 @@
 			fileType = wrapper.framework;
 			path = BitcoinJKit.framework;
 			remoteRef = D958B0E117A2A8FD00B0EDD5 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		D958B10C17A6817300B0EDD5 /* libbitcoinj.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libbitcoinj.a;
-			remoteRef = D958B10B17A6817300B0EDD5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */

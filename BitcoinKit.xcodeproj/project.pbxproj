@@ -201,7 +201,6 @@
 		D958B0BD17A2A41800B0EDD5 /* HIBitcoinManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE767178EC170001B37D8 /* HIBitcoinManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D958B0BE17A2A41A00B0EDD5 /* BitcoinJKit.h in Headers */ = {isa = PBXBuildFile; fileRef = D958B0A617A29B0500B0EDD5 /* BitcoinJKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D958B0C117A2A50A00B0EDD5 /* HIJavaBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = D958B0BF17A2A50A00B0EDD5 /* HIJavaBridge.h */; };
-		D958B0C217A2A50A00B0EDD5 /* HIJavaBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = D958B0C017A2A50A00B0EDD5 /* HIJavaBridge.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1083,7 +1082,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\ncd ${SRCROOT}\n\n# Check if we have the classes compiled with avian\n\nif [ ! -f boot-jar.o ]; then\n\n# Build avian first\ncd avian\nexport JAVA_HOME=/Library/Java/Home\nmake use-clang=true\n\n# Build bitcoinj now\ncd ../bitcoinj/core\nmvn package -Dmaven.test.skip=true\n\n# Ok, now we need to build a boot.jar so we need to combine two jars\ncd ../../\nmkdir tmp\n\n(cd tmp; jar -xf ../avian/build/darwin-x86_64/classpath.jar)\n(cd tmp; jar -xf ../bitcoinj/core/target/bitcoinj-0.10-SNAPSHOT.jar)\njar -cvf boot.jar -C tmp .\n\n# Now we have to make it an object, so...\navian/build/darwin-x86_64/binaryToObject/binaryToObject boot.jar boot-jar.o _binary_boot_jar_start _binary_boot_jar_end darwin x86_64\n\nrm -rf tmp\n\nfi\n";
+			shellScript = "\ncd ${SRCROOT}\n\n# Check if we have the classes compiled with avian\n\nif [ ! -f boot-jar.o ]; then\n\n# Build avian first\ncd avian\nexport JAVA_HOME=/Library/Java/Home\nmake mode=debug openjdk=${AVIAN_JAVA_JDK} openjdk-src=${AVIAN_JAVA_JDK_SRC}\n\n# Prepare bitcoinj building\ncd ../BitcoinJKit/java\n\nif [ ! -d core ]; then\n\n    ln -s ../../bitcoinj/core core\n\nfi\n\n# Build bitcoinj with bitcoinkit bridge\nmvn package -Dmaven.test.skip=true\n\n# Ok, now we need to build a boot.jar so we need to combine two jars\ncd ../../\nif [ ! -d tmp ]; then\n    mkdir tmp\nfi\n\n(cd tmp; jar -xf ../avian/build/darwin-x86_64-openjdk-src/classpath.jar)\n(cd tmp; jar -xf ../BitcoinJKit/java/bitcoinkit/target/BitcoinKit-0.11-SNAPSHOT.jar)\njar -cvf boot.jar -C tmp .\n\n# Now we have to make it an object, so...\navian/build/darwin-x86_64/binaryToObject/binaryToObject boot.jar boot-jar.o _binary_boot_jar_start _binary_boot_jar_end darwin x86_64\n\nrm -rf tmp\n\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1186,7 +1185,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				D958B0BC17A2A40600B0EDD5 /* HIBitcoinManager.m in Sources */,
-				D958B0C217A2A50A00B0EDD5 /* HIJavaBridge.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
