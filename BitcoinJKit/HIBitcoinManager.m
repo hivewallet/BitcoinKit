@@ -34,44 +34,6 @@
 //    return SYMBOL(start);
 //}
 
-JNIEXPORT void JNICALL Java_com_hive_bitcoinkit_BitcoinManager_onBalanceChanged
-(JNIEnv *env, jobject thisobject)
-{
-    NSLog(@"Balance changed!");
-}
-
-JNIEXPORT void JNICALL Java_BitcoinManager_onBalanceChanged
-(JNIEnv *env, jobject thisobject)
-{
-    NSLog(@"Balance changed!");
-}
-
-JNIEXPORT void JNICALL Java_BitcoinManager_onSynchronizationUpdate
-(JNIEnv *env, jint size, jobject getSizeInterface)
-{
-    NSLog(@"Test");
-}
-
-JNIEXPORT void JNICALL Java_com_hive_bitcoinkit_BitcoinManager_onSynchronizationUpdate
-(JNIEnv *env, jint size, jobject getSizeInterface)
-{
-    jclass objclass = (*env)->GetObjectClass(env, getSizeInterface);
-//    jmethodID method = env->GetMethodID(objclass, "GetSize", "(m_SizeClass)I");
-//    if(methodID == 0){
-//        cout << "could not get method id!\n";
-//        return;
-//    }
-//    g_method = method;
-//    g_getSizeIface = getSizeInterface;
-//    g_env = env
-//    MyCPPFunction(size, WrapperFunc);
-}
-
-NSString * const kHIBitcoinManagerTransactionChangedNotification = @"kJHIBitcoinManagerTransactionChangedNotification";
-NSString * const kHIBitcoinManagerStartedNotification = @"kJHIBitcoinManagerStartedNotification";
-NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStoppedNotification";
-
-
 @interface HIBitcoinManager ()
 {
     JavaVM *_vm;
@@ -81,8 +43,34 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
 }
 
 - (jclass)jClassForClass:(NSString *)class;
-
+- (void)onBalanceChanged;
+- (void)onSynchronizationChanged:(int)percent;
 @end
+
+
+JNIEXPORT void JNICALL onBalanceChanged
+(JNIEnv *env, jobject thisobject)
+{
+    [[HIBitcoinManager defaultManager] onBalanceChanged];
+}
+
+JNIEXPORT void JNICALL onSynchronizationUpdate
+(JNIEnv *env, jobject thisobject, jint percent)
+{
+    [[HIBitcoinManager defaultManager] onSynchronizationChanged:(int)percent];
+}
+
+
+static JNINativeMethod methods[] = {
+    {"onBalanceChanged",    "()V",                    (void *)&onBalanceChanged},
+    {"onSynchronizationUpdate",    "(I)V",           (void *)&onSynchronizationUpdate}
+};
+
+NSString * const kHIBitcoinManagerTransactionChangedNotification = @"kJHIBitcoinManagerTransactionChangedNotification";
+NSString * const kHIBitcoinManagerStartedNotification = @"kJHIBitcoinManagerStartedNotification";
+NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStoppedNotification";
+
+
 
 @implementation HIBitcoinManager
 
@@ -151,8 +139,11 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
         JNI_CreateJavaVM(&vm, &env, &_vmArgs);
         _jniEnv = (JNIEnv *)(env);
         
+        
         // We need to create the manager object
         jclass mgrClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];
+        (*_jniEnv)->RegisterNatives(_jniEnv, mgrClass, methods, sizeof(methods)/sizeof(methods[0]));
+        
         jmethodID constructorM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "<init>", "()V");
         if (constructorM)
         {
@@ -215,6 +206,29 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
     _isRunning = YES;
     [self didChangeValueForKey:@"isRunning"];
     
+    [self willChangeValueForKey:@"walletAddress"];
+    [self didChangeValueForKey:@"walletAddress"];
+}
+
+- (NSString *)walletAddress
+{
+    jclass mgrClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];    
+    jmethodID walletM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "getWalletAddres", "()Ljava/lang/String;");
+    
+    if (walletM)
+    {
+        jstring wa = (*_jniEnv)->CallObjectMethod(_jniEnv, _managerObject, walletM);
+        
+        const char *waStr = (*_jniEnv)->GetStringUTFChars(_jniEnv, wa, NULL);
+        
+        NSString *str = [NSString stringWithUTF8String:waStr];
+        (*_jniEnv)->ReleaseStringUTFChars(_jniEnv, wa, waStr);
+        
+        return str;
+    }
+    
+    
+    return nil;
 }
 
 - (void)stop
@@ -296,5 +310,27 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
 - (BOOL)importWalletFrom:(NSURL *)importURL
 {
     return NO;
+}
+
+#pragma mark - Callbacks
+
+- (void)onBalanceChanged
+{
+    [self willChangeValueForKey:@"balance"];
+    [self didChangeValueForKey:@"balance"];
+}
+
+- (void)onSynchronizationChanged:(int)percent
+{
+    [self willChangeValueForKey:@"syncProgress"];
+    _syncProgress = (NSUInteger)percent;
+    [self didChangeValueForKey:@"syncProgress"];
+    
+}
+
+- (uint64_t)balance
+{
+    // How to do it?
+    return 0;
 }
 @end
