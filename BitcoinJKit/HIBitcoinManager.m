@@ -150,6 +150,7 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
         void *env;
         JNI_CreateJavaVM(&vm, &env, &_vmArgs);
         _jniEnv = (JNIEnv *)(env);
+        
         // We need to create the manager object
         jclass mgrClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];
         jmethodID constructorM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "<init>", "()V");

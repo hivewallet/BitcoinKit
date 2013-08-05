@@ -6,4 +6,4 @@
 //  Copyright (c) 2013 Hive Developers. All rights reserved.
 //
 
-#import <BitcoinKit/HIBitcoinManager.h>
+#import <BitcoinJKit/HIBitcoinManager.h>
