@@ -7,30 +7,64 @@
 //
 
 #import "HIBitcoinManager.h"
-#import "HIJavaBridge.h"
-#import "jni.h"
+//#import "HIJavaBridge.h"
+#import <JavaVM/jni.h>
+//#import "jni.h"
 
-#if (defined __MINGW32__) || (defined _MSC_VER)
-#  define EXPORT __declspec(dllexport)
-#else
-#  define EXPORT __attribute__ ((visibility("default"))) \
-__attribute__ ((used))
-#endif
+//#if (defined __MINGW32__) || (defined _MSC_VER)
+//#  define EXPORT __declspec(dllexport)
+//#else
+//#  define EXPORT __attribute__ ((visibility("default"))) \
+//__attribute__ ((used))
+//#endif
+//
+//#if (! defined __x86_64__) && ((defined __MINGW32__) || (defined _MSC_VER))
+//#  define SYMBOL(x) binary_boot_jar_##x
+//#else
+//#  define SYMBOL(x) _binary_boot_jar_##x
+//#endif
+//
+//extern const uint8_t SYMBOL(start)[];
+//extern const uint8_t SYMBOL(end)[];
+//
+//EXPORT const uint8_t*
+//bootJar(unsigned* size)
+//{
+//    *size = (unsigned int)(SYMBOL(end) - SYMBOL(start));
+//    return SYMBOL(start);
+//}
 
-#if (! defined __x86_64__) && ((defined __MINGW32__) || (defined _MSC_VER))
-#  define SYMBOL(x) binary_boot_jar_##x
-#else
-#  define SYMBOL(x) _binary_boot_jar_##x
-#endif
-
-extern const uint8_t SYMBOL(start)[];
-extern const uint8_t SYMBOL(end)[];
-
-EXPORT const uint8_t*
-bootJar(unsigned* size)
+JNIEXPORT void JNICALL Java_com_hive_bitcoinkit_BitcoinManager_onBalanceChanged
+(JNIEnv *env, jobject thisobject)
 {
-    *size = (unsigned int)(SYMBOL(end) - SYMBOL(start));
-    return SYMBOL(start);
+    NSLog(@"Balance changed!");
+}
+
+JNIEXPORT void JNICALL Java_BitcoinManager_onBalanceChanged
+(JNIEnv *env, jobject thisobject)
+{
+    NSLog(@"Balance changed!");
+}
+
+JNIEXPORT void JNICALL Java_BitcoinManager_onSynchronizationUpdate
+(JNIEnv *env, jint size, jobject getSizeInterface)
+{
+    NSLog(@"Test");
+}
+
+JNIEXPORT void JNICALL Java_com_hive_bitcoinkit_BitcoinManager_onSynchronizationUpdate
+(JNIEnv *env, jint size, jobject getSizeInterface)
+{
+    jclass objclass = (*env)->GetObjectClass(env, getSizeInterface);
+//    jmethodID method = env->GetMethodID(objclass, "GetSize", "(m_SizeClass)I");
+//    if(methodID == 0){
+//        cout << "could not get method id!\n";
+//        return;
+//    }
+//    g_method = method;
+//    g_getSizeIface = getSizeInterface;
+//    g_env = env
+//    MyCPPFunction(size, WrapperFunc);
 }
 
 NSString * const kHIBitcoinManagerTransactionChangedNotification = @"kJHIBitcoinManagerTransactionChangedNotification";
@@ -78,8 +112,12 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
     jclass cls = (*_jniEnv)->FindClass(_jniEnv, [class UTF8String]);
     
     if ((*_jniEnv)->ExceptionCheck(_jniEnv))
+    {
+        (*_jniEnv)->ExceptionDescribe(_jniEnv);
+        (*_jniEnv)->ExceptionClear(_jniEnv);
+        
         @throw [NSException exceptionWithName:@"Java exception" reason:@"Java VM raised an exception" userInfo:@{@"class": class}];
-    
+    }
     return cls;
 }
 
@@ -105,13 +143,13 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
         JavaVMOption options[_vmArgs.nOptions];
         _vmArgs.options = options;
         
-        options[0].optionString = (char*) "-Xbootclasspath:[bootJar]";
+//        options[0].optionString = (char*) "-Xbootclasspath:[bootJar]";
+        options[0].optionString = (char *)[[NSString stringWithFormat:@"-Djava.class.path=%@", [[NSBundle mainBundle] pathForResource:@"boot" ofType:@"jar"]] UTF8String];
         
         JavaVM* vm;
         void *env;
         JNI_CreateJavaVM(&vm, &env, &_vmArgs);
         _jniEnv = (JNIEnv *)(env);
-        
         // We need to create the manager object
         jclass mgrClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];
         jmethodID constructorM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "<init>", "()V");
@@ -172,12 +210,31 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
         (*_jniEnv)->ExceptionDescribe(_jniEnv);
         (*_jniEnv)->ExceptionClear(_jniEnv);
     }
+    [self willChangeValueForKey:@"isRunning"];
+    _isRunning = YES;
+    [self didChangeValueForKey:@"isRunning"];
     
 }
 
 - (void)stop
 {
+    jclass mgrClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];    
+    // We're ready! Let's start
+    jmethodID stopM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "stop", "()V");
     
+    if (stopM == NULL)
+        return;
+    
+    (*_jniEnv)->CallVoidMethod(_jniEnv, _managerObject, stopM);
+    if ((*_jniEnv)->ExceptionCheck(_jniEnv))
+    {
+        (*_jniEnv)->ExceptionDescribe(_jniEnv);
+        (*_jniEnv)->ExceptionClear(_jniEnv);
+    }
+    
+    [self willChangeValueForKey:@"isRunning"];
+    _isRunning = NO;
+    [self didChangeValueForKey:@"isRunning"];
 }
 
 - (NSDictionary *)transactionForHash:(NSString *)hash

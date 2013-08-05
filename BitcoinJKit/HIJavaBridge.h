@@ -7,7 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
-#include "jni.h"
+//#include "jni.h"
+#import <JavaVM/jni.h>
 
 @protocol HIJavaObject <NSObject>
 

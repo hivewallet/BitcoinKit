@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D901F49917AF9DAB0071780D /* JavaVM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D901F49817AF9DAA0071780D /* JavaVM.framework */; };
+		D901F49B17AF9DDB0071780D /* boot.jar in Frameworks */ = {isa = PBXBuildFile; fileRef = D901F49A17AF9DDB0071780D /* boot.jar */; };
+		D901F49E17AFAA940071780D /* boot.jar in Resources */ = {isa = PBXBuildFile; fileRef = D901F49A17AF9DDB0071780D /* boot.jar */; };
 		D91FE4F2178EB1F1001B37D8 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D91FE4F1178EB1F1001B37D8 /* Cocoa.framework */; };
 		D91FE4FC178EB1F1001B37D8 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D91FE4FA178EB1F1001B37D8 /* InfoPlist.strings */; };
 		D91FE5F0178EB375001B37D8 /* addrman.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE508178EB374001B37D8 /* addrman.h */; };
@@ -193,14 +196,10 @@
 		D958B0A417A29B0500B0EDD5 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D958B0A217A29B0500B0EDD5 /* InfoPlist.strings */; };
 		D958B0AF17A29CE200B0EDD5 /* jni_md.h in Headers */ = {isa = PBXBuildFile; fileRef = D958B0AD17A29CE200B0EDD5 /* jni_md.h */; };
 		D958B0B017A29CE200B0EDD5 /* jni.h in Headers */ = {isa = PBXBuildFile; fileRef = D958B0AE17A29CE200B0EDD5 /* jni.h */; };
-		D958B0B217A29D0200B0EDD5 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D958B0B117A29D0200B0EDD5 /* libz.dylib */; };
-		D958B0B417A29D0A00B0EDD5 /* libc++abi.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D958B0B317A29D0A00B0EDD5 /* libc++abi.dylib */; };
-		D958B0B817A2A11000B0EDD5 /* boot-jar.o in Frameworks */ = {isa = PBXBuildFile; fileRef = D958B0B717A2A11000B0EDD5 /* boot-jar.o */; };
 		D958B0BC17A2A40600B0EDD5 /* HIBitcoinManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D958B0BA17A2A40600B0EDD5 /* HIBitcoinManager.m */; };
 		D958B0BD17A2A41800B0EDD5 /* HIBitcoinManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE767178EC170001B37D8 /* HIBitcoinManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D958B0BE17A2A41A00B0EDD5 /* BitcoinJKit.h in Headers */ = {isa = PBXBuildFile; fileRef = D958B0A617A29B0500B0EDD5 /* BitcoinJKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D958B0C117A2A50A00B0EDD5 /* HIJavaBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = D958B0BF17A2A50A00B0EDD5 /* HIJavaBridge.h */; };
-		D9E67AE217ABF7CE002EEE01 /* libavian.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D9E67AE117ABF7CD002EEE01 /* libavian.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -214,6 +213,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D901F49817AF9DAA0071780D /* JavaVM.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaVM.framework; path = System/Library/Frameworks/JavaVM.framework; sourceTree = SDKROOT; };
+		D901F49A17AF9DDB0071780D /* boot.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = boot.jar; sourceTree = SOURCE_ROOT; };
 		D91FE4EE178EB1F1001B37D8 /* BitcoinKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = BitcoinKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D91FE4F1178EB1F1001B37D8 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		D91FE4F4178EB1F1001B37D8 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -417,13 +418,9 @@
 		D958B0A617A29B0500B0EDD5 /* BitcoinJKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BitcoinJKit.h; sourceTree = "<group>"; };
 		D958B0AD17A29CE200B0EDD5 /* jni_md.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jni_md.h; sourceTree = "<group>"; };
 		D958B0AE17A29CE200B0EDD5 /* jni.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jni.h; sourceTree = "<group>"; };
-		D958B0B117A29D0200B0EDD5 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
-		D958B0B317A29D0A00B0EDD5 /* libc++abi.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++abi.dylib"; path = "usr/lib/libc++abi.dylib"; sourceTree = SDKROOT; };
-		D958B0B717A2A11000B0EDD5 /* boot-jar.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "boot-jar.o"; sourceTree = SOURCE_ROOT; };
 		D958B0BA17A2A40600B0EDD5 /* HIBitcoinManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HIBitcoinManager.m; sourceTree = "<group>"; };
 		D958B0BF17A2A50A00B0EDD5 /* HIJavaBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HIJavaBridge.h; sourceTree = "<group>"; };
 		D958B0C017A2A50A00B0EDD5 /* HIJavaBridge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HIJavaBridge.m; sourceTree = "<group>"; };
-		D9E67AE117ABF7CD002EEE01 /* libavian.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavian.a; path = "avian/build/darwin-x86_64-continuations-openjdk-src/libavian.a"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -448,11 +445,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D9E67AE217ABF7CE002EEE01 /* libavian.a in Frameworks */,
-				D958B0B417A29D0A00B0EDD5 /* libc++abi.dylib in Frameworks */,
-				D958B0B217A29D0200B0EDD5 /* libz.dylib in Frameworks */,
+				D901F49917AF9DAB0071780D /* JavaVM.framework in Frameworks */,
 				D958B09E17A29B0500B0EDD5 /* Cocoa.framework in Frameworks */,
-				D958B0B817A2A11000B0EDD5 /* boot-jar.o in Frameworks */,
+				D901F49B17AF9DDB0071780D /* boot.jar in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -484,9 +479,7 @@
 		D91FE4F0178EB1F1001B37D8 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				D9E67AE117ABF7CD002EEE01 /* libavian.a */,
-				D958B0B317A29D0A00B0EDD5 /* libc++abi.dylib */,
-				D958B0B117A29D0200B0EDD5 /* libz.dylib */,
+				D901F49817AF9DAA0071780D /* JavaVM.framework */,
 				D91FE6CA178EB53A001B37D8 /* libsqlite3.dylib */,
 				D91FE4F1178EB1F1001B37D8 /* Cocoa.framework */,
 				D91FE4F3178EB1F1001B37D8 /* Other Frameworks */,
@@ -815,7 +808,7 @@
 		D958B09F17A29B0500B0EDD5 /* BitcoinJKit */ = {
 			isa = PBXGroup;
 			children = (
-				D958B0B717A2A11000B0EDD5 /* boot-jar.o */,
+				D901F49A17AF9DDB0071780D /* boot.jar */,
 				D958B0AD17A29CE200B0EDD5 /* jni_md.h */,
 				D958B0AE17A29CE200B0EDD5 /* jni.h */,
 				D958B0A617A29B0500B0EDD5 /* BitcoinJKit.h */,
@@ -1065,6 +1058,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D958B0A417A29B0500B0EDD5 /* InfoPlist.strings in Resources */,
+				D901F49E17AFAA940071780D /* boot.jar in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1082,7 +1076,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\ncd ${SRCROOT}\n\n# Check if we have the classes compiled with avian\n\nif [ ! -f boot-jar.o ]; then\n\n# Build avian first\ncd avian\nexport JAVA_HOME=/Library/Java/Home\nmake continuations=true openjdk=${AVIAN_JAVA_JDK} openjdk-src=${AVIAN_JAVA_JDK_SRC}\n\n# Prepare bitcoinj building\ncd ../BitcoinJKit/java\n\nif [ ! -d core ]; then\n\n    ln -s ../../bitcoinj/core core\n\nfi\n\n# Build bitcoinj with bitcoinkit bridge\nmvn clean package -Dmaven.test.skip=true\n\n# Ok, now we need to build a boot.jar so we need to combine two jars\ncd ../../\nif [ ! -d tmp ]; then\n    mkdir tmp\nfi\n\n(cd tmp; jar -xf ../avian/build/darwin-x86_64-continuations-openjdk-src/classpath.jar)\n(cd tmp; jar -xf ../BitcoinJKit/java/bitcoinkit/target/BitcoinKit-0.11-SNAPSHOT.jar)\njar -cvf boot.jar -C tmp .\n\n# Now we have to make it an object, so...\navian/build/darwin-x86_64-continuations-openjdk-src/binaryToObject/binaryToObject boot.jar boot-jar.o _binary_boot_jar_start _binary_boot_jar_end darwin x86_64\n\n#rm -rf tmp\n\nfi\n";
+			shellScript = "\ncd ${SRCROOT}\n\n# Check if we have the classes compiled with avian\n\n#if [ ! -f boot-jar.o ]; then\n\n# Build avian first\n#cd avian\n#export JAVA_HOME=/Library/Java/Home\n#make continuations=true openjdk=${AVIAN_JAVA_JDK} openjdk-src=${AVIAN_JAVA_JDK_SRC}\n#cd ..\n# Prepare bitcoinj building\n\ncd BitcoinJKit/java\n\nif [ ! -d core ]; then\n\n    ln -s ../../bitcoinj/core core\n\nfi\n\n# Build bitcoinj with bitcoinkit bridge\nmvn clean package -Dmaven.test.skip=true\n\n# Ok, now we need to build a boot.jar so we need to combine two jars\ncd ../../\nif [ ! -d tmp ]; then\n    mkdir tmp\nfi\n\n#(cd tmp; jar -xf ../avian/build/darwin-x86_64-continuations-openjdk-src/classpath.jar)\n#(cd tmp; jar -xf ../BitcoinJKit/java/bitcoinkit/target/BitcoinKit-0.11-SNAPSHOT.jar)\n#jar -cvf boot.jar -C tmp .\ncp BitcoinJKit/java/bitcoinkit/target/BitcoinKit-0.11-SNAPSHOT.jar boot.jar\n# Now we have to make it an object, so...\n#avian/build/darwin-x86_64-continuations-openjdk-src/binaryToObject/binaryToObject boot.jar boot-jar.o _binary_boot_jar_start _binary_boot_jar_end darwin x86_64\n\n#rm -rf tmp\n\n#fi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

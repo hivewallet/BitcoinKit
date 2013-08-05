@@ -7,7 +7,7 @@
 //
 
 #import "HIJavaBridge.h"
-#import "jni.h"
+
 
 #if (defined __MINGW32__) || (defined _MSC_VER)
 #  define EXPORT __declspec(dllexport)

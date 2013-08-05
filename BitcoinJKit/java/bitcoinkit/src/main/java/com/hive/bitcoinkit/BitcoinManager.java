@@ -204,7 +204,7 @@ public class BitcoinManager implements PeerEventListener {
 	       }		
 	}
 	
-	public void start()
+	public void start() throws Exception
 	{
 
         File chainFile = new File(dataDirectory + "/bitcoinkit.spvchain");
@@ -212,93 +212,93 @@ public class BitcoinManager implements PeerEventListener {
         // Try to read the wallet from storage, create a new one if not possible.
         wallet = null;
         walletFile = new File(dataDirectory + "/bitcoinkit.wallet");
-//        try {
-//            // Wipe the wallet if the chain file was deleted.
-//            if (walletFile.exists() && chainFile.exists())
-//            	wallet = Wallet.loadFromFile(walletFile);
-//        } catch (UnreadableWalletException e) {
-////            System.err.println("Couldn't load wallet: " + e);
-//            // Fall through.
-//        }
-//        if (wallet == null) {
-////            System.out.println("Creating new wallet file.");
-//            wallet = new Wallet(networkParams);
-//            wallet.addKey(new ECKey());
-//            wallet.saveToFile(walletFile);
-//        }
+        try {
+            // Wipe the wallet if the chain file was deleted.
+            if (walletFile.exists() && chainFile.exists())
+            	wallet = Wallet.loadFromFile(walletFile);
+        } catch (UnreadableWalletException e) {
+//            System.err.println("Couldn't load wallet: " + e);
+            // Fall through.
+        }
+        if (wallet == null) {
+//            System.out.println("Creating new wallet file.");
+            wallet = new Wallet(networkParams);
+            wallet.addKey(new ECKey());
+            wallet.saveToFile(walletFile);
+        }
         
 
         // Fetch the first key in the wallet (should be the only key).
-//        ECKey key = wallet.getKeys().iterator().next();
-//        // Load the block chain, if there is one stored locally. If it's going to be freshly created, checkpoint it.
-////        System.out.println("Reading block store from disk");
-//
-//        boolean chainExistedAlready = chainFile.exists();
-//        blockStore = new SPVBlockStore(networkParams, chainFile);
-//        if (!chainExistedAlready) {
-//            File checkpointsFile = new File(dataDirectory + "/bitcoinkit.checkpoints");
-//            if (checkpointsFile.exists()) {
-//                FileInputStream stream = new FileInputStream(checkpointsFile);
-//                CheckpointManager.checkpoint(networkParams, stream, blockStore, key.getCreationTimeSeconds());
-//            }
-//        }
-//     
-//        BlockChain chain = new BlockChain(networkParams, wallet, blockStore);
-//        // Connect to the localhost node. One minute timeout since we won't try any other peers
-////        System.out.println("Connecting ...");
-//        peerGroup = new PeerGroup(networkParams, chain);
-////        peerGroup.setUserAgent("BitcoinKit", "1.0");
-//        if (networkParams == RegTestParams.get()) {
-//            peerGroup.addAddress(InetAddress.getLocalHost());
-//        } else {
-//            peerGroup.addPeerDiscovery(new DnsDiscovery(networkParams));
-//        }
-//        peerGroup.addWallet(wallet);
+        ECKey key = wallet.getKeys().iterator().next();
+        // Load the block chain, if there is one stored locally. If it's going to be freshly created, checkpoint it.
+//        System.out.println("Reading block store from disk");
+
+        boolean chainExistedAlready = chainFile.exists();
+        blockStore = new SPVBlockStore(networkParams, chainFile);
+        if (!chainExistedAlready) {
+            File checkpointsFile = new File(dataDirectory + "/bitcoinkit.checkpoints");
+            if (checkpointsFile.exists()) {
+                FileInputStream stream = new FileInputStream(checkpointsFile);
+                CheckpointManager.checkpoint(networkParams, stream, blockStore, key.getCreationTimeSeconds());
+            }
+        }
+     
+        BlockChain chain = new BlockChain(networkParams, wallet, blockStore);
+        // Connect to the localhost node. One minute timeout since we won't try any other peers
+//        System.out.println("Connecting ...");
+        peerGroup = new PeerGroup(networkParams, chain);
+//        peerGroup.setUserAgent("BitcoinKit", "1.0");
+        if (networkParams == RegTestParams.get()) {
+            peerGroup.addAddress(InetAddress.getLocalHost());
+        } else {
+            peerGroup.addPeerDiscovery(new DnsDiscovery(networkParams));
+        }
+        peerGroup.addWallet(wallet);
         
 
         // We want to know when the balance changes.
-//        wallet.addEventListener(new AbstractWalletEventListener() {
-//            @Override
-//            public void onCoinsReceived(Wallet w, Transaction tx, BigInteger prevBalance, BigInteger newBalance) {
-//                assert !newBalance.equals(BigInteger.ZERO);
-//                if (!tx.isPending()) return;
-//                // It was broadcast, but we can't really verify it's valid until it appears in a block.
-//                BigInteger value = tx.getValueSentToMe(w);
-////                System.out.println("Received pending tx for " + Utils.bitcoinValueToFriendlyString(value) +
-////                        ": " + tx);
-//                tx.getConfidence().addEventListener(new TransactionConfidence.Listener() {
-//                    public void onConfidenceChanged(final Transaction tx2, TransactionConfidence.Listener.ChangeReason reason) {
-//                        if (tx2.getConfidence().getConfidenceType() == TransactionConfidence.ConfidenceType.BUILDING) {
-//                            // Coins were confirmed (appeared in a block).
-//                            tx2.getConfidence().removeEventListener(this);
-////                            System.out.println("We get " + tx2);
-//                           
-//                        } else {
-////                            System.out.println(String.format("Confidence of %s changed, is now: %s",
-////                                    tx2.getHashAsString(), tx2.getConfidence().toString()));
-//                        }
-//                    }
-//                });
-//            }
-//        });   
+        wallet.addEventListener(new AbstractWalletEventListener() {
+            @Override
+            public void onCoinsReceived(Wallet w, Transaction tx, BigInteger prevBalance, BigInteger newBalance) {
+                assert !newBalance.equals(BigInteger.ZERO);
+                if (!tx.isPending()) return;
+                // It was broadcast, but we can't really verify it's valid until it appears in a block.
+                BigInteger value = tx.getValueSentToMe(w);
+//                System.out.println("Received pending tx for " + Utils.bitcoinValueToFriendlyString(value) +
+//                        ": " + tx);
+                tx.getConfidence().addEventListener(new TransactionConfidence.Listener() {
+                    public void onConfidenceChanged(final Transaction tx2, TransactionConfidence.Listener.ChangeReason reason) {
+                        if (tx2.getConfidence().getConfidenceType() == TransactionConfidence.ConfidenceType.BUILDING) {
+                            // Coins were confirmed (appeared in a block).
+                            tx2.getConfidence().removeEventListener(this);
+//                            System.out.println("We get " + tx2);
+                           
+                        } else {
+//                            System.out.println(String.format("Confidence of %s changed, is now: %s",
+//                                    tx2.getHashAsString(), tx2.getConfidence().toString()));
+                        }
+                    }
+                });
+            }
+        });   
         
-//        peerGroup.startAndWait();
-//        peerGroup.start();
+        peerGroup.startAndWait();
+        peerGroup.start();
 
-//        onBalanceChanged();
+        onBalanceChanged();
 
-//        peerGroup.startBlockChainDownload(this);
+        peerGroup.startBlockChainDownload(this);
 
 	}
 	
 	public void stop()
 	{
 		try {
-//            System.out.print("Shutting down ... ");
+            System.out.print("Shutting down ... ");
             peerGroup.stopAndWait();
             wallet.saveToFile(walletFile);
             blockStore.close();
-//            System.out.print("done ");
+            System.out.print("done ");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -322,20 +322,14 @@ public class BitcoinManager implements PeerEventListener {
 //		System.out.println("Sending to " + sendingAddress + " has failed!");
 	}
 	
-	public void onSynchronizationUpdate(int percent)
-	{
-//		System.out.println("Update status " + percent);
-	}
+	public native void onSynchronizationUpdate(int percent);
 	
 	public void onPeerCountChange(int peersConnected)
 	{
 //		System.out.println("Peers " + peersConnected);
 	}
 	
-	public void onBalanceChanged()
-	{
-//		System.out.println("Balance changed!");
-	}
+	public native void onBalanceChanged();
 	
 	/* Implementing peer listener */
 	public void onBlocksDownloaded(Peer peer, Block block, int blocksLeft)
