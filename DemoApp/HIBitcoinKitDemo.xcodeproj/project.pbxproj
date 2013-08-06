@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		D901F4A117AFAB340071780D /* boot.jar in Resources */ = {isa = PBXBuildFile; fileRef = D901F4A017AFAB340071780D /* boot.jar */; };
 		D91FE7C717900FCC001B37D8 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D91FE7C617900FCC001B37D8 /* Cocoa.framework */; };
 		D91FE7D117900FCC001B37D8 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D91FE7CF17900FCC001B37D8 /* InfoPlist.strings */; };
 		D91FE7D317900FCC001B37D8 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D91FE7D217900FCC001B37D8 /* main.m */; };
@@ -91,7 +90,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		D901F4A017AFAB340071780D /* boot.jar */ = {isa = PBXFileReference; lastKnownFileType = file; name = boot.jar; path = ../boot.jar; sourceTree = "<group>"; };
 		D91FE7C317900FCC001B37D8 /* HIBitcoinKitDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HIBitcoinKitDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D91FE7C617900FCC001B37D8 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		D91FE7C917900FCC001B37D8 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -142,7 +140,6 @@
 		D91FE7BA17900FCC001B37D8 = {
 			isa = PBXGroup;
 			children = (
-				D901F4A017AFAB340071780D /* boot.jar */,
 				D91FE7CC17900FCC001B37D8 /* HIBitcoinKitDemo */,
 				D958B0CA17A2A8FD00B0EDD5 /* HIBitcoinJKitDemo */,
 				D91FE7C517900FCC001B37D8 /* Frameworks */,
@@ -351,7 +348,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				D958B0CF17A2A8FD00B0EDD5 /* InfoPlist.strings in Resources */,
-				D901F4A117AFAB340071780D /* boot.jar in Resources */,
 				D958B0D517A2A8FD00B0EDD5 /* Credits.rtf in Resources */,
 				D958B0E817A2A93000B0EDD5 /* MainMenu.xib in Resources */,
 			);

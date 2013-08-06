@@ -45,6 +45,8 @@
 - (jclass)jClassForClass:(NSString *)class;
 - (void)onBalanceChanged;
 - (void)onSynchronizationChanged:(int)percent;
+- (void)onTransactionChanged:(NSString *)txid;
+
 @end
 
 
@@ -60,10 +62,30 @@ JNIEXPORT void JNICALL onSynchronizationUpdate
     [[HIBitcoinManager defaultManager] onSynchronizationChanged:(int)percent];
 }
 
+JNIEXPORT void JNICALL onTransactionChanged
+(JNIEnv *env, jobject thisobject, jstring txid)
+{
+    NSAutoreleasePool *pool = [NSAutoreleasePool new];
+    if (txid)
+    {
+        const char *txc = (*env)->GetStringUTFChars(env, txid, NULL);
+        
+        NSString *bStr = [NSString stringWithUTF8String:txc];
+        (*env)->ReleaseStringUTFChars(env, txid, txc);
+        [[HIBitcoinManager defaultManager] onTransactionChanged:bStr];
+
+    }
+    
+//    [[HIBitcoinManager defaultManager] onSynchronizationChanged:(int)percent];
+    
+    [pool release];
+}
+
 
 static JNINativeMethod methods[] = {
-    {"onBalanceChanged",    "()V",                    (void *)&onBalanceChanged},
-    {"onSynchronizationUpdate",    "(I)V",           (void *)&onSynchronizationUpdate}
+    {"onBalanceChanged",        "()V",                   (void *)&onBalanceChanged},
+    {"onTransactionChanged",    "(Ljava/lang/String;)V", (void *)&onTransactionChanged},
+    {"onSynchronizationUpdate", "(I)V",                  (void *)&onSynchronizationUpdate}
 };
 
 NSString * const kHIBitcoinManagerTransactionChangedNotification = @"kJHIBitcoinManagerTransactionChangedNotification";
@@ -132,7 +154,8 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
         _vmArgs.options = options;
         
 //        options[0].optionString = (char*) "-Xbootclasspath:[bootJar]";
-        options[0].optionString = (char *)[[NSString stringWithFormat:@"-Djava.class.path=%@", [[NSBundle mainBundle] pathForResource:@"boot" ofType:@"jar"]] UTF8String];
+        NSBundle *myBundle = [NSBundle bundleWithIdentifier:@"com.hive.BitcoinJKit"];
+        options[0].optionString = (char *)[[NSString stringWithFormat:@"-Djava.class.path=%@", [myBundle pathForResource:@"boot" ofType:@"jar"]] UTF8String];
         
         JavaVM* vm;
         void *env;
@@ -205,7 +228,7 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
     [self willChangeValueForKey:@"isRunning"];
     _isRunning = YES;
     [self didChangeValueForKey:@"isRunning"];
-    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kHIBitcoinManagerStartedNotification object:self];
     [self willChangeValueForKey:@"walletAddress"];
     [self didChangeValueForKey:@"walletAddress"];
 }
@@ -250,25 +273,109 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
     [self willChangeValueForKey:@"isRunning"];
     _isRunning = NO;
     [self didChangeValueForKey:@"isRunning"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:kHIBitcoinManagerStoppedNotification object:self];
 }
 
 - (NSDictionary *)transactionForHash:(NSString *)hash
 {
+    jclass mgrClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];
+    // We're ready! Let's start
+    jmethodID tM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "getTransaction", "(Ljava/lang/String;)Ljava/lang/String;");
+    
+    if (tM == NULL)
+        return nil;
+    
+
+    jstring transString = (*_jniEnv)->CallObjectMethod(_jniEnv, _managerObject, tM, (*_jniEnv)->NewStringUTF(_jniEnv, hash.UTF8String));
+    
+    if (transString)
+    {
+        const char *transChars = (*_jniEnv)->GetStringUTFChars(_jniEnv, transString, NULL);
+        
+        NSString *bStr = [NSString stringWithUTF8String:transChars];
+        (*_jniEnv)->ReleaseStringUTFChars(_jniEnv, transString, transChars);
+        
+        return [NSJSONSerialization JSONObjectWithData:[bStr dataUsingEncoding:NSUTF8StringEncoding] options:0 error:NULL];
+        
+    }
+    
     return nil;
 }
 
 - (NSDictionary *)transactionAtIndex:(NSUInteger)index
 {
+    jclass mgrClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];
+    // We're ready! Let's start
+    jmethodID tM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "getTransaction", "(I)Ljava/lang/String;");
+    
+    if (tM == NULL)
+        return nil;
+    
+    
+    jstring transString = (*_jniEnv)->CallObjectMethod(_jniEnv, _managerObject, tM, index);
+    
+    if (transString)
+    {
+        const char *transChars = (*_jniEnv)->GetStringUTFChars(_jniEnv, transString, NULL);
+        
+        NSString *bStr = [NSString stringWithUTF8String:transChars];
+        (*_jniEnv)->ReleaseStringUTFChars(_jniEnv, transString, transChars);
+        
+        return [NSJSONSerialization JSONObjectWithData:[bStr dataUsingEncoding:NSUTF8StringEncoding] options:0 error:NULL];
+        
+    }
+    
     return nil;
 }
 
 - (NSArray *)allTransactions
 {
+    jclass mgrClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];
+    // We're ready! Let's start
+    jmethodID tM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "getAllTransactions", "()Ljava/lang/String;");
+    
+    if (tM == NULL)
+        return nil;
+    
+    jstring transString = (*_jniEnv)->CallObjectMethod(_jniEnv, _managerObject, tM);
+    
+    if (transString)
+    {
+        const char *transChars = (*_jniEnv)->GetStringUTFChars(_jniEnv, transString, NULL);
+        
+        NSString *bStr = [NSString stringWithUTF8String:transChars];
+        (*_jniEnv)->ReleaseStringUTFChars(_jniEnv, transString, transChars);
+        
+        return [NSJSONSerialization JSONObjectWithData:[bStr dataUsingEncoding:NSUTF8StringEncoding] options:0 error:NULL];
+        
+    }
+    
     return nil;
 }
 
 - (NSArray *)transactionsWithRange:(NSRange)range
 {
+    jclass mgrClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];
+    // We're ready! Let's start
+    jmethodID tM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "getTransaction", "(II)Ljava/lang/String;");
+    
+    if (tM == NULL)
+        return nil;
+    
+    
+    jstring transString = (*_jniEnv)->CallObjectMethod(_jniEnv, _managerObject, tM, range.location, range.length);
+    
+    if (transString)
+    {
+        const char *transChars = (*_jniEnv)->GetStringUTFChars(_jniEnv, transString, NULL);
+        
+        NSString *bStr = [NSString stringWithUTF8String:transChars];
+        (*_jniEnv)->ReleaseStringUTFChars(_jniEnv, transString, transChars);
+        
+        return [NSJSONSerialization JSONObjectWithData:[bStr dataUsingEncoding:NSUTF8StringEncoding] options:0 error:NULL];
+        
+    }
+    
     return nil;
 }
 
@@ -312,6 +419,45 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
     return NO;
 }
 
+- (uint64_t)balance
+{
+    jclass mgrClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];
+    // We're ready! Let's start
+    jmethodID balanceM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "getBalanceString", "()Ljava/lang/String;");
+    
+    if (balanceM == NULL)
+        return 0;
+    
+    jstring balanceString = (*_jniEnv)->CallObjectMethod(_jniEnv, _managerObject, balanceM);
+    
+    if (balanceString)
+    {
+        const char *balanceChars = (*_jniEnv)->GetStringUTFChars(_jniEnv, balanceString, NULL);
+        
+        NSString *bStr = [NSString stringWithUTF8String:balanceChars];
+        (*_jniEnv)->ReleaseStringUTFChars(_jniEnv, balanceString, balanceChars);
+        
+        return [bStr longLongValue];
+    }
+    
+    return 0;
+}
+
+- (NSUInteger)transactionCount
+{
+    jclass mgrClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];
+    // We're ready! Let's start
+    jmethodID tCM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "getTransactionCount", "()I");
+    
+    if (tCM == NULL)
+        return 0;
+    
+    jint c = (*_jniEnv)->CallIntMethod(_jniEnv, _managerObject, tCM);
+    
+    return (NSUInteger)c;
+}
+
+
 #pragma mark - Callbacks
 
 - (void)onBalanceChanged
@@ -328,9 +474,9 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
     
 }
 
-- (uint64_t)balance
+- (void)onTransactionChanged:(NSString *)txid
 {
-    // How to do it?
-    return 0;
+    [[NSNotificationCenter defaultCenter] postNotificationName:kHIBitcoinManagerTransactionChangedNotification object:txid];
 }
+
 @end

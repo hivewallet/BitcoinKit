@@ -60,6 +60,14 @@ public class BitcoinManager implements PeerEventListener {
 	{
 		return wallet.getBalance();
 	}
+    
+    public String getBalanceString()
+    {
+        if (wallet != null)
+            return getBalance().toString();
+        
+        return null;
+    }
 	
 	private String getJSONFromTransaction(Transaction tx)
 	{
@@ -141,6 +149,11 @@ public class BitcoinManager implements PeerEventListener {
 	{
 		return wallet.getTransactionsByTime().size();
 	}
+    
+    public String getAllTransactions()
+    {
+        return getTransactions(0, getTransactionCount());
+    }
 	
 	public String getTransaction(String tx)
 	{
@@ -311,12 +324,8 @@ public class BitcoinManager implements PeerEventListener {
 	
 	/* Implementing native callbacks here */
 	
-	public void onTransactionChanged(String txid)
-	{
-		onBalanceChanged();
-//		System.out.println("Transaction " + txid + " has changed");
-	}
-	
+	public native void onTransactionChanged(String txid);
+    
 	public void onTransactionFailed(String sendingAddress)
 	{
 //		System.out.println("Sending to " + sendingAddress + " has failed!");
