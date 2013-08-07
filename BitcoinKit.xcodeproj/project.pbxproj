@@ -1424,6 +1424,7 @@
 				GCC_PREFIX_HEADER = "BitcoinJKit/BitcoinJKit-Prefix.pch";
 				GCC_VERSION = "";
 				INFOPLIST_FILE = "BitcoinJKit/BitcoinJKit-Info.plist";
+				INSTALL_PATH = "@executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/avian/build/darwin-x86_64\"",
@@ -1447,6 +1448,7 @@
 				GCC_PREFIX_HEADER = "BitcoinJKit/BitcoinJKit-Prefix.pch";
 				GCC_VERSION = "";
 				INFOPLIST_FILE = "BitcoinJKit/BitcoinJKit-Info.plist";
+				INSTALL_PATH = "@executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/avian/build/darwin-x86_64\"",
