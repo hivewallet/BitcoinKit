@@ -43,6 +43,8 @@
     NSDateFormatter *_dateFormatter;
     BOOL _sending;
     void(^sendCompletionBlock)(NSString *hash);
+    uint64_t _lastBalance;
+    NSTimer *_balanceChecker;
 }
 
 - (jclass)jClassForClass:(NSString *)class;
@@ -51,7 +53,7 @@
 - (void)onTransactionChanged:(NSString *)txid;
 - (void)onTransactionSucceeded:(NSString *)txid;
 - (void)onTransactionFailed;
-
+- (void)checkBalance:(NSTimer *)timer;
 @end
 
 
@@ -211,6 +213,8 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
         {
             _managerObject = (*_jniEnv)->NewObject(_jniEnv, mgrClass, constructorM);
         }
+        
+        _balanceChecker = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(checkBalance:) userInfo:nil repeats:YES];
     }
     
     return self;
@@ -302,6 +306,8 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
 
 - (void)stop
 {
+    [_balanceChecker invalidate];
+    _balanceChecker = nil;
     jclass mgrClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];    
     // We're ready! Let's start
     jmethodID stopM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "stop", "()V");
@@ -543,10 +549,20 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
         NSString *bStr = [NSString stringWithUTF8String:balanceChars];
         (*_jniEnv)->ReleaseStringUTFChars(_jniEnv, balanceString, balanceChars);
         
+        _lastBalance = [bStr longLongValue];
         return [bStr longLongValue];
     }
     
     return 0;
+}
+
+- (void)checkBalance:(NSTimer *)timer
+{
+    uint64_t lastBalance = _lastBalance;
+    if (lastBalance != [self balance])
+    {
+        [self onBalanceChanged];
+    }
 }
 
 - (NSUInteger)transactionCount
