@@ -77,7 +77,7 @@
         }
         else if ([keyPath compare:@"balance"] == NSOrderedSame)
         {
-            _balanceLabel.stringValue = [NSString stringWithFormat:@"%.4f ฿", (CGFloat)[HIBitcoinManager defaultManager].balance / 10000000.0];
+            _balanceLabel.stringValue = [NSString stringWithFormat:@"%.4f ฿", (CGFloat)[HIBitcoinManager defaultManager].balance / 100000000.0];
         }
         else if ([keyPath compare:@"isRunning"] == NSOrderedSame)
         {
@@ -145,7 +145,7 @@
     if ([[aTableColumn identifier] compare:@"category"] == NSOrderedSame)
         return transaction[@"details"][0][@"category"];
     else if ([[aTableColumn identifier] compare:@"amount"] == NSOrderedSame)
-        return [NSString stringWithFormat:@"%.4f ฿", [((NSNumber *)transaction[@"amount"]) longLongValue] / 10000000.0];
+        return [NSString stringWithFormat:@"%.4f ฿", [((NSNumber *)transaction[@"amount"]) longLongValue] / 100000000.0];
     else if ([[aTableColumn identifier] compare:@"address"] == NSOrderedSame)
         return transaction[@"details"][0][@"address"];
     else if ([[aTableColumn identifier] compare:@"time"] == NSOrderedSame)

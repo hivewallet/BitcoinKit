@@ -40,6 +40,7 @@
     JNIEnv *_jniEnv;
     JavaVMInitArgs _vmArgs;
     jobject _managerObject;
+    NSDateFormatter *_dateFormatter;
 }
 
 - (jclass)jClassForClass:(NSString *)class;
@@ -53,13 +54,17 @@
 JNIEXPORT void JNICALL onBalanceChanged
 (JNIEnv *env, jobject thisobject)
 {
+    NSAutoreleasePool *pool = [NSAutoreleasePool new];
     [[HIBitcoinManager defaultManager] onBalanceChanged];
+    [pool release];
 }
 
 JNIEXPORT void JNICALL onSynchronizationUpdate
 (JNIEnv *env, jobject thisobject, jint percent)
 {
+    NSAutoreleasePool *pool = [NSAutoreleasePool new];
     [[HIBitcoinManager defaultManager] onSynchronizationChanged:(int)percent];
+    [pool release];
 }
 
 JNIEXPORT void JNICALL onTransactionChanged
@@ -138,6 +143,9 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
     {
         NSURL *appSupportURL = [[[[NSFileManager defaultManager] URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"com.Hive.BitcoinJKit"];
         
+        _dateFormatter = [[NSDateFormatter alloc] init];
+        _dateFormatter.locale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en_GB"] autorelease];
+        _dateFormatter.dateFormat = @"EEE MMM dd HH:mm:ss zzz yyyy";
         _connections = 0;
         _balance = 0;
         _syncProgress = 0;
@@ -276,6 +284,14 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
     [[NSNotificationCenter defaultCenter] postNotificationName:kHIBitcoinManagerStoppedNotification object:self];
 }
 
+- (NSDictionary *)modifiedTransactionForTransaction:(NSDictionary *)transaction
+{
+    NSMutableDictionary *d = [NSMutableDictionary dictionaryWithDictionary:transaction];
+    d[@"time"] = [_dateFormatter dateFromString:transaction[@"time"]];
+
+    return d;
+}
+
 - (NSDictionary *)transactionForHash:(NSString *)hash
 {
     jclass mgrClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];
@@ -295,7 +311,7 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
         NSString *bStr = [NSString stringWithUTF8String:transChars];
         (*_jniEnv)->ReleaseStringUTFChars(_jniEnv, transString, transChars);
         
-        return [NSJSONSerialization JSONObjectWithData:[bStr dataUsingEncoding:NSUTF8StringEncoding] options:0 error:NULL];
+        return [self modifiedTransactionForTransaction:[NSJSONSerialization JSONObjectWithData:[bStr dataUsingEncoding:NSUTF8StringEncoding] options:0 error:NULL]];
         
     }
     
@@ -321,7 +337,7 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
         NSString *bStr = [NSString stringWithUTF8String:transChars];
         (*_jniEnv)->ReleaseStringUTFChars(_jniEnv, transString, transChars);
         
-        return [NSJSONSerialization JSONObjectWithData:[bStr dataUsingEncoding:NSUTF8StringEncoding] options:0 error:NULL];
+        return [self modifiedTransactionForTransaction:[NSJSONSerialization JSONObjectWithData:[bStr dataUsingEncoding:NSUTF8StringEncoding] options:0 error:NULL]];
         
     }
     
@@ -346,7 +362,16 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
         NSString *bStr = [NSString stringWithUTF8String:transChars];
         (*_jniEnv)->ReleaseStringUTFChars(_jniEnv, transString, transChars);
         
-        return [NSJSONSerialization JSONObjectWithData:[bStr dataUsingEncoding:NSUTF8StringEncoding] options:0 error:NULL];
+        NSArray *ts = [NSJSONSerialization JSONObjectWithData:[bStr dataUsingEncoding:NSUTF8StringEncoding] options:0 error:NULL];
+        NSMutableArray *mts = [NSMutableArray array];
+        
+        for (NSDictionary *t in ts)
+        {
+            [mts addObject:[self modifiedTransactionForTransaction:t]];
+        }
+        
+        return mts;
+        
         
     }
     
@@ -372,7 +397,17 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
         NSString *bStr = [NSString stringWithUTF8String:transChars];
         (*_jniEnv)->ReleaseStringUTFChars(_jniEnv, transString, transChars);
         
-        return [NSJSONSerialization JSONObjectWithData:[bStr dataUsingEncoding:NSUTF8StringEncoding] options:0 error:NULL];
+        NSArray *ts = [NSJSONSerialization JSONObjectWithData:[bStr dataUsingEncoding:NSUTF8StringEncoding] options:0 error:NULL];
+        NSMutableArray *mts = [NSMutableArray array];
+        
+        for (NSDictionary *t in ts)
+        {
+            [mts addObject:[self modifiedTransactionForTransaction:t]];
+        }
+        
+        return mts;
+
+        
         
     }
     
@@ -476,7 +511,9 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
 
 - (void)onTransactionChanged:(NSString *)txid
 {
+    [self willChangeValueForKey:@"balance"];
     [[NSNotificationCenter defaultCenter] postNotificationName:kHIBitcoinManagerTransactionChangedNotification object:txid];
+    [self didChangeValueForKey:@"balance"];
 }
 
 @end

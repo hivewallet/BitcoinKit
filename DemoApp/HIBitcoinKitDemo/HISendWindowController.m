@@ -47,16 +47,16 @@
     // Sanity check first
     NSString *address = _addressField.stringValue;
     CGFloat amount = [_amountField.stringValue floatValue];
-    NSLog(@"Balance %llu and amount %llu", [[HIBitcoinManager defaultManager] balance], (long long)(amount * 10000000));
+    NSLog(@"Balance %llu and amount %llu", [[HIBitcoinManager defaultManager] balance], (long long)(amount * 100000000));
     if (amount <= 0 ||
-        [[HIBitcoinManager defaultManager] balance] < (long long)(amount * 10000000) ||
+        [[HIBitcoinManager defaultManager] balance] < (long long)(amount * 100000000) ||
         ![[HIBitcoinManager defaultManager] isAddressValid:address])
     {
         NSAlert *alert = [[NSAlert alloc] init];
         [alert setMessageText:@"Cannot send money"];
         if (amount <= 0)
             [alert setInformativeText:@"Your amount is invalid"];
-        else if ([[HIBitcoinManager defaultManager] balance] < (long long)(amount * 10000000))
+        else if ([[HIBitcoinManager defaultManager] balance] < (long long)(amount * 100000000))
             [alert setInformativeText:@"You can't send more than you own"];
         else if (![[HIBitcoinManager defaultManager] isAddressValid:address])
             [alert setInformativeText:@"Given receipent address is invalid"];
@@ -66,7 +66,7 @@
     }
     else
     {
-        if ([[HIBitcoinManager defaultManager] sendCoins:(amount * 10000000) toReceipent:address comment:nil] != nil)
+        if ([[HIBitcoinManager defaultManager] sendCoins:(amount * 100000000) toReceipent:address comment:nil] != nil)
         {
             [self cancelClicked:sender];
         }
