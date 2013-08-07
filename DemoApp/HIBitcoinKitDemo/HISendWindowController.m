@@ -66,18 +66,21 @@
     }
     else
     {
-        if ([[HIBitcoinManager defaultManager] sendCoins:(amount * 100000000) toReceipent:address comment:nil] != nil)
+        [[HIBitcoinManager defaultManager] sendCoins:(amount * 100000000) toReceipent:address comment:nil completion:^(NSString *hash)
         {
-            [self cancelClicked:sender];
-        }
-        else
-        {
-            NSAlert *alert = [[NSAlert alloc] init];
-            [alert setMessageText:@"Cannot send money"];
-            [alert setInformativeText:@"Failed to send money"];
-            [alert addButtonWithTitle:@"Ok"];
-            [alert runModal];            
-        }
+            if (hash)
+            {
+                [self cancelClicked:sender];
+            }
+            else
+            {
+                NSAlert *alert = [[NSAlert alloc] init];
+                [alert setMessageText:@"Cannot send money"];
+                [alert setInformativeText:@"Failed to send money"];
+                [alert addButtonWithTitle:@"Ok"];
+                [alert runModal];            
+            }            
+        }];
     }
 }
 @end

@@ -201,21 +201,32 @@ public class BitcoinManager implements PeerEventListener {
 	          final Wallet.SendResult sendResult = wallet.sendCoins(peerGroup, sendToAddress, aToSend);
 	          Futures.addCallback(sendResult.broadcastComplete, new FutureCallback<Transaction>() {
 	               public void onSuccess(Transaction transaction) {
+                       onTransactionSuccess(sendResult.tx.getHashAsString());
 	            	   onTransactionChanged(sendResult.tx.getHashAsString());
 	                }
 
 	                public void onFailure(Throwable throwable) {
 	                	
-	                	onTransactionFailed(sendToAddressString);
-	                    System.err.println("Failed to send coins :(");
+	                	onTransactionFailed();
 	                    throwable.printStackTrace();
 	                }
 	            });
 	       } catch (Exception e) {
-	    	   onTransactionFailed(sendToAddressString);
-	    	   System.err.println("Failed to send coins :(");	    	   
+	    	   onTransactionFailed();   	   
 	       }		
 	}
+    
+    public boolean isAddressValid(String address)
+    {
+        try {
+            Address addr = new Address(networkParams, address);
+            return (addr != null);
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+    }
 	
 	public void start() throws Exception
 	{
@@ -279,6 +290,7 @@ public class BitcoinManager implements PeerEventListener {
                 BigInteger value = tx.getValueSentToMe(w);
 //                System.out.println("Received pending tx for " + Utils.bitcoinValueToFriendlyString(value) +
 //                        ": " + tx);
+                onTransactionChanged(tx.getHashAsString());
                 tx.getConfidence().addEventListener(new TransactionConfidence.Listener() {
                     public void onConfidenceChanged(final Transaction tx2, TransactionConfidence.Listener.ChangeReason reason) {
                         if (tx2.getConfidence().getConfidenceType() == TransactionConfidence.ConfidenceType.BUILDING) {
@@ -290,6 +302,7 @@ public class BitcoinManager implements PeerEventListener {
 //                            System.out.println(String.format("Confidence of %s changed, is now: %s",
 //                                    tx2.getHashAsString(), tx2.getConfidence().toString()));
                         }
+                        onTransactionChanged(tx2.getHashAsString());
                     }
                 });
             }
@@ -326,11 +339,10 @@ public class BitcoinManager implements PeerEventListener {
 	
 	public native void onTransactionChanged(String txid);
     
-	public void onTransactionFailed(String sendingAddress)
-	{
-//		System.out.println("Sending to " + sendingAddress + " has failed!");
-	}
+	public native void onTransactionFailed();
 	
+    public native void onTransactionSuccess(String txid);
+    
 	public native void onSynchronizationUpdate(int percent);
 	
 	public void onPeerCountChange(int peersConnected)

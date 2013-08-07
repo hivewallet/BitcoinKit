@@ -215,6 +215,7 @@
 /* Begin PBXFileReference section */
 		D901F49817AF9DAA0071780D /* JavaVM.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaVM.framework; path = System/Library/Frameworks/JavaVM.framework; sourceTree = SDKROOT; };
 		D901F49A17AF9DDB0071780D /* boot.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = boot.jar; sourceTree = SOURCE_ROOT; };
+		D901F4EC17B2479C0071780D /* BitcoinManager.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; name = BitcoinManager.java; path = java/bitcoinkit/src/main/java/com/hive/bitcoinkit/BitcoinManager.java; sourceTree = "<group>"; };
 		D91FE4EE178EB1F1001B37D8 /* BitcoinKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = BitcoinKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D91FE4F1178EB1F1001B37D8 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		D91FE4F4178EB1F1001B37D8 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -808,6 +809,7 @@
 		D958B09F17A29B0500B0EDD5 /* BitcoinJKit */ = {
 			isa = PBXGroup;
 			children = (
+				D901F4EC17B2479C0071780D /* BitcoinManager.java */,
 				D901F49A17AF9DDB0071780D /* boot.jar */,
 				D958B0AD17A29CE200B0EDD5 /* jni_md.h */,
 				D958B0AE17A29CE200B0EDD5 /* jni.h */,

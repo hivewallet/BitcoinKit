@@ -41,12 +41,16 @@
     JavaVMInitArgs _vmArgs;
     jobject _managerObject;
     NSDateFormatter *_dateFormatter;
+    BOOL _sending;
+    void(^sendCompletionBlock)(NSString *hash);
 }
 
 - (jclass)jClassForClass:(NSString *)class;
 - (void)onBalanceChanged;
 - (void)onSynchronizationChanged:(int)percent;
 - (void)onTransactionChanged:(NSString *)txid;
+- (void)onTransactionSucceeded:(NSString *)txid;
+- (void)onTransactionFailed;
 
 @end
 
@@ -81,16 +85,42 @@ JNIEXPORT void JNICALL onTransactionChanged
 
     }
     
-//    [[HIBitcoinManager defaultManager] onSynchronizationChanged:(int)percent];
+    [pool release];
+}
+
+JNIEXPORT void JNICALL onTransactionSucceeded
+(JNIEnv *env, jobject thisobject, jstring txid)
+{
+    NSAutoreleasePool *pool = [NSAutoreleasePool new];
+    if (txid)
+    {
+        const char *txc = (*env)->GetStringUTFChars(env, txid, NULL);
+        
+        NSString *bStr = [NSString stringWithUTF8String:txc];
+        (*env)->ReleaseStringUTFChars(env, txid, txc);
+        [[HIBitcoinManager defaultManager] onTransactionSucceeded:bStr];
+        
+    }
+    
+    [pool release];
+}
+
+JNIEXPORT void JNICALL onTransactionFailed
+(JNIEnv *env, jobject thisobject)
+{
+    NSAutoreleasePool *pool = [NSAutoreleasePool new];
+    [[HIBitcoinManager defaultManager] onTransactionFailed];
     
     [pool release];
 }
 
 
 static JNINativeMethod methods[] = {
-    {"onBalanceChanged",        "()V",                   (void *)&onBalanceChanged},
-    {"onTransactionChanged",    "(Ljava/lang/String;)V", (void *)&onTransactionChanged},
-    {"onSynchronizationUpdate", "(I)V",                  (void *)&onSynchronizationUpdate}
+    {"onBalanceChanged",        "()V",                                     (void *)&onBalanceChanged},
+    {"onTransactionChanged",    "(Ljava/lang/String;)V",                   (void *)&onTransactionChanged},
+    {"onTransactionSuccess",    "(Ljava/lang/String;)V",                   (void *)&onTransactionSucceeded},
+    {"onTransactionFailed",     "()V",                                     (void *)&onTransactionFailed},
+    {"onSynchronizationUpdate", "(I)V",                                    (void *)&onSynchronizationUpdate}
 };
 
 NSString * const kHIBitcoinManagerTransactionChangedNotification = @"kJHIBitcoinManagerTransactionChangedNotification";
@@ -148,6 +178,7 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
         _dateFormatter.dateFormat = @"EEE MMM dd HH:mm:ss zzz yyyy";
         _connections = 0;
         _balance = 0;
+        _sending = NO;
         _syncProgress = 0;
         _testingNetwork = NO;
         _enableMining = NO;
@@ -183,6 +214,13 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
     }
     
     return self;
+}
+
+- (void)dealloc
+{
+    [self stop];
+    [sendCompletionBlock release];
+    [super dealloc];
 }
 
 - (void)start
@@ -416,12 +454,45 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
 
 - (BOOL)isAddressValid:(NSString *)address
 {
-    return NO;
+    jclass mgrClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];
+    // We're ready! Let's start
+    jmethodID aV = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "isAddressValid", "(Ljava/lang/String;)Z");
+    
+    if (aV == NULL)
+        return NO;
+    
+    jboolean valid = (*_jniEnv)->CallBooleanMethod(_jniEnv, _managerObject, aV, (*_jniEnv)->NewStringUTF(_jniEnv, address.UTF8String));
+    return valid;
 }
 
-- (NSString *)sendCoins:(uint64_t)coins toReceipent:(NSString *)receipent comment:(NSString *)comment
+- (void)sendCoins:(uint64_t)coins toReceipent:(NSString *)receipent comment:(NSString *)comment completion:(void(^)(NSString *hash))completion
 {
-    return nil;
+    if (_sending)
+    {
+        if (completion)
+            completion(nil);
+        return;
+    }
+    
+    _sending = YES;
+    [sendCompletionBlock release];
+    sendCompletionBlock = [completion copy];
+    
+    jclass mgrClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];
+    // We're ready! Let's start
+    jmethodID sendM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "sendCoins", "(Ljava/lang/String;Ljava/lang/String;)V");
+    
+    if (sendM == NULL)
+    {
+        if (sendCompletionBlock)
+            sendCompletionBlock(nil);
+        
+        [sendCompletionBlock release];
+        sendCompletionBlock = nil;        
+    }
+    
+    (*_jniEnv)->CallVoidMethod(_jniEnv, _managerObject, sendM, (*_jniEnv)->NewStringUTF(_jniEnv, [[NSString stringWithFormat:@"%lld", coins] UTF8String]),
+                                (*_jniEnv)->NewStringUTF(_jniEnv, receipent.UTF8String));
 }
 
 - (BOOL)encryptWalletWith:(NSString *)passwd
@@ -497,23 +568,55 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
 
 - (void)onBalanceChanged
 {
-    [self willChangeValueForKey:@"balance"];
-    [self didChangeValueForKey:@"balance"];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self willChangeValueForKey:@"balance"];
+        [self didChangeValueForKey:@"balance"];
+    });
 }
 
 - (void)onSynchronizationChanged:(int)percent
 {
-    [self willChangeValueForKey:@"syncProgress"];
-    _syncProgress = (NSUInteger)percent;
-    [self didChangeValueForKey:@"syncProgress"];
-    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self willChangeValueForKey:@"syncProgress"];
+        _syncProgress = (NSUInteger)percent;
+        [self didChangeValueForKey:@"syncProgress"];
+    });
 }
 
 - (void)onTransactionChanged:(NSString *)txid
 {
-    [self willChangeValueForKey:@"balance"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:kHIBitcoinManagerTransactionChangedNotification object:txid];
-    [self didChangeValueForKey:@"balance"];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self willChangeValueForKey:@"balance"];
+        [[NSNotificationCenter defaultCenter] postNotificationName:kHIBitcoinManagerTransactionChangedNotification object:txid];
+        [self didChangeValueForKey:@"balance"];
+    });
+}
+
+- (void)onTransactionSucceeded:(NSString *)txid
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        _sending = NO;
+        if (sendCompletionBlock)
+        {
+            sendCompletionBlock(txid);
+        }
+        [sendCompletionBlock release];
+        sendCompletionBlock = nil;        
+    });
+}
+
+- (void)onTransactionFailed
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        _sending = NO;
+        if (sendCompletionBlock)
+        {
+            sendCompletionBlock(nil);
+        }
+   
+        [sendCompletionBlock release];
+        sendCompletionBlock = nil;
+    });
 }
 
 @end
