@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		D901F49917AF9DAB0071780D /* JavaVM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D901F49817AF9DAA0071780D /* JavaVM.framework */; };
 		D901F49B17AF9DDB0071780D /* boot.jar in Frameworks */ = {isa = PBXBuildFile; fileRef = D901F49A17AF9DDB0071780D /* boot.jar */; };
-		D901F49E17AFAA940071780D /* boot.jar in Resources */ = {isa = PBXBuildFile; fileRef = D901F49A17AF9DDB0071780D /* boot.jar */; };
+		D901F50017B279EA0071780D /* boot.jar in Resources */ = {isa = PBXBuildFile; fileRef = D901F49A17AF9DDB0071780D /* boot.jar */; };
 		D91FE4F2178EB1F1001B37D8 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D91FE4F1178EB1F1001B37D8 /* Cocoa.framework */; };
 		D91FE4FC178EB1F1001B37D8 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D91FE4FA178EB1F1001B37D8 /* InfoPlist.strings */; };
 		D91FE5F0178EB375001B37D8 /* addrman.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE508178EB374001B37D8 /* addrman.h */; };
@@ -1060,7 +1060,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D958B0A417A29B0500B0EDD5 /* InfoPlist.strings in Resources */,
-				D901F49E17AFAA940071780D /* boot.jar in Resources */,
+				D901F50017B279EA0071780D /* boot.jar in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
