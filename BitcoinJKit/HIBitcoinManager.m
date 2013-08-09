@@ -331,7 +331,11 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
 - (NSDictionary *)modifiedTransactionForTransaction:(NSDictionary *)transaction
 {
     NSMutableDictionary *d = [NSMutableDictionary dictionaryWithDictionary:transaction];
-    d[@"time"] = [_dateFormatter dateFromString:transaction[@"time"]];
+    NSDate *date = [_dateFormatter dateFromString:transaction[@"time"]];
+    if (date)
+        d[@"time"] = date;
+    else
+        d[@"time"] = [NSDate dateWithTimeIntervalSinceNow:0];
 
     return d;
 }
