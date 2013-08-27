@@ -8,31 +8,31 @@
 
 #import "HIBitcoinManager.h"
 //#import "HIJavaBridge.h"
-#import <JavaVM/jni.h>
-//#import "jni.h"
+//#import <JavaVM/jni.h>
+#import "jni.h"
 
-//#if (defined __MINGW32__) || (defined _MSC_VER)
-//#  define EXPORT __declspec(dllexport)
-//#else
-//#  define EXPORT __attribute__ ((visibility("default"))) \
-//__attribute__ ((used))
-//#endif
-//
-//#if (! defined __x86_64__) && ((defined __MINGW32__) || (defined _MSC_VER))
-//#  define SYMBOL(x) binary_boot_jar_##x
-//#else
-//#  define SYMBOL(x) _binary_boot_jar_##x
-//#endif
-//
-//extern const uint8_t SYMBOL(start)[];
-//extern const uint8_t SYMBOL(end)[];
-//
-//EXPORT const uint8_t*
-//bootJar(unsigned* size)
-//{
-//    *size = (unsigned int)(SYMBOL(end) - SYMBOL(start));
-//    return SYMBOL(start);
-//}
+#if (defined __MINGW32__) || (defined _MSC_VER)
+#  define EXPORT __declspec(dllexport)
+#else
+#  define EXPORT __attribute__ ((visibility("default"))) \
+__attribute__ ((used))
+#endif
+
+#if (! defined __x86_64__) && ((defined __MINGW32__) || (defined _MSC_VER))
+#  define SYMBOL(x) binary_boot_jar_##x
+#else
+#  define SYMBOL(x) _binary_boot_jar_##x
+#endif
+
+extern const uint8_t SYMBOL(start)[];
+extern const uint8_t SYMBOL(end)[];
+
+EXPORT const uint8_t*
+bootJar(unsigned* size)
+{
+    *size = (unsigned int)((unsigned int)SYMBOL(end) - (unsigned int)SYMBOL(start));
+    return SYMBOL(start);
+}
 
 @interface HIBitcoinManager ()
 {
@@ -163,7 +163,7 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
         (*_jniEnv)->ExceptionDescribe(_jniEnv);
         (*_jniEnv)->ExceptionClear(_jniEnv);
         
-        @throw [NSException exceptionWithName:@"Java exception" reason:@"Java VM raised an exception" userInfo:@{@"class": class}];
+       // @throw [NSException exceptionWithName:@"Java exception" reason:@"Java VM raised an exception" userInfo:@{@"class": class}];
     }
     return cls;
 }
@@ -187,16 +187,16 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
         _isRunning = NO;
         _dataURL = [appSupportURL copy];
         
-        _vmArgs.version = JNI_VERSION_1_2;
+        _vmArgs.version = JNI_VERSION_1_6;
         _vmArgs.nOptions = 1;
         _vmArgs.ignoreUnrecognized = JNI_TRUE;
         
         JavaVMOption options[_vmArgs.nOptions];
         _vmArgs.options = options;
         
-//        options[0].optionString = (char*) "-Xbootclasspath:[bootJar]";
-        NSBundle *myBundle = [NSBundle bundleWithIdentifier:@"com.hive.BitcoinJKit"];
-        options[0].optionString = (char *)[[NSString stringWithFormat:@"-Djava.class.path=%@", [myBundle pathForResource:@"boot" ofType:@"jar"]] UTF8String];
+        options[0].optionString = (char*) "-Xbootclasspath:[bootJar]";
+//        NSBundle *myBundle = [NSBundle bundleWithIdentifier:@"com.hive.BitcoinJKit"];
+//        options[0].optionString = (char *)[[NSString stringWithFormat:@"-Djava.class.path=%@", [myBundle pathForResource:@"boot" ofType:@"jar"]] UTF8String];
         
         JavaVM* vm;
         void *env;
@@ -205,6 +205,7 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
         
         
         // We need to create the manager object
+        jclass testClass = [self jClassForClass:@"java/lang/Object"];
         jclass mgrClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];
         (*_jniEnv)->RegisterNatives(_jniEnv, mgrClass, methods, sizeof(methods)/sizeof(methods[0]));
         
