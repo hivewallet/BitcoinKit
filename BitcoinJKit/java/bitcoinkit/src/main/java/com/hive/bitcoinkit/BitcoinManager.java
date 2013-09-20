@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class BitcoinManager implements PeerEventListener {
 	private NetworkParameters networkParams;
@@ -250,6 +251,9 @@ public class BitcoinManager implements PeerEventListener {
             wallet.addKey(new ECKey());
             wallet.saveToFile(walletFile);
         }
+
+        //make wallet autosave
+        wallet.autosaveToFile(walletFile, 1, TimeUnit.SECONDS, null);
         
 
         // Fetch the first key in the wallet (should be the only key).
