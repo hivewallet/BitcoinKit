@@ -286,7 +286,7 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
 - (NSString *)walletAddress
 {
     jclass mgrClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];    
-    jmethodID walletM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "getWalletAddres", "()Ljava/lang/String;");
+    jmethodID walletM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "getWalletAddress", "()Ljava/lang/String;");
     
     if (walletM)
     {

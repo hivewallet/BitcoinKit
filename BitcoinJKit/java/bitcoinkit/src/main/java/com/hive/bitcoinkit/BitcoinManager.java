@@ -51,7 +51,7 @@ public class BitcoinManager implements PeerEventListener {
 		dataDirectory = path;
 	}
 	
-	public String getWalletAddres()
+	public String getWalletAddress()
 	{
 		ECKey ecKey = wallet.getKeys().get(0);
 		return ecKey.toAddress(networkParams).toString();
