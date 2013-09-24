@@ -246,7 +246,10 @@ public class BitcoinManager implements PeerEventListener {
             // Fall through.
         }
         if (wallet == null) {
-//            System.out.println("Creating new wallet file.");
+            if (networkParams == null)
+            {
+                setTestingNetwork(false);
+            }
             wallet = new Wallet(networkParams);
             wallet.addKey(new ECKey());
             wallet.saveToFile(walletFile);
