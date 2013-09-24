@@ -231,6 +231,10 @@ public class BitcoinManager implements PeerEventListener {
 	
 	public void start() throws Exception
 	{
+        if (networkParams == null)
+        {
+            setTestingNetwork(false);
+        }
 
         File chainFile = new File(dataDirectory + "/bitcoinkit.spvchain");
 
@@ -246,10 +250,6 @@ public class BitcoinManager implements PeerEventListener {
             // Fall through.
         }
         if (wallet == null) {
-            if (networkParams == null)
-            {
-                setTestingNetwork(false);
-            }
             wallet = new Wallet(networkParams);
             wallet.addKey(new ECKey());
             wallet.saveToFile(walletFile);
