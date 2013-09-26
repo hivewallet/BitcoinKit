@@ -28,7 +28,8 @@ public class BitcoinManager implements PeerEventListener {
 	private NetworkParameters networkParams;
 	private Wallet wallet;
 	private String dataDirectory;
-	
+    private String appName = "bitcoinkit";
+
     private PeerGroup peerGroup;
     private BlockStore blockStore;
     private File walletFile;
@@ -50,6 +51,21 @@ public class BitcoinManager implements PeerEventListener {
 	{
 		dataDirectory = path;
 	}
+
+    public String getDataDirectory()
+    {
+        return dataDirectory;
+    }
+
+    public void setAppName(String newAppName)
+    {
+        appName = newAppName;
+    }
+
+    public String getAppName()
+    {
+        return appName;
+    }
 	
 	public String getWalletAddress()
 	{
@@ -236,11 +252,11 @@ public class BitcoinManager implements PeerEventListener {
             setTestingNetwork(false);
         }
 
-        File chainFile = new File(dataDirectory + "/bitcoinkit.spvchain");
+        File chainFile = new File(dataDirectory + "/" + appName + ".spvchain");
 
         // Try to read the wallet from storage, create a new one if not possible.
         wallet = null;
-        walletFile = new File(dataDirectory + "/bitcoinkit.wallet");
+        walletFile = new File(dataDirectory + "/"+ appName +".wallet");
         try {
             // Wipe the wallet if the chain file was deleted.
             if (walletFile.exists() && chainFile.exists())

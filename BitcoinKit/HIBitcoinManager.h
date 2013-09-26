@@ -21,6 +21,8 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;                   
  */
 @interface HIBitcoinManager : NSObject
 
+@property (nonatomic, copy) NSString *appSupportDirectoryIdentifier;                                         //<<< Specifies the support directory identifier. Warning! All changes to it has to be performed BEFORE start.
+@property (nonatomic, copy) NSString *appName;                                         //<<< Specifies an App Name. The name will be used for data file/folder creation. Warning! All changes to it has to be performed BEFORE start.
 @property (nonatomic, copy) NSURL *dataURL;                                         //<<< Specifies an URL path to a directory where HIBitcoinManager should store its data. Warning! All changes to it has to be performed BEFORE start.
 @property (nonatomic, assign) BOOL testingNetwork;                                  //<<< Specifies if a manager is running on the testing network. Warning! All changes to it has to be performed BEFORE start.
 @property (nonatomic, assign) BOOL enableMining;                                    //<<< Specifies if a manager should try to mine bticoins. Warning! All changes to it has to be performed BEFORE start.

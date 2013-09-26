@@ -45,6 +45,8 @@
     void(^sendCompletionBlock)(NSString *hash);
     uint64_t _lastBalance;
     NSTimer *_balanceChecker;
+    
+    NSString *_appSupportDirectoryIdentifier;
 }
 
 - (jclass)jClassForClass:(NSString *)class;
@@ -129,10 +131,14 @@ NSString * const kHIBitcoinManagerTransactionChangedNotification = @"kJHIBitcoin
 NSString * const kHIBitcoinManagerStartedNotification = @"kJHIBitcoinManagerStartedNotification";
 NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStoppedNotification";
 
+#define kHIDefaultAppSupportIdentifier @"com.Hive.BitcoinJKit"
+#define kHIDefaultAppName @"bitcoinkit"
 
+static HIBitcoinManager *_defaultManager = nil;
 
 @implementation HIBitcoinManager
 
+@synthesize appName = _appName;
 @synthesize dataURL = _dataURL;
 @synthesize connections = _connections;
 @synthesize isRunning = _isRunning;
@@ -144,7 +150,6 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
 
 + (HIBitcoinManager *)defaultManager
 {
-    static HIBitcoinManager *_defaultManager = nil;
     static dispatch_once_t oncePredicate;
     if (!_defaultManager)
         dispatch_once(&oncePredicate, ^{
@@ -168,13 +173,31 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
     return cls;
 }
 
+- (void)setAppSupportDirectoryIdentifier:(NSString *)appSupportDirectoryIdentifier
+{
+    if(_appSupportDirectoryIdentifier != appSupportDirectoryIdentifier)
+    {
+        [_appSupportDirectoryIdentifier release];
+        _appSupportDirectoryIdentifier = [appSupportDirectoryIdentifier retain];
+        
+        // set the new data url
+        self.dataURL = [[[[NSFileManager defaultManager] URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:self.appSupportDirectoryIdentifier];
+    }
+}
+
+- (NSString *)appSupportDirectoryIdentifier
+{
+    return _appSupportDirectoryIdentifier;
+}
+
 - (id)init
 {
     self = [super init];
     if (self)
     {
-        NSURL *appSupportURL = [[[[NSFileManager defaultManager] URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"com.Hive.BitcoinJKit"];
-        
+        self.appSupportDirectoryIdentifier   = kHIDefaultAppSupportIdentifier;
+        self.appName                         = kHIDefaultAppName;
+
         _dateFormatter = [[NSDateFormatter alloc] init];
         _dateFormatter.locale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en_GB"] autorelease];
         _dateFormatter.dateFormat = @"EEE MMM dd HH:mm:ss zzz yyyy";
@@ -185,7 +208,8 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
         _testingNetwork = NO;
         _enableMining = NO;
         _isRunning = NO;
-        _dataURL = [appSupportURL copy];
+        
+        self.dataURL = [[[[NSFileManager defaultManager] URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:self.appSupportDirectoryIdentifier];
         
         _vmArgs.version = JNI_VERSION_1_2;
         _vmArgs.nOptions = 1;
@@ -251,11 +275,23 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
     }
     
     // Now set the folder
-    jmethodID folderM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "setDataDirectory", "(Ljava/lang/String;)V");
-    if (folderM == NULL)
+    jmethodID setDataDirM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "setDataDirectory", "(Ljava/lang/String;)V");
+    if (setDataDirM == NULL)
         return;
     
-    (*_jniEnv)->CallVoidMethod(_jniEnv, _managerObject, folderM, (*_jniEnv)->NewStringUTF(_jniEnv, _dataURL.path.UTF8String));
+    (*_jniEnv)->CallVoidMethod(_jniEnv, _managerObject, setDataDirM, (*_jniEnv)->NewStringUTF(_jniEnv, _dataURL.path.UTF8String));
+    if ((*_jniEnv)->ExceptionCheck(_jniEnv))
+    {
+        (*_jniEnv)->ExceptionDescribe(_jniEnv);
+        (*_jniEnv)->ExceptionClear(_jniEnv);
+    }
+    
+    // Now set the app name
+    jmethodID setAppNameM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "setAppName", "(Ljava/lang/String;)V");
+    if (setAppNameM == NULL)
+        return;
+    
+    (*_jniEnv)->CallVoidMethod(_jniEnv, _managerObject, setAppNameM, (*_jniEnv)->NewStringUTF(_jniEnv, _appName.UTF8String));
     if ((*_jniEnv)->ExceptionCheck(_jniEnv))
     {
         (*_jniEnv)->ExceptionDescribe(_jniEnv);
