@@ -243,7 +243,7 @@ public class BitcoinManager implements PeerEventListener {
         walletFile = new File(dataDirectory + "/bitcoinkit.wallet");
         try {
             // Wipe the wallet if the chain file was deleted.
-            if (walletFile.exists() && chainFile.exists())
+            if (walletFile.exists())
             	wallet = Wallet.loadFromFile(walletFile);
         } catch (UnreadableWalletException e) {
 //            System.err.println("Couldn't load wallet: " + e);
