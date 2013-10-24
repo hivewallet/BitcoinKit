@@ -14,6 +14,7 @@
     JNIEnv *_jniEnv;
     JavaVMInitArgs _vmArgs;
     jobject _managerObject;
+    jclass _managerClass;
     NSDateFormatter *_dateFormatter;
     BOOL _sending;
     void(^sendCompletionBlock)(NSString *hash);
@@ -29,6 +30,25 @@
 
 @end
 
+
+#pragma mark - Helper functions for conversion
+
+NSString * NSStringFromJString(JNIEnv *env, jstring javaString)
+{
+    const char *chars = (*env)->GetStringUTFChars(env, javaString, NULL);
+    NSString *objcString = [NSString stringWithUTF8String:chars];
+    (*env)->ReleaseStringUTFChars(env, javaString, chars);
+
+    return objcString;
+}
+
+jstring JStringFromNSString(JNIEnv *env, NSString *string)
+{
+    return (*env)->NewStringUTF(env, [string UTF8String]);
+}
+
+
+#pragma mark - JNI callback functions
 
 JNIEXPORT void JNICALL onBalanceChanged(JNIEnv *env, jobject thisobject)
 {
@@ -47,14 +67,10 @@ JNIEXPORT void JNICALL onSynchronizationUpdate(JNIEnv *env, jobject thisobject, 
 JNIEXPORT void JNICALL onTransactionChanged(JNIEnv *env, jobject thisobject, jstring txid)
 {
     NSAutoreleasePool *pool = [NSAutoreleasePool new];
+
     if (txid)
     {
-        const char *txc = (*env)->GetStringUTFChars(env, txid, NULL);
-        
-        NSString *bStr = [NSString stringWithUTF8String:txc];
-        (*env)->ReleaseStringUTFChars(env, txid, txc);
-        [[HIBitcoinManager defaultManager] onTransactionChanged:bStr];
-
+        [[HIBitcoinManager defaultManager] onTransactionChanged:NSStringFromJString(env, txid)];
     }
     
     [pool release];
@@ -63,14 +79,10 @@ JNIEXPORT void JNICALL onTransactionChanged(JNIEnv *env, jobject thisobject, jst
 JNIEXPORT void JNICALL onTransactionSucceeded(JNIEnv *env, jobject thisobject, jstring txid)
 {
     NSAutoreleasePool *pool = [NSAutoreleasePool new];
+
     if (txid)
     {
-        const char *txc = (*env)->GetStringUTFChars(env, txid, NULL);
-        
-        NSString *bStr = [NSString stringWithUTF8String:txc];
-        (*env)->ReleaseStringUTFChars(env, txid, txc);
-        [[HIBitcoinManager defaultManager] onTransactionSucceeded:bStr];
-        
+        [[HIBitcoinManager defaultManager] onTransactionSucceeded:NSStringFromJString(env, txid)];
     }
     
     [pool release];
@@ -80,7 +92,6 @@ JNIEXPORT void JNICALL onTransactionFailed(JNIEnv *env, jobject thisobject)
 {
     NSAutoreleasePool *pool = [NSAutoreleasePool new];
     [[HIBitcoinManager defaultManager] onTransactionFailed];
-    
     [pool release];
 }
 
@@ -92,6 +103,7 @@ static JNINativeMethod methods[] = {
     {"onTransactionFailed",     "()V",                                     (void *)&onTransactionFailed},
     {"onSynchronizationUpdate", "(I)V",                                    (void *)&onSynchronizationUpdate}
 };
+
 
 NSString * const kHIBitcoinManagerTransactionChangedNotification = @"kJHIBitcoinManagerTransactionChangedNotification";
 NSString * const kHIBitcoinManagerStartedNotification = @"kJHIBitcoinManagerStartedNotification";
@@ -117,6 +129,9 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     return defaultManager;
 }
 
+
+#pragma mark - helper methods for JNI calls and conversion
+
 - (jclass)jClassForClass:(NSString *)class
 {
     jclass cls = (*_jniEnv)->FindClass(_jniEnv, [class UTF8String]);
@@ -133,6 +148,92 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
     return cls;
 }
+
+- (jmethodID)jMethodWithName:(char *)name signature:(char *)signature
+{
+    jmethodID method = (*_jniEnv)->GetMethodID(_jniEnv, _managerClass, name, signature);
+
+    if (method == NULL)
+    {
+        @throw [NSException exceptionWithName:@"Java exception"
+                                       reason:[NSString stringWithFormat:@"Method not found: %s (%s)", name, signature]
+                                     userInfo:nil];
+    }
+
+    return method;
+}
+
+- (BOOL)callBooleanMethodWithName:(char *)name signature:(char *)signature, ...
+{
+    jmethodID method = [self jMethodWithName:name signature:signature];
+
+    va_list args;
+    va_start(args, signature);
+    jboolean result = (*_jniEnv)->CallBooleanMethodV(_jniEnv, _managerObject, method, args);
+    va_end(args);
+
+    [self handleJavaExceptions];
+
+    return result;
+}
+
+- (NSInteger)callIntegerMethodWithName:(char *)name signature:(char *)signature, ...
+{
+    jmethodID method = [self jMethodWithName:name signature:signature];
+
+    va_list args;
+    va_start(args, signature);
+    jint result = (*_jniEnv)->CallIntMethodV(_jniEnv, _managerObject, method, args);
+    va_end(args);
+
+    [self handleJavaExceptions];
+
+    return result;
+}
+
+- (jobject)callObjectMethodWithName:(char *)name signature:(char *)signature, ...
+{
+    jmethodID method = [self jMethodWithName:name signature:signature];
+
+    va_list args;
+    va_start(args, signature);
+    jobject result = (*_jniEnv)->CallObjectMethodV(_jniEnv, _managerObject, method, args);
+    va_end(args);
+
+    [self handleJavaExceptions];
+
+    return result;
+}
+
+- (void)callVoidMethodWithName:(char *)name signature:(char *)signature, ...
+{
+    jmethodID method = [self jMethodWithName:name signature:signature];
+
+    va_list args;
+    va_start(args, signature);
+    (*_jniEnv)->CallVoidMethodV(_jniEnv, _managerObject, method, args);
+    va_end(args);
+
+    [self handleJavaExceptions];
+}
+
+- (void)handleJavaExceptions
+{
+    if ((*_jniEnv)->ExceptionCheck(_jniEnv))
+    {
+        (*_jniEnv)->ExceptionDescribe(_jniEnv);
+        (*_jniEnv)->ExceptionClear(_jniEnv);
+    }
+}
+
+- (id)objectFromJSONString:(NSString *)JSONString
+{
+    NSData *data = [JSONString dataUsingEncoding:NSUTF8StringEncoding];
+    return [NSJSONSerialization JSONObjectWithData:data options:0 error:NULL];
+}
+
+
+#pragma mark - Initialization
 
 - (id)init
 {
@@ -169,14 +270,11 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
         JNI_CreateJavaVM(&vm, (void *) &_jniEnv, &_vmArgs);
 
         // We need to create the manager object
-        jclass mgrClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];
-        (*_jniEnv)->RegisterNatives(_jniEnv, mgrClass, methods, sizeof(methods)/sizeof(methods[0]));
+        _managerClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];
+        (*_jniEnv)->RegisterNatives(_jniEnv, _managerClass, methods, sizeof(methods)/sizeof(methods[0]));
 
-        jmethodID constructorM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "<init>", "()V");
-        if (constructorM)
-        {
-            _managerObject = (*_jniEnv)->NewObject(_jniEnv, mgrClass, constructorM);
-        }
+        jmethodID constructorMethod = [self jMethodWithName:"<init>" signature:"()V"];
+        _managerObject = (*_jniEnv)->NewObject(_jniEnv, _managerClass, constructorMethod);
 
         _balanceChecker = [NSTimer scheduledTimerWithTimeInterval:1.0
                                                            target:self
@@ -202,56 +300,17 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
                                               attributes:0
                                                    error:NULL];
     
-    jclass mgrClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];
-    
     if (_testingNetwork)
     {
-        // Find testing network method in the class
-        jmethodID testingM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "setTestingNetwork", "(Z)V");
-        
-        if (testingM == NULL)
-        {
-            return;
-        }
-        
-        (*_jniEnv)->CallVoidMethod(_jniEnv, _managerObject, testingM, true);
-        if ((*_jniEnv)->ExceptionCheck(_jniEnv))
-        {
-            (*_jniEnv)->ExceptionDescribe(_jniEnv);
-            (*_jniEnv)->ExceptionClear(_jniEnv);
-        }
-        
+        [self callVoidMethodWithName:"setTestingNetwork" signature:"(Z)V", true];
     }
     
     // Now set the folder
-    jmethodID folderM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "setDataDirectory", "(Ljava/lang/String;)V");
-    if (folderM == NULL)
-    {
-        return;
-    }
-    
-    (*_jniEnv)->CallVoidMethod(_jniEnv, _managerObject, folderM, (*_jniEnv)->NewStringUTF(_jniEnv, _dataURL.path.UTF8String));
-    if ((*_jniEnv)->ExceptionCheck(_jniEnv))
-    {
-        (*_jniEnv)->ExceptionDescribe(_jniEnv);
-        (*_jniEnv)->ExceptionClear(_jniEnv);
-    }
+    [self callVoidMethodWithName:"setDataDirectory" signature:"(Ljava/lang/String;)V",
+     JStringFromNSString(_jniEnv, self.dataURL.path)];
 
-    
     // We're ready! Let's start
-    jmethodID startM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "start", "()V");
-    
-    if (startM == NULL)
-    {
-        return;
-    }
-    
-    (*_jniEnv)->CallVoidMethod(_jniEnv, _managerObject, startM);
-    if ((*_jniEnv)->ExceptionCheck(_jniEnv))
-    {
-        (*_jniEnv)->ExceptionDescribe(_jniEnv);
-        (*_jniEnv)->ExceptionClear(_jniEnv);
-    }
+    [self callVoidMethodWithName:"start" signature:"()V"];
 
     [self willChangeValueForKey:@"isRunning"];
     _isRunning = YES;
@@ -265,22 +324,8 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
 - (NSString *)walletAddress
 {
-    jclass mgrClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];    
-    jmethodID walletM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "getWalletAddress", "()Ljava/lang/String;");
-    
-    if (walletM)
-    {
-        jstring wa = (*_jniEnv)->CallObjectMethod(_jniEnv, _managerObject, walletM);
-        
-        const char *waStr = (*_jniEnv)->GetStringUTFChars(_jniEnv, wa, NULL);
-        
-        NSString *str = [NSString stringWithUTF8String:waStr];
-        (*_jniEnv)->ReleaseStringUTFChars(_jniEnv, wa, waStr);
-        
-        return str;
-    }
-
-    return nil;
+    jstring address = [self callObjectMethodWithName:"getWalletAddress" signature:"()Ljava/lang/String;"];
+    return NSStringFromJString(_jniEnv, address);
 }
 
 - (void)stop
@@ -288,22 +333,8 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     [_balanceChecker invalidate];
     _balanceChecker = nil;
 
-    jclass mgrClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];    
-    // We're ready! Let's start
-    jmethodID stopM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "stop", "()V");
-    
-    if (stopM == NULL)
-    {
-        return;
-    }
-    
-    (*_jniEnv)->CallVoidMethod(_jniEnv, _managerObject, stopM);
-    if ((*_jniEnv)->ExceptionCheck(_jniEnv))
-    {
-        (*_jniEnv)->ExceptionDescribe(_jniEnv);
-        (*_jniEnv)->ExceptionClear(_jniEnv);
-    }
-    
+    [self callVoidMethodWithName:"stop" signature:"()V"];
+
     [self willChangeValueForKey:@"isRunning"];
     _isRunning = NO;
     [self didChangeValueForKey:@"isRunning"];
@@ -322,7 +353,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     }
     else
     {
-        d[@"time"] = [NSDate dateWithTimeIntervalSinceNow:0];
+        d[@"time"] = [NSDate date];
     }
 
     return d;
@@ -330,28 +361,14 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
 - (NSDictionary *)transactionForHash:(NSString *)hash
 {
-    jclass mgrClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];
-    // We're ready! Let's start
-    jmethodID tM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "getTransaction", "(Ljava/lang/String;)Ljava/lang/String;");
-    
-    if (tM == NULL)
-    {
-        return nil;
-    }
+    jstring transactionJString = [self callObjectMethodWithName:"getTransaction"
+                                                       signature:"(Ljava/lang/String;)Ljava/lang/String;",
+                                  JStringFromNSString(_jniEnv, hash)];
 
-    jstring transString = (*_jniEnv)->CallObjectMethod(_jniEnv, _managerObject, tM, (*_jniEnv)->NewStringUTF(_jniEnv, hash.UTF8String));
-    
-    if (transString)
+    if (transactionJString)
     {
-        const char *transChars = (*_jniEnv)->GetStringUTFChars(_jniEnv, transString, NULL);
-        
-        NSString *bStr = [NSString stringWithUTF8String:transChars];
-        (*_jniEnv)->ReleaseStringUTFChars(_jniEnv, transString, transChars);
-
-        id data = [NSJSONSerialization JSONObjectWithData:[bStr dataUsingEncoding:NSUTF8StringEncoding]
-                                                  options:0
-                                                    error:NULL];
-        return [self modifiedTransactionForTransaction:data];
+        NSDictionary *transactionData = [self objectFromJSONString:NSStringFromJString(_jniEnv, transactionJString)];
+        return [self modifiedTransactionForTransaction:transactionData];
     }
     
     return nil;
@@ -359,28 +376,13 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
 - (NSDictionary *)transactionAtIndex:(NSUInteger)index
 {
-    jclass mgrClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];
-    // We're ready! Let's start
-    jmethodID tM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "getTransaction", "(I)Ljava/lang/String;");
-    
-    if (tM == NULL)
-    {
-        return nil;
-    }
+    jstring transactionJString = [self callObjectMethodWithName:"getTransaction" signature:"(I)Ljava/lang/String;",
+                                  index];
 
-    jstring transString = (*_jniEnv)->CallObjectMethod(_jniEnv, _managerObject, tM, index);
-    
-    if (transString)
+    if (transactionJString)
     {
-        const char *transChars = (*_jniEnv)->GetStringUTFChars(_jniEnv, transString, NULL);
-        
-        NSString *bStr = [NSString stringWithUTF8String:transChars];
-        (*_jniEnv)->ReleaseStringUTFChars(_jniEnv, transString, transChars);
-
-        id data = [NSJSONSerialization JSONObjectWithData:[bStr dataUsingEncoding:NSUTF8StringEncoding]
-                                                  options:0
-                                                    error:NULL];
-        return [self modifiedTransactionForTransaction:data];
+        NSDictionary *transactionData = [self objectFromJSONString:NSStringFromJString(_jniEnv, transactionJString)];
+        return [self modifiedTransactionForTransaction:transactionData];
     }
     
     return nil;
@@ -388,87 +390,49 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
 - (NSArray *)allTransactions
 {
-    jclass mgrClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];
-    // We're ready! Let's start
-    jmethodID tM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "getAllTransactions", "()Ljava/lang/String;");
-    
-    if (tM == NULL)
+    jstring transactionsJString = [self callObjectMethodWithName:"getAllTransactions" signature:"()Ljava/lang/String;"];
+
+    if (transactionsJString)
     {
-        return nil;
-    }
-    
-    jstring transString = (*_jniEnv)->CallObjectMethod(_jniEnv, _managerObject, tM);
-    
-    if (transString)
-    {
-        const char *transChars = (*_jniEnv)->GetStringUTFChars(_jniEnv, transString, NULL);
-        
-        NSString *bStr = [NSString stringWithUTF8String:transChars];
-        (*_jniEnv)->ReleaseStringUTFChars(_jniEnv, transString, transChars);
-        
-        NSArray *ts = [NSJSONSerialization JSONObjectWithData:[bStr dataUsingEncoding:NSUTF8StringEncoding]
-                                                      options:0
-                                                        error:NULL];
-        NSMutableArray *mts = [NSMutableArray array];
-        
-        for (NSDictionary *t in ts)
+        NSArray *transactionJSONs = [self objectFromJSONString:NSStringFromJString(_jniEnv, transactionsJString)];
+        NSMutableArray *transactions = [NSMutableArray arrayWithCapacity:transactionJSONs.count];
+
+        for (NSDictionary *JSON in transactionJSONs)
         {
-            [mts addObject:[self modifiedTransactionForTransaction:t]];
+            [transactions addObject:[self modifiedTransactionForTransaction:JSON]];
         }
-        
-        return mts;
+
+        return transactions;
     }
-    
+
     return nil;
 }
 
 - (NSArray *)transactionsWithRange:(NSRange)range
 {
-    jclass mgrClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];
-    // We're ready! Let's start
-    jmethodID tM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "getTransaction", "(II)Ljava/lang/String;");
-    
-    if (tM == NULL)
-    {
-        return nil;
-    }
+    jstring transactionsJString = [self callObjectMethodWithName:"getTransaction" signature:"(II)Ljava/lang/String;",
+                                   range.location, range.length];
 
-    jstring transString = (*_jniEnv)->CallObjectMethod(_jniEnv, _managerObject, tM, range.location, range.length);
-    
-    if (transString)
+    if (transactionsJString)
     {
-        const char *transChars = (*_jniEnv)->GetStringUTFChars(_jniEnv, transString, NULL);
-        
-        NSString *bStr = [NSString stringWithUTF8String:transChars];
-        (*_jniEnv)->ReleaseStringUTFChars(_jniEnv, transString, transChars);
-        
-        NSArray *ts = [NSJSONSerialization JSONObjectWithData:[bStr dataUsingEncoding:NSUTF8StringEncoding]
-                                                      options:0
-                                                        error:NULL];
-        NSMutableArray *mts = [NSMutableArray array];
-        
-        for (NSDictionary *t in ts)
+        NSArray *transactionJSONs = [self objectFromJSONString:NSStringFromJString(_jniEnv, transactionsJString)];
+        NSMutableArray *transactions = [NSMutableArray arrayWithCapacity:transactionJSONs.count];
+
+        for (NSDictionary *JSON in transactionJSONs)
         {
-            [mts addObject:[self modifiedTransactionForTransaction:t]];
+            [transactions addObject:[self modifiedTransactionForTransaction:JSON]];
         }
         
-        return mts;
+        return transactions;
     }
-    
+
     return nil;
 }
 
 - (BOOL)isAddressValid:(NSString *)address
 {
-    jclass mgrClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];
-    // We're ready! Let's start
-    jmethodID aV = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "isAddressValid", "(Ljava/lang/String;)Z");
-    
-    if (aV == NULL)
-        return NO;
-    
-    jboolean valid = (*_jniEnv)->CallBooleanMethod(_jniEnv, _managerObject, aV, (*_jniEnv)->NewStringUTF(_jniEnv, address.UTF8String));
-    return valid;
+    return [self callBooleanMethodWithName:"isAddressValid" signature:"(Ljava/lang/String;)Z",
+            JStringFromNSString(_jniEnv, address)];
 }
 
 - (void)sendCoins:(uint64_t)coins
@@ -491,23 +455,9 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     [sendCompletionBlock release];
     sendCompletionBlock = [completion copy];
     
-    jclass mgrClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];
-    // We're ready! Let's start
-    jmethodID sendM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "sendCoins", "(Ljava/lang/String;Ljava/lang/String;)V");
-    
-    if (sendM == NULL)
-    {
-        if (sendCompletionBlock)
-        {
-            sendCompletionBlock(nil);
-        }
-
-        [sendCompletionBlock release];
-        sendCompletionBlock = nil;        
-    }
-    
-    (*_jniEnv)->CallVoidMethod(_jniEnv, _managerObject, sendM, (*_jniEnv)->NewStringUTF(_jniEnv, [[NSString stringWithFormat:@"%lld", coins] UTF8String]),
-                                (*_jniEnv)->NewStringUTF(_jniEnv, receipent.UTF8String));
+    [self callVoidMethodWithName:"sendCoins" signature:"(Ljava/lang/String;Ljava/lang/String;)V",
+     JStringFromNSString(_jniEnv, [NSString stringWithFormat:@"%lld", coins]),
+     JStringFromNSString(_jniEnv, receipent)];
 }
 
 - (BOOL)encryptWalletWith:(NSString *)passwd
@@ -542,24 +492,13 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
 - (uint64_t)balance
 {
-    jclass mgrClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];
-    // We're ready! Let's start
-    jmethodID balanceM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "getBalanceString", "()Ljava/lang/String;");
-    
-    if (balanceM == NULL)
-        return 0;
-    
-    jstring balanceString = (*_jniEnv)->CallObjectMethod(_jniEnv, _managerObject, balanceM);
-    
-    if (balanceString)
+    jstring balanceJString = [self callObjectMethodWithName:"getBalanceString" signature:"()Ljava/lang/String;"];
+
+    if (balanceJString)
     {
-        const char *balanceChars = (*_jniEnv)->GetStringUTFChars(_jniEnv, balanceString, NULL);
-        
-        NSString *bStr = [NSString stringWithUTF8String:balanceChars];
-        (*_jniEnv)->ReleaseStringUTFChars(_jniEnv, balanceString, balanceChars);
-        
-        _lastBalance = [bStr longLongValue];
-        return [bStr longLongValue];
+        NSString *balanceString = NSStringFromJString(_jniEnv, balanceJString);
+        _lastBalance = [balanceString longLongValue];
+        return [balanceString longLongValue];
     }
     
     return 0;
@@ -577,16 +516,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
 - (NSUInteger)transactionCount
 {
-    jclass mgrClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];
-    // We're ready! Let's start
-    jmethodID tCM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "getTransactionCount", "()I");
-    
-    if (tCM == NULL)
-        return 0;
-    
-    jint c = (*_jniEnv)->CallIntMethod(_jniEnv, _managerObject, tCM);
-    
-    return (NSUInteger)c;
+    return [self callIntegerMethodWithName:"getTransactionCount" signature:"()I"];
 }
 
 
@@ -623,10 +553,12 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         _sending = NO;
+
         if (sendCompletionBlock)
         {
             sendCompletionBlock(txid);
         }
+
         [sendCompletionBlock release];
         sendCompletionBlock = nil;        
     });
@@ -636,11 +568,12 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         _sending = NO;
+
         if (sendCompletionBlock)
         {
             sendCompletionBlock(nil);
         }
-   
+
         [sendCompletionBlock release];
         sendCompletionBlock = nil;
     });
