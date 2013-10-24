@@ -7,36 +7,10 @@
 //
 
 #import "HIBitcoinManager.h"
-//#import "HIJavaBridge.h"
 #import <JavaVM/jni.h>
-//#import "jni.h"
-
-//#if (defined __MINGW32__) || (defined _MSC_VER)
-//#  define EXPORT __declspec(dllexport)
-//#else
-//#  define EXPORT __attribute__ ((visibility("default"))) \
-//__attribute__ ((used))
-//#endif
-//
-//#if (! defined __x86_64__) && ((defined __MINGW32__) || (defined _MSC_VER))
-//#  define SYMBOL(x) binary_boot_jar_##x
-//#else
-//#  define SYMBOL(x) _binary_boot_jar_##x
-//#endif
-//
-//extern const uint8_t SYMBOL(start)[];
-//extern const uint8_t SYMBOL(end)[];
-//
-//EXPORT const uint8_t*
-//bootJar(unsigned* size)
-//{
-//    *size = (unsigned int)(SYMBOL(end) - SYMBOL(start));
-//    return SYMBOL(start);
-//}
 
 @interface HIBitcoinManager ()
 {
-    JavaVM *_vm;
     JNIEnv *_jniEnv;
     JavaVMInitArgs _vmArgs;
     jobject _managerObject;
@@ -47,34 +21,30 @@
     NSTimer *_balanceChecker;
 }
 
-- (jclass)jClassForClass:(NSString *)class;
 - (void)onBalanceChanged;
 - (void)onSynchronizationChanged:(int)percent;
 - (void)onTransactionChanged:(NSString *)txid;
 - (void)onTransactionSucceeded:(NSString *)txid;
 - (void)onTransactionFailed;
-- (void)checkBalance:(NSTimer *)timer;
+
 @end
 
 
-JNIEXPORT void JNICALL onBalanceChanged
-(JNIEnv *env, jobject thisobject)
+JNIEXPORT void JNICALL onBalanceChanged(JNIEnv *env, jobject thisobject)
 {
     NSAutoreleasePool *pool = [NSAutoreleasePool new];
     [[HIBitcoinManager defaultManager] onBalanceChanged];
     [pool release];
 }
 
-JNIEXPORT void JNICALL onSynchronizationUpdate
-(JNIEnv *env, jobject thisobject, jint percent)
+JNIEXPORT void JNICALL onSynchronizationUpdate(JNIEnv *env, jobject thisobject, jint percent)
 {
     NSAutoreleasePool *pool = [NSAutoreleasePool new];
     [[HIBitcoinManager defaultManager] onSynchronizationChanged:(int)percent];
     [pool release];
 }
 
-JNIEXPORT void JNICALL onTransactionChanged
-(JNIEnv *env, jobject thisobject, jstring txid)
+JNIEXPORT void JNICALL onTransactionChanged(JNIEnv *env, jobject thisobject, jstring txid)
 {
     NSAutoreleasePool *pool = [NSAutoreleasePool new];
     if (txid)
@@ -90,8 +60,7 @@ JNIEXPORT void JNICALL onTransactionChanged
     [pool release];
 }
 
-JNIEXPORT void JNICALL onTransactionSucceeded
-(JNIEnv *env, jobject thisobject, jstring txid)
+JNIEXPORT void JNICALL onTransactionSucceeded(JNIEnv *env, jobject thisobject, jstring txid)
 {
     NSAutoreleasePool *pool = [NSAutoreleasePool new];
     if (txid)
@@ -107,8 +76,7 @@ JNIEXPORT void JNICALL onTransactionSucceeded
     [pool release];
 }
 
-JNIEXPORT void JNICALL onTransactionFailed
-(JNIEnv *env, jobject thisobject)
+JNIEXPORT void JNICALL onTransactionFailed(JNIEnv *env, jobject thisobject)
 {
     NSAutoreleasePool *pool = [NSAutoreleasePool new];
     [[HIBitcoinManager defaultManager] onTransactionFailed];
@@ -129,29 +97,24 @@ NSString * const kHIBitcoinManagerTransactionChangedNotification = @"kJHIBitcoin
 NSString * const kHIBitcoinManagerStartedNotification = @"kJHIBitcoinManagerStartedNotification";
 NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStoppedNotification";
 
+static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
 
 @implementation HIBitcoinManager
 
-@synthesize dataURL = _dataURL;
-@synthesize connections = _connections;
-@synthesize isRunning = _isRunning;
-@synthesize balance = _balance;
-@synthesize syncProgress = _syncProgress;
-@synthesize testingNetwork = _testingNetwork;
-@synthesize enableMining = _enableMining;
-@synthesize walletAddress;
-
 + (HIBitcoinManager *)defaultManager
 {
-    static HIBitcoinManager *_defaultManager = nil;
+    static HIBitcoinManager *defaultManager = nil;
     static dispatch_once_t oncePredicate;
-    if (!_defaultManager)
+
+    if (!defaultManager)
+    {
         dispatch_once(&oncePredicate, ^{
-            _defaultManager = [[self alloc] init];
+            defaultManager = [[self alloc] init];
         });
-    
-    return _defaultManager;
+    }
+
+    return defaultManager;
 }
 
 - (jclass)jClassForClass:(NSString *)class
@@ -163,60 +126,65 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
         (*_jniEnv)->ExceptionDescribe(_jniEnv);
         (*_jniEnv)->ExceptionClear(_jniEnv);
         
-        @throw [NSException exceptionWithName:@"Java exception" reason:@"Java VM raised an exception" userInfo:@{@"class": class}];
+        @throw [NSException exceptionWithName:@"Java exception"
+                                       reason:@"Java VM raised an exception"
+                                     userInfo:@{@"class": class}];
     }
+
     return cls;
 }
 
 - (id)init
 {
     self = [super init];
+
     if (self)
     {
-        NSURL *appSupportURL = [[[[NSFileManager defaultManager] URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"com.Hive.BitcoinJKit"];
-        
         _dateFormatter = [[NSDateFormatter alloc] init];
         _dateFormatter.locale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en_GB"] autorelease];
         _dateFormatter.dateFormat = @"EEE MMM dd HH:mm:ss zzz yyyy";
+
         _connections = 0;
-        _balance = 0;
         _sending = NO;
         _syncProgress = 0;
         _testingNetwork = NO;
         _enableMining = NO;
         _isRunning = NO;
-        _dataURL = [appSupportURL copy];
-        
+
+        NSArray *applicationSupport = [[NSFileManager defaultManager] URLsForDirectory:NSApplicationSupportDirectory
+                                                                             inDomains:NSUserDomainMask];
+        self.dataURL = [[applicationSupport lastObject] URLByAppendingPathComponent:BitcoinJKitBundleIdentifier];
+
+        JavaVMOption options[_vmArgs.nOptions];
+        NSBundle *myBundle = [NSBundle bundleWithIdentifier:BitcoinJKitBundleIdentifier];
+        NSString *bootJarPath = [myBundle pathForResource:@"boot" ofType:@"jar"];
+        options[0].optionString = (char *) [[NSString stringWithFormat:@"-Djava.class.path=%@", bootJarPath] UTF8String];
+
         _vmArgs.version = JNI_VERSION_1_2;
         _vmArgs.nOptions = 1;
         _vmArgs.ignoreUnrecognized = JNI_TRUE;
-        
-        JavaVMOption options[_vmArgs.nOptions];
         _vmArgs.options = options;
-        
-//        options[0].optionString = (char*) "-Xbootclasspath:[bootJar]";
-        NSBundle *myBundle = [NSBundle bundleWithIdentifier:@"com.hive.BitcoinJKit"];
-        options[0].optionString = (char *)[[NSString stringWithFormat:@"-Djava.class.path=%@", [myBundle pathForResource:@"boot" ofType:@"jar"]] UTF8String];
-        
-        JavaVM* vm;
-        void *env;
-        JNI_CreateJavaVM(&vm, &env, &_vmArgs);
-        _jniEnv = (JNIEnv *)(env);
-        
-        
+
+        JavaVM *vm;
+        JNI_CreateJavaVM(&vm, (void *) &_jniEnv, &_vmArgs);
+
         // We need to create the manager object
         jclass mgrClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];
         (*_jniEnv)->RegisterNatives(_jniEnv, mgrClass, methods, sizeof(methods)/sizeof(methods[0]));
-        
+
         jmethodID constructorM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "<init>", "()V");
         if (constructorM)
         {
             _managerObject = (*_jniEnv)->NewObject(_jniEnv, mgrClass, constructorM);
         }
-        
-        _balanceChecker = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(checkBalance:) userInfo:nil repeats:YES];
+
+        _balanceChecker = [NSTimer scheduledTimerWithTimeInterval:1.0
+                                                           target:self
+                                                         selector:@selector(checkBalance:)
+                                                         userInfo:nil
+                                                          repeats:YES];
     }
-    
+
     return self;
 }
 
@@ -229,7 +197,10 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
 
 - (void)start
 {
-    [[NSFileManager defaultManager] createDirectoryAtURL:_dataURL withIntermediateDirectories:YES attributes:0 error:NULL];
+    [[NSFileManager defaultManager] createDirectoryAtURL:self.dataURL
+                             withIntermediateDirectories:YES
+                                              attributes:0
+                                                   error:NULL];
     
     jclass mgrClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];
     
@@ -239,7 +210,9 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
         jmethodID testingM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "setTestingNetwork", "(Z)V");
         
         if (testingM == NULL)
+        {
             return;
+        }
         
         (*_jniEnv)->CallVoidMethod(_jniEnv, _managerObject, testingM, true);
         if ((*_jniEnv)->ExceptionCheck(_jniEnv))
@@ -253,7 +226,9 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
     // Now set the folder
     jmethodID folderM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "setDataDirectory", "(Ljava/lang/String;)V");
     if (folderM == NULL)
+    {
         return;
+    }
     
     (*_jniEnv)->CallVoidMethod(_jniEnv, _managerObject, folderM, (*_jniEnv)->NewStringUTF(_jniEnv, _dataURL.path.UTF8String));
     if ((*_jniEnv)->ExceptionCheck(_jniEnv))
@@ -267,7 +242,9 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
     jmethodID startM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "start", "()V");
     
     if (startM == NULL)
+    {
         return;
+    }
     
     (*_jniEnv)->CallVoidMethod(_jniEnv, _managerObject, startM);
     if ((*_jniEnv)->ExceptionCheck(_jniEnv))
@@ -275,10 +252,13 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
         (*_jniEnv)->ExceptionDescribe(_jniEnv);
         (*_jniEnv)->ExceptionClear(_jniEnv);
     }
+
     [self willChangeValueForKey:@"isRunning"];
     _isRunning = YES;
     [self didChangeValueForKey:@"isRunning"];
+
     [[NSNotificationCenter defaultCenter] postNotificationName:kHIBitcoinManagerStartedNotification object:self];
+
     [self willChangeValueForKey:@"walletAddress"];
     [self didChangeValueForKey:@"walletAddress"];
 }
@@ -299,8 +279,7 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
         
         return str;
     }
-    
-    
+
     return nil;
 }
 
@@ -308,12 +287,15 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
 {
     [_balanceChecker invalidate];
     _balanceChecker = nil;
+
     jclass mgrClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];    
     // We're ready! Let's start
     jmethodID stopM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "stop", "()V");
     
     if (stopM == NULL)
+    {
         return;
+    }
     
     (*_jniEnv)->CallVoidMethod(_jniEnv, _managerObject, stopM);
     if ((*_jniEnv)->ExceptionCheck(_jniEnv))
@@ -325,6 +307,7 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
     [self willChangeValueForKey:@"isRunning"];
     _isRunning = NO;
     [self didChangeValueForKey:@"isRunning"];
+
     [[NSNotificationCenter defaultCenter] postNotificationName:kHIBitcoinManagerStoppedNotification object:self];
 }
 
@@ -332,10 +315,15 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
 {
     NSMutableDictionary *d = [NSMutableDictionary dictionaryWithDictionary:transaction];
     NSDate *date = [_dateFormatter dateFromString:transaction[@"time"]];
+
     if (date)
+    {
         d[@"time"] = date;
+    }
     else
+    {
         d[@"time"] = [NSDate dateWithTimeIntervalSinceNow:0];
+    }
 
     return d;
 }
@@ -347,8 +335,9 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
     jmethodID tM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "getTransaction", "(Ljava/lang/String;)Ljava/lang/String;");
     
     if (tM == NULL)
+    {
         return nil;
-    
+    }
 
     jstring transString = (*_jniEnv)->CallObjectMethod(_jniEnv, _managerObject, tM, (*_jniEnv)->NewStringUTF(_jniEnv, hash.UTF8String));
     
@@ -358,9 +347,11 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
         
         NSString *bStr = [NSString stringWithUTF8String:transChars];
         (*_jniEnv)->ReleaseStringUTFChars(_jniEnv, transString, transChars);
-        
-        return [self modifiedTransactionForTransaction:[NSJSONSerialization JSONObjectWithData:[bStr dataUsingEncoding:NSUTF8StringEncoding] options:0 error:NULL]];
-        
+
+        id data = [NSJSONSerialization JSONObjectWithData:[bStr dataUsingEncoding:NSUTF8StringEncoding]
+                                                  options:0
+                                                    error:NULL];
+        return [self modifiedTransactionForTransaction:data];
     }
     
     return nil;
@@ -373,9 +364,10 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
     jmethodID tM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "getTransaction", "(I)Ljava/lang/String;");
     
     if (tM == NULL)
+    {
         return nil;
-    
-    
+    }
+
     jstring transString = (*_jniEnv)->CallObjectMethod(_jniEnv, _managerObject, tM, index);
     
     if (transString)
@@ -384,9 +376,11 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
         
         NSString *bStr = [NSString stringWithUTF8String:transChars];
         (*_jniEnv)->ReleaseStringUTFChars(_jniEnv, transString, transChars);
-        
-        return [self modifiedTransactionForTransaction:[NSJSONSerialization JSONObjectWithData:[bStr dataUsingEncoding:NSUTF8StringEncoding] options:0 error:NULL]];
-        
+
+        id data = [NSJSONSerialization JSONObjectWithData:[bStr dataUsingEncoding:NSUTF8StringEncoding]
+                                                  options:0
+                                                    error:NULL];
+        return [self modifiedTransactionForTransaction:data];
     }
     
     return nil;
@@ -399,7 +393,9 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
     jmethodID tM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "getAllTransactions", "()Ljava/lang/String;");
     
     if (tM == NULL)
+    {
         return nil;
+    }
     
     jstring transString = (*_jniEnv)->CallObjectMethod(_jniEnv, _managerObject, tM);
     
@@ -410,7 +406,9 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
         NSString *bStr = [NSString stringWithUTF8String:transChars];
         (*_jniEnv)->ReleaseStringUTFChars(_jniEnv, transString, transChars);
         
-        NSArray *ts = [NSJSONSerialization JSONObjectWithData:[bStr dataUsingEncoding:NSUTF8StringEncoding] options:0 error:NULL];
+        NSArray *ts = [NSJSONSerialization JSONObjectWithData:[bStr dataUsingEncoding:NSUTF8StringEncoding]
+                                                      options:0
+                                                        error:NULL];
         NSMutableArray *mts = [NSMutableArray array];
         
         for (NSDictionary *t in ts)
@@ -419,8 +417,6 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
         }
         
         return mts;
-        
-        
     }
     
     return nil;
@@ -433,9 +429,10 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
     jmethodID tM = (*_jniEnv)->GetMethodID(_jniEnv, mgrClass, "getTransaction", "(II)Ljava/lang/String;");
     
     if (tM == NULL)
+    {
         return nil;
-    
-    
+    }
+
     jstring transString = (*_jniEnv)->CallObjectMethod(_jniEnv, _managerObject, tM, range.location, range.length);
     
     if (transString)
@@ -445,7 +442,9 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
         NSString *bStr = [NSString stringWithUTF8String:transChars];
         (*_jniEnv)->ReleaseStringUTFChars(_jniEnv, transString, transChars);
         
-        NSArray *ts = [NSJSONSerialization JSONObjectWithData:[bStr dataUsingEncoding:NSUTF8StringEncoding] options:0 error:NULL];
+        NSArray *ts = [NSJSONSerialization JSONObjectWithData:[bStr dataUsingEncoding:NSUTF8StringEncoding]
+                                                      options:0
+                                                        error:NULL];
         NSMutableArray *mts = [NSMutableArray array];
         
         for (NSDictionary *t in ts)
@@ -454,9 +453,6 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
         }
         
         return mts;
-
-        
-        
     }
     
     return nil;
@@ -475,16 +471,23 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
     return valid;
 }
 
-- (void)sendCoins:(uint64_t)coins toReceipent:(NSString *)receipent comment:(NSString *)comment completion:(void(^)(NSString *hash))completion
+- (void)sendCoins:(uint64_t)coins
+      toReceipent:(NSString *)receipent
+          comment:(NSString *)comment
+       completion:(void(^)(NSString *hash))completion
 {
     if (_sending)
     {
         if (completion)
+        {
             completion(nil);
+        }
+
         return;
     }
     
     _sending = YES;
+
     [sendCompletionBlock release];
     sendCompletionBlock = [completion copy];
     
@@ -495,8 +498,10 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
     if (sendM == NULL)
     {
         if (sendCompletionBlock)
+        {
             sendCompletionBlock(nil);
-        
+        }
+
         [sendCompletionBlock release];
         sendCompletionBlock = nil;        
     }
@@ -563,7 +568,8 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
 - (void)checkBalance:(NSTimer *)timer
 {
     uint64_t lastBalance = _lastBalance;
-    if (lastBalance != [self balance])
+
+    if (lastBalance != self.balance)
     {
         [self onBalanceChanged];
     }
@@ -607,7 +613,8 @@ NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStop
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self willChangeValueForKey:@"balance"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:kHIBitcoinManagerTransactionChangedNotification object:txid];
+        [[NSNotificationCenter defaultCenter] postNotificationName:kHIBitcoinManagerTransactionChangedNotification
+                                                            object:txid];
         [self didChangeValueForKey:@"balance"];
     });
 }
