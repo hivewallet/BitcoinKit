@@ -70,6 +70,13 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;
 // Warning! All changes to it has to be performed BEFORE start.
 @property (nonatomic, assign) BOOL disableListening;
 
+// Block that will be called when an exception is thrown on a background thread in JVM (e.g. while processing an
+// incoming transaction or other blockchain update). If not set, the exception will just be thrown and will crash your
+// app unless you install a global uncaught exception handler.
+// Note: exceptions that are thrown while processing calls made from the Cocoa side will ignore this handler and will
+// simply be thrown directly in the same thread.
+@property (nonatomic, copy) void(^exceptionHandler)(NSException *exception);
+
 
 /** Class method returning application singleton to the manager.
  *

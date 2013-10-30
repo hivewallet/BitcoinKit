@@ -27,7 +27,7 @@
 - (void)onTransactionChanged:(NSString *)txid;
 - (void)onTransactionSucceeded:(NSString *)txid;
 - (void)onTransactionFailed;
-- (void)handleJavaException:(jthrowable)exception;
+- (void)handleJavaException:(jthrowable)exception useExceptionHandler:(BOOL)useHandler;
 
 @end
 
@@ -99,7 +99,7 @@ JNIEXPORT void JNICALL onTransactionFailed(JNIEnv *env, jobject thisobject)
 JNIEXPORT void JNICALL onException(JNIEnv *env, jobject thisobject, jthrowable jexception)
 {
     NSAutoreleasePool *pool = [NSAutoreleasePool new];
-    [[HIBitcoinManager defaultManager] handleJavaException:jexception];
+    [[HIBitcoinManager defaultManager] handleJavaException:jexception useExceptionHandler:YES];
     [pool release];
 }
 
@@ -225,11 +225,11 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
         // get the exception object
         jthrowable exception = (*_jniEnv)->ExceptionOccurred(_jniEnv);
 
-        [self handleJavaException:exception];
+        [self handleJavaException:exception useExceptionHandler:NO];
     }
 }
 
-- (void)handleJavaException:(jthrowable)exception
+- (void)handleJavaException:(jthrowable)exception useExceptionHandler:(BOOL)useHandler
 {
     // log exception to console
     (*_jniEnv)->ExceptionDescribe(_jniEnv);
@@ -262,7 +262,16 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
         }
     }
 
-    @throw [NSException exceptionWithName:@"JavaException" reason:reason userInfo:nil];
+    NSException *wrappedException = [NSException exceptionWithName:@"JavaException" reason:reason userInfo:nil];
+
+    if (useHandler && self.exceptionHandler)
+    {
+        self.exceptionHandler(wrappedException);
+    }
+    else
+    {
+        @throw wrappedException;
+    }
 }
 
 - (id)objectFromJSONString:(NSString *)JSONString
@@ -332,6 +341,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     [_dateFormatter release];
     [sendCompletionBlock release];
     self.dataURL = nil;
+    self.exceptionHandler = nil;
 
     [super dealloc];
 }
