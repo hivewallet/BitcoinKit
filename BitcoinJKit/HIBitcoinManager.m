@@ -135,16 +135,8 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 - (jclass)jClassForClass:(NSString *)class
 {
     jclass cls = (*_jniEnv)->FindClass(_jniEnv, [class UTF8String]);
-    
-    if ((*_jniEnv)->ExceptionCheck(_jniEnv))
-    {
-        (*_jniEnv)->ExceptionDescribe(_jniEnv);
-        (*_jniEnv)->ExceptionClear(_jniEnv);
-        
-        @throw [NSException exceptionWithName:@"Java exception"
-                                       reason:@"Java VM raised an exception"
-                                     userInfo:@{@"class": class}];
-    }
+
+    [self handleJavaExceptions];
 
     return cls;
 }
@@ -221,8 +213,41 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 {
     if ((*_jniEnv)->ExceptionCheck(_jniEnv))
     {
+        // get the exception object
+        jthrowable exception = (*_jniEnv)->ExceptionOccurred(_jniEnv);
+
+        // log exception to console
         (*_jniEnv)->ExceptionDescribe(_jniEnv);
+
+        // exception has to be cleared if it exists
         (*_jniEnv)->ExceptionClear(_jniEnv);
+
+        NSString *reason = @"Java VM raised an exception";
+
+        // try to get exception.toString()
+        jclass throwableClass = (*_jniEnv)->FindClass(_jniEnv, "java/lang/Throwable");
+        if (throwableClass)
+        {
+            jmethodID toStringMethod = (*_jniEnv)->GetMethodID(_jniEnv, throwableClass, "toString",
+                                                               "()Ljava/lang/String;");
+            if (toStringMethod)
+            {
+                jstring description = (*_jniEnv)->CallObjectMethod(_jniEnv, exception, toStringMethod);
+
+                if ((*_jniEnv)->ExceptionCheck(_jniEnv))
+                {
+                    (*_jniEnv)->ExceptionDescribe(_jniEnv);
+                    (*_jniEnv)->ExceptionClear(_jniEnv);
+                }
+
+                if (description)
+                {
+                    reason = NSStringFromJString(_jniEnv, description);
+                }
+            }
+        }
+
+        @throw [NSException exceptionWithName:@"JavaException" reason:reason userInfo:nil];
     }
 }
 
