@@ -8,9 +8,15 @@
 
 #import <Foundation/Foundation.h>
 
-extern NSString * const kHIBitcoinManagerTransactionChangedNotification;            //<<< Transaction list update notification. Sent object is a NSString representation of the updated hash
-extern NSString * const kHIBitcoinManagerStartedNotification;                       //<<< Manager start notification. Informs that manager is now ready to use
-extern NSString * const kHIBitcoinManagerStoppedNotification;                       //<<< Manager stop notification. Informs that manager is now stopped and can't be used anymore
+// Transaction list update notification. Sent object is a NSString representation of the updated hash
+extern NSString * const kHIBitcoinManagerTransactionChangedNotification;
+
+// Manager start notification. Informs that manager is now ready to use
+extern NSString * const kHIBitcoinManagerStartedNotification;
+
+// Manager stop notification. Informs that manager is now stopped and can't be used anymore
+extern NSString * const kHIBitcoinManagerStoppedNotification;
+
 
 /** HIBitcoinManager is a class responsible for managing all Bitcoin actions app should do 
  *
@@ -21,19 +27,49 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;                   
  */
 @interface HIBitcoinManager : NSObject
 
-@property (nonatomic, copy) NSURL *dataURL;                                         //<<< Specifies an URL path to a directory where HIBitcoinManager should store its data. Warning! All changes to it has to be performed BEFORE start.
-@property (nonatomic, assign) BOOL testingNetwork;                                  //<<< Specifies if a manager is running on the testing network. Warning! All changes to it has to be performed BEFORE start.
-@property (nonatomic, assign) BOOL enableMining;                                    //<<< Specifies if a manager should try to mine bticoins. Warning! All changes to it has to be performed BEFORE start.
-@property (nonatomic, readonly) NSUInteger connections;                             //<<< Currently active connections to bitcoin network
-@property (nonatomic, readonly) BOOL isRunning;                                     //<<< Flag indicating if NPBitcoinManager is currently running and connecting with the network
-@property (nonatomic, readonly) uint64_t balance;                                   //<<< Actual balance of the wallet
-@property (nonatomic, readonly) NSUInteger syncProgress;                            //<<< Integer value indicating the progress of network sync. Values are from 0 to 10000.
-@property (nonatomic, readonly, getter = walletAddress) NSString *walletAddress;    //<<< Returns wallets main address. Creates one if none exists yet
-@property (nonatomic, readonly, getter = isWalletEncrypted) BOOL isWalletEncrypted; //<<< Returns YES if wallet is encrypted. NO - otherwise
-@property (nonatomic, readonly, getter = isWalletLocked) BOOL isWalletLocked;       //<<< Returns YES if wallet is currently locked. NO - otherwise
-@property (nonatomic, readonly, getter = transactionCount) NSUInteger transactionCount; //<<< Returns global transaction cound for current wallet
-@property (nonatomic, copy) NSString *proxyAddress;                                 //<<< Proxy server in address:port format. Default is nil (no proxy). Warning! All changes to it has to be performed BEFORE start.
-@property (nonatomic, assign) BOOL disableListening;                                //<<< Flag disabling listening on public IP address. To be used i.e. with tor proxy not to reveal real IP address. Warning! All changes to it has to be performed BEFORE start.
+// Specifies an URL path to a directory where HIBitcoinManager should store its data.
+// Warning! All changes to it has to be performed BEFORE start.
+@property (nonatomic, copy) NSURL *dataURL;
+
+// Specifies if a manager is running on the testing network.
+// Warning! All changes to it has to be performed BEFORE start.
+@property (nonatomic, assign) BOOL testingNetwork;
+
+// Specifies if a manager should try to mine bticoins.
+// Warning! All changes to it has to be performed BEFORE start.
+@property (nonatomic, assign) BOOL enableMining;
+
+// Currently active connections to bitcoin network
+@property (nonatomic, readonly) NSUInteger connections;
+
+// Flag indicating if NPBitcoinManager is currently running and connecting with the network
+@property (nonatomic, readonly) BOOL isRunning;
+
+// Actual balance of the wallet
+@property (nonatomic, readonly) uint64_t balance;
+
+// Integer value indicating the progress of network sync. Values are from 0 to 10000.
+@property (nonatomic, readonly) NSUInteger syncProgress;
+
+// Returns wallets main address. Creates one if none exists yet
+@property (nonatomic, readonly, getter = walletAddress) NSString *walletAddress;
+
+// Returns YES if wallet is encrypted. NO - otherwise
+@property (nonatomic, readonly, getter = isWalletEncrypted) BOOL isWalletEncrypted;
+
+// Returns YES if wallet is currently locked. NO - otherwise
+@property (nonatomic, readonly, getter = isWalletLocked) BOOL isWalletLocked;
+
+// Returns global transaction cound for current wallet
+@property (nonatomic, readonly, getter = transactionCount) NSUInteger transactionCount;
+
+// Proxy server in address:port format. Default is nil (no proxy). Warning! All changes to it has to be performed BEFORE start.
+@property (nonatomic, copy) NSString *proxyAddress;
+
+// Flag disabling listening on public IP address. To be used i.e. with tor proxy not to reveal real IP address.
+// Warning! All changes to it has to be performed BEFORE start.
+@property (nonatomic, assign) BOOL disableListening;
+
 
 /** Class method returning application singleton to the manager.
  *
@@ -156,5 +192,5 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;                   
  * @returns YES if import was successful. NO - otherwise
  */
 - (BOOL)importWalletFrom:(NSURL *)importURL;
+
 @end
- 
