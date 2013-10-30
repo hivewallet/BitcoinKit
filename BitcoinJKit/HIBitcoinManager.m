@@ -27,6 +27,7 @@
 - (void)onTransactionChanged:(NSString *)txid;
 - (void)onTransactionSucceeded:(NSString *)txid;
 - (void)onTransactionFailed;
+- (void)handleJavaException:(jthrowable)exception;
 
 @end
 
@@ -95,13 +96,21 @@ JNIEXPORT void JNICALL onTransactionFailed(JNIEnv *env, jobject thisobject)
     [pool release];
 }
 
+JNIEXPORT void JNICALL onException(JNIEnv *env, jobject thisobject, jthrowable jexception)
+{
+    NSAutoreleasePool *pool = [NSAutoreleasePool new];
+    [[HIBitcoinManager defaultManager] handleJavaException:jexception];
+    [pool release];
+}
+
 
 static JNINativeMethod methods[] = {
     {"onBalanceChanged",        "()V",                                     (void *)&onBalanceChanged},
     {"onTransactionChanged",    "(Ljava/lang/String;)V",                   (void *)&onTransactionChanged},
     {"onTransactionSuccess",    "(Ljava/lang/String;)V",                   (void *)&onTransactionSucceeded},
     {"onTransactionFailed",     "()V",                                     (void *)&onTransactionFailed},
-    {"onSynchronizationUpdate", "(I)V",                                    (void *)&onSynchronizationUpdate}
+    {"onSynchronizationUpdate", "(I)V",                                    (void *)&onSynchronizationUpdate},
+    {"onException",             "(Ljava/lang/Throwable;)V",                (void *)&onException}
 };
 
 
@@ -216,39 +225,44 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
         // get the exception object
         jthrowable exception = (*_jniEnv)->ExceptionOccurred(_jniEnv);
 
-        // log exception to console
-        (*_jniEnv)->ExceptionDescribe(_jniEnv);
+        [self handleJavaException:exception];
+    }
+}
 
-        // exception has to be cleared if it exists
-        (*_jniEnv)->ExceptionClear(_jniEnv);
+- (void)handleJavaException:(jthrowable)exception
+{
+    // log exception to console
+    (*_jniEnv)->ExceptionDescribe(_jniEnv);
 
-        NSString *reason = @"Java VM raised an exception";
+    // exception has to be cleared if it exists
+    (*_jniEnv)->ExceptionClear(_jniEnv);
 
-        // try to get exception.toString()
-        jclass throwableClass = (*_jniEnv)->FindClass(_jniEnv, "java/lang/Throwable");
-        if (throwableClass)
+    NSString *reason = @"Java VM raised an exception";
+
+    // try to get exception.toString()
+    jclass throwableClass = (*_jniEnv)->FindClass(_jniEnv, "java/lang/Throwable");
+    if (throwableClass)
+    {
+        jmethodID toStringMethod = (*_jniEnv)->GetMethodID(_jniEnv, throwableClass, "toString",
+                                                           "()Ljava/lang/String;");
+        if (toStringMethod)
         {
-            jmethodID toStringMethod = (*_jniEnv)->GetMethodID(_jniEnv, throwableClass, "toString",
-                                                               "()Ljava/lang/String;");
-            if (toStringMethod)
+            jstring description = (*_jniEnv)->CallObjectMethod(_jniEnv, exception, toStringMethod);
+
+            if ((*_jniEnv)->ExceptionCheck(_jniEnv))
             {
-                jstring description = (*_jniEnv)->CallObjectMethod(_jniEnv, exception, toStringMethod);
+                (*_jniEnv)->ExceptionDescribe(_jniEnv);
+                (*_jniEnv)->ExceptionClear(_jniEnv);
+            }
 
-                if ((*_jniEnv)->ExceptionCheck(_jniEnv))
-                {
-                    (*_jniEnv)->ExceptionDescribe(_jniEnv);
-                    (*_jniEnv)->ExceptionClear(_jniEnv);
-                }
-
-                if (description)
-                {
-                    reason = NSStringFromJString(_jniEnv, description);
-                }
+            if (description)
+            {
+                reason = NSStringFromJString(_jniEnv, description);
             }
         }
-
-        @throw [NSException exceptionWithName:@"JavaException" reason:reason userInfo:nil];
     }
+
+    @throw [NSException exceptionWithName:@"JavaException" reason:reason userInfo:nil];
 }
 
 - (id)objectFromJSONString:(NSString *)JSONString

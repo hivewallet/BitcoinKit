@@ -13,6 +13,7 @@ import com.google.bitcoin.store.BlockStore;
 import com.google.bitcoin.store.SPVBlockStore;
 import com.google.bitcoin.store.UnreadableWalletException;
 import com.google.bitcoin.utils.BriefLogFormatter;
+import com.google.bitcoin.utils.Threading;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 
@@ -24,7 +25,7 @@ import java.net.InetAddress;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class BitcoinManager implements PeerEventListener {
+public class BitcoinManager implements PeerEventListener, Thread.UncaughtExceptionHandler {
 	private NetworkParameters networkParams;
 	private Wallet wallet;
 	private String dataDirectory;
@@ -33,7 +34,12 @@ public class BitcoinManager implements PeerEventListener {
     private BlockStore blockStore;
     private File walletFile;
     private int blocksToDownload;
-    
+
+    public BitcoinManager()
+    {
+        Threading.uncaughtExceptionHandler = this;
+    }
+
 	public void setTestingNetwork(boolean testing)
 	{
 		if (testing)
@@ -315,7 +321,12 @@ public class BitcoinManager implements PeerEventListener {
         peerGroup.startBlockChainDownload(this);
 
 	}
-	
+
+    public void uncaughtException(Thread thread, Throwable exception)
+    {
+        onException(exception);
+    }
+
 	public void stop()
 	{
 		try {
@@ -333,7 +344,8 @@ public class BitcoinManager implements PeerEventListener {
 	{
 		
 	}
-	
+
+
 	/* Implementing native callbacks here */
 	
 	public native void onTransactionChanged(String txid);
@@ -343,16 +355,20 @@ public class BitcoinManager implements PeerEventListener {
     public native void onTransactionSuccess(String txid);
     
 	public native void onSynchronizationUpdate(int percent);
-	
-	public void onPeerCountChange(int peersConnected)
-	{
-//		System.out.println("Peers " + peersConnected);
-	}
-	
+
 	public native void onBalanceChanged();
-	
+
+    public native void onException(Throwable exception);
+
+
 	/* Implementing peer listener */
-	public void onBlocksDownloaded(Peer peer, Block block, int blocksLeft)
+
+    public void onPeerCountChange(int peersConnected)
+	{
+        //		System.out.println("Peers " + peersConnected);
+	}
+
+    public void onBlocksDownloaded(Peer peer, Block block, int blocksLeft)
 	{
 		int downloadedSoFar = blocksToDownload - blocksLeft;
 		if (blocksToDownload == 0)
