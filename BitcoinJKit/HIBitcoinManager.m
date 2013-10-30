@@ -314,7 +314,11 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 - (void)dealloc
 {
     [self stop];
+
+    [_dateFormatter release];
     [sendCompletionBlock release];
+    self.dataURL = nil;
+
     [super dealloc];
 }
 
