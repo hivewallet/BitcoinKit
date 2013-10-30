@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		D901F49917AF9DAB0071780D /* JavaVM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D901F49817AF9DAA0071780D /* JavaVM.framework */; };
-		D901F49B17AF9DDB0071780D /* boot.jar in Frameworks */ = {isa = PBXBuildFile; fileRef = D901F49A17AF9DDB0071780D /* boot.jar */; };
 		D901F50017B279EA0071780D /* boot.jar in Resources */ = {isa = PBXBuildFile; fileRef = D901F49A17AF9DDB0071780D /* boot.jar */; };
 		D91FE4F2178EB1F1001B37D8 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D91FE4F1178EB1F1001B37D8 /* Cocoa.framework */; };
 		D91FE4FC178EB1F1001B37D8 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D91FE4FA178EB1F1001B37D8 /* InfoPlist.strings */; };
@@ -448,7 +447,6 @@
 			files = (
 				D901F49917AF9DAB0071780D /* JavaVM.framework in Frameworks */,
 				D958B09E17A29B0500B0EDD5 /* Cocoa.framework in Frameworks */,
-				D901F49B17AF9DDB0071780D /* boot.jar in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
