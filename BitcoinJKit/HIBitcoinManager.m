@@ -237,14 +237,52 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     // exception has to be cleared if it exists
     (*_jniEnv)->ExceptionClear(_jniEnv);
 
-    NSString *reason = @"Java VM raised an exception";
+    // try to get exception details from Java
+    // note: we need to do this on the main thread - if this is called from a background thread,
+    // the toString() call returns nil and throws a new exception (java.lang.StackOverflowException)
+    dispatch_block_t processException = ^{
+        NSString *reason = [self getJavaExceptionMessage:exception];
 
-    // try to get exception.toString()
-    jclass throwableClass = (*_jniEnv)->FindClass(_jniEnv, "java/lang/Throwable");
-    if (throwableClass)
+        if (!reason)
+        {
+            reason = @"Java VM raised an exception";
+        }
+
+        NSException *wrappedException = [NSException exceptionWithName:@"JavaException"
+                                                                reason:reason
+                                                              userInfo:nil];
+
+        if (useHandler && self.exceptionHandler)
+        {
+            self.exceptionHandler(wrappedException);
+        }
+        else
+        {
+            @throw wrappedException;
+        }
+    };
+
+    if (dispatch_get_current_queue() != dispatch_get_main_queue())
     {
-        jmethodID toStringMethod = (*_jniEnv)->GetMethodID(_jniEnv, throwableClass, "toString",
-                                                           "()Ljava/lang/String;");
+        // run the above code synchronously on the main thread,
+        // otherwise Java GC can clean up the exception object and we get a memory access error
+        dispatch_sync(dispatch_get_main_queue(), processException);
+    }
+    else
+    {
+        // if this is the main thread, we can't use dispatch_sync or the whole thing will lock up
+        processException();
+    }
+}
+
+- (NSString *)getJavaExceptionMessage:(jthrowable)exception
+{
+    jclass exceptionClass = (*_jniEnv)->GetObjectClass(_jniEnv, exception);
+
+    if (exceptionClass)
+    {
+        jmethodID toStringMethod = (*_jniEnv)->GetMethodID(_jniEnv, exceptionClass, "toString", "()Ljava/lang/String;");
+
         if (toStringMethod)
         {
             jstring description = (*_jniEnv)->CallObjectMethod(_jniEnv, exception, toStringMethod);
@@ -257,21 +295,12 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
             if (description)
             {
-                reason = NSStringFromJString(_jniEnv, description);
+                return NSStringFromJString(_jniEnv, description);
             }
         }
     }
 
-    NSException *wrappedException = [NSException exceptionWithName:@"JavaException" reason:reason userInfo:nil];
-
-    if (useHandler && self.exceptionHandler)
-    {
-        self.exceptionHandler(wrappedException);
-    }
-    else
-    {
-        @throw wrappedException;
-    }
+    return nil;
 }
 
 - (id)objectFromJSONString:(NSString *)JSONString
