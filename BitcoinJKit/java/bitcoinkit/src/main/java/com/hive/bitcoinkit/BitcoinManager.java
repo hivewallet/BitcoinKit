@@ -222,7 +222,19 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
 	    	   onTransactionFailed();   	   
 	       }		
 	}
-    
+
+    public String getExceptionStackTrace(Throwable exception)
+    {
+        StringBuilder buffer = new StringBuilder();
+
+        for (StackTraceElement line : exception.getStackTrace())
+        {
+            buffer.append("at " + line.toString() + "\n");
+        }
+
+        return buffer.toString();
+    }
+
     public boolean isAddressValid(String address)
     {
         try {

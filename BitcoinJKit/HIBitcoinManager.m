@@ -248,9 +248,12 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
             reason = @"Java VM raised an exception";
         }
 
+        NSString *stackTrace = [self getJavaExceptionStackTrace:exception];
+        NSDictionary *info = stackTrace ? @{ @"stackTrace": stackTrace } : @{};
+
         NSException *wrappedException = [NSException exceptionWithName:@"JavaException"
                                                                 reason:reason
-                                                              userInfo:nil];
+                                                              userInfo:info];
 
         if (useHandler && self.exceptionHandler)
         {
@@ -297,6 +300,30 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
             {
                 return NSStringFromJString(_jniEnv, description);
             }
+        }
+    }
+
+    return nil;
+}
+
+- (NSString *)getJavaExceptionStackTrace:(jthrowable)exception
+{
+    jmethodID stackTraceMethod = (*_jniEnv)->GetMethodID(_jniEnv, _managerClass, "getExceptionStackTrace",
+                                                         "(Ljava/lang/Throwable;)Ljava/lang/String;");
+
+    if (stackTraceMethod)
+    {
+        jstring stackTrace = (*_jniEnv)->CallObjectMethod(_jniEnv, _managerObject, stackTraceMethod, exception);
+
+        if ((*_jniEnv)->ExceptionCheck(_jniEnv))
+        {
+            (*_jniEnv)->ExceptionDescribe(_jniEnv);
+            (*_jniEnv)->ExceptionClear(_jniEnv);
+        }
+
+        if (stackTrace)
+        {
+            return NSStringFromJString(_jniEnv, stackTrace);
         }
     }
 
