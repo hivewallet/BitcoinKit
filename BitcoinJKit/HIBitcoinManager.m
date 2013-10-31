@@ -545,7 +545,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 }
 
 - (void)sendCoins:(uint64_t)coins
-      toReceipent:(NSString *)receipent
+      toRecipient:(NSString *)recipient
           comment:(NSString *)comment
        completion:(void(^)(NSString *hash))completion
 {
@@ -566,7 +566,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     
     [self callVoidMethodWithName:"sendCoins" signature:"(Ljava/lang/String;Ljava/lang/String;)V",
      JStringFromNSString(_jniEnv, [NSString stringWithFormat:@"%lld", coins]),
-     JStringFromNSString(_jniEnv, receipent)];
+     JStringFromNSString(_jniEnv, recipient)];
 }
 
 - (BOOL)encryptWalletWith:(NSString *)passwd

@@ -146,15 +146,15 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;
  */
 - (BOOL)isAddressValid:(NSString *)address;
 
-/** Sends amount of coins to receipent
+/** Sends amount of coins to recipient
  *
  * @param coins Amount of coins to be sent in satoshis
- * @param receipent Receipent address hash
+ * @param recipient Recipient's address hash
  * @param comment optional comment string that will be bound to the transaction
  * @param complection Completion block where notification about created transaction hash will be sent
  *
  */
-- (void)sendCoins:(uint64_t)coins toReceipent:(NSString *)receipent comment:(NSString *)comment completion:(void(^)(NSString *hash))completion;
+- (void)sendCoins:(uint64_t)coins toRecipient:(NSString *)recipient comment:(NSString *)comment completion:(void(^)(NSString *hash))completion;
 
 /** Encrypts wallet with given passphrase
  *

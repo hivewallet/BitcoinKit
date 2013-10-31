@@ -580,7 +580,7 @@ static void NotifyTransactionChanged(HIBitcoinManager *manager, CWallet *wallet,
     return addr.IsValid();
 }
 
-- (void)sendCoins:(uint64_t)coins toReceipent:(NSString *)receipent comment:(NSString *)comment completion:(void(^)(NSString *hash))completion
+- (void)sendCoins:(uint64_t)coins toRecipient:(NSString *)recipient comment:(NSString *)comment completion:(void(^)(NSString *hash))completion
 {
     if (coins == 0 || coins > self.balance)
     {
@@ -588,7 +588,7 @@ static void NotifyTransactionChanged(HIBitcoinManager *manager, CWallet *wallet,
             completion(nil);
         return;
     }
-    CBitcoinAddress address(receipent.UTF8String);
+    CBitcoinAddress address(recipient.UTF8String);
   
     if (!address.IsValid())
     {
