@@ -538,6 +538,12 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     return nil;
 }
 
+- (NSString *)walletDebuggingInfo
+{
+    jstring info = [self callObjectMethodWithName:"getWalletDebuggingInfo" signature:"()Ljava/lang/String;"];
+    return NSStringFromJString(_jniEnv, info);
+}
+
 - (BOOL)isAddressValid:(NSString *)address
 {
     return [self callBooleanMethodWithName:"isAddressValid" signature:"(Ljava/lang/String;)Z",

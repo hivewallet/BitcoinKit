@@ -54,6 +54,9 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;
 // Integer value indicating the progress of network sync. Values are from 0 to 10000.
 @property (nonatomic, readonly) NSUInteger syncProgress;
 
+// Various details about the wallet dumped into a single string, useful for debugging
+@property (nonatomic, readonly) NSString *walletDebuggingInfo;
+
 // Returns wallets main address. Creates one if none exists yet
 @property (nonatomic, readonly, getter = walletAddress) NSString *walletAddress;
 

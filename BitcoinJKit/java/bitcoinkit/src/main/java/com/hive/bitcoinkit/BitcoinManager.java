@@ -63,6 +63,11 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
 		return ecKey.toAddress(networkParams).toString();
 	}
 
+    public String getWalletDebuggingInfo()
+    {
+        return (wallet != null) ? wallet.toString() : null;
+    }
+
     public int getBalance()
     {
         return (wallet != null) ? wallet.getBalance().intValue() : 0;
