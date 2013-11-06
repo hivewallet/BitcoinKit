@@ -75,105 +75,125 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         
         return null;
     }
-	
-	private String getJSONFromTransaction(Transaction tx)
-	{
-		if (tx != null)
-		{
-			try {
-				String confidence = "building";
-				StringBuffer conns = new StringBuffer();
-				int connCount = 0;
-				
-				
-				if (tx.getConfidence().getConfidenceType() == TransactionConfidence.ConfidenceType.PENDING)
-					confidence = "pending";
-				
-//				if (tx.isCoinBase())
-//					tType = "generated";
-				
-				conns.append("[");
-				
-				if (tx.getInputs().size() > 0 && tx.getValue(wallet).compareTo(BigInteger.ZERO) > 0)
-				{
-					TransactionInput in = tx.getInput(0);
-					if (connCount > 0)
-	                	conns.append(", ");
-					
-					conns.append("{ ");
-					try {
-		                Script scriptSig = in.getScriptSig();
-		                if (scriptSig.getChunks().size() == 2)
-		                	conns.append("\"address\": \"" + scriptSig.getFromAddress(networkParams).toString() + "\"");
-		                
-		                conns.append(" ,\"category\": \"received\" }");
-		                
-		                connCount++;
-		            } catch (Exception e) {
-		              
-		            }
-				}
-				
-				if (tx.getOutputs().size() > 0 && tx.getValue(wallet).compareTo(BigInteger.ZERO) < 0)
-				{
-					TransactionOutput out = tx.getOutput(0);
-						
-					if (connCount > 0)
-	                	conns.append(", ");
-					
-					conns.append("{ ");
-					try {
-		                Script scriptPubKey = out.getScriptPubKey();
-		                if (scriptPubKey.isSentToAddress()) 
-		                    conns.append(" \"address\": \"" + scriptPubKey.getToAddress(networkParams).toString() + "\"");
-		                
-		                conns.append(" ,\"category\": \"sent\" }");
-		                
-		                connCount++;
-		            } catch (Exception e) {
-		              
-		            }
-				}
-				conns.append("]");
 
-				return "{ \"amount\": " + tx.getValue(wallet) +
-						", \"txid\": \"" + tx.getHashAsString()  + "\"" +
-						", \"time\": \""  + tx.getUpdateTime() + "\"" + 
-						", \"confidence\": \""   +confidence + "\"" +
-						", \"details\": "   + conns.toString() +						
-						"}";
-			
-			} catch (ScriptException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		
-		return null;
+	private String getJSONFromTransaction(Transaction tx) throws ScriptException
+	{
+		if (tx == null)
+        {
+            return null;
+        }
+
+        StringBuffer conns = new StringBuffer();
+        int connCount = 0;
+
+        TransactionConfidence.ConfidenceType confidenceType = tx.getConfidence().getConfidenceType();
+        String confidence;
+
+        if (confidenceType == TransactionConfidence.ConfidenceType.BUILDING)
+        {
+            confidence = "building";
+        }
+        else if (confidenceType == TransactionConfidence.ConfidenceType.PENDING)
+        {
+            confidence = "pending";
+        }
+        else if (confidenceType == TransactionConfidence.ConfidenceType.DEAD)
+        {
+            confidence = "dead";
+        }
+        else
+        {
+            confidence = "unknown";
+        }
+
+        conns.append("[");
+
+        if (tx.getInputs().size() > 0 && tx.getValue(wallet).compareTo(BigInteger.ZERO) > 0)
+        {
+            TransactionInput in = tx.getInput(0);
+
+            if (connCount > 0)
+            {
+                conns.append(", ");
+            }
+
+            conns.append("{ ");
+
+            try {
+                Script scriptSig = in.getScriptSig();
+
+                if (scriptSig.getChunks().size() == 2)
+                {
+                    conns.append("\"address\": \"" + scriptSig.getFromAddress(networkParams).toString() + "\"");
+                }
+
+                conns.append(" ,\"category\": \"received\" }");
+
+                connCount++;
+            } catch (Exception e) {
+
+            }
+        }
+
+        if (tx.getOutputs().size() > 0 && tx.getValue(wallet).compareTo(BigInteger.ZERO) < 0)
+        {
+            TransactionOutput out = tx.getOutput(0);
+
+            if (connCount > 0)
+            {
+                conns.append(", ");
+            }
+
+            conns.append("{ ");
+
+            try {
+                Script scriptPubKey = out.getScriptPubKey();
+
+                if (scriptPubKey.isSentToAddress())
+                {
+                    conns.append(" \"address\": \"" + scriptPubKey.getToAddress(networkParams).toString() + "\"");
+                }
+
+                conns.append(" ,\"category\": \"sent\" }");
+
+                connCount++;
+            } catch (Exception e) {
+
+            }
+        }
+
+        conns.append("]");
+
+        return "{ \"amount\": " + tx.getValue(wallet) +
+                ", \"txid\": \"" + tx.getHashAsString()  + "\"" +
+                ", \"time\": \""  + tx.getUpdateTime() + "\"" +
+                ", \"confidence\": \""   +confidence + "\"" +
+                ", \"details\": "   + conns.toString() +
+                "}";
 	}
-	
+
 	public int getTransactionCount()
 	{
 		return wallet.getTransactionsByTime().size();
 	}
     
-    public String getAllTransactions()
+    public String getAllTransactions() throws ScriptException
     {
         return getTransactions(0, getTransactionCount());
     }
 	
-	public String getTransaction(String tx)
+	public String getTransaction(String tx) throws ScriptException
 	{
 		Sha256Hash hash = new Sha256Hash(tx);
 		return getJSONFromTransaction(wallet.getTransaction(hash));
 	}
 	
-	public String getTransaction(int idx)
+	public String getTransaction(int idx) throws ScriptException
 	{	
 		return getJSONFromTransaction(wallet.getTransactionsByTime().get(idx));
 	}
 	
-	public String getTransactions(int from, int count)
+	public String getTransactions(int from, int count) throws ScriptException
 	{
 		List<Transaction> transactions = wallet.getTransactionsByTime();
 		
