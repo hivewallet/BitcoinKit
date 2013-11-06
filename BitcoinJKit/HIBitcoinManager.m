@@ -601,16 +601,12 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
 - (uint64_t)balance
 {
-    jstring balanceJString = [self callObjectMethodWithName:"getBalanceString" signature:"()Ljava/lang/String;"];
+    return [self callIntegerMethodWithName:"getBalance" signature:"()I"];
+}
 
-    if (balanceJString)
-    {
-        NSString *balanceString = NSStringFromJString(_jniEnv, balanceJString);
-        _lastBalance = [balanceString longLongValue];
-        return [balanceString longLongValue];
-    }
-    
-    return 0;
+- (uint64_t)estimatedBalance
+{
+    return [self callIntegerMethodWithName:"getEstimatedBalance" signature:"()I"];
 }
 
 - (void)checkBalance:(NSTimer *)timer

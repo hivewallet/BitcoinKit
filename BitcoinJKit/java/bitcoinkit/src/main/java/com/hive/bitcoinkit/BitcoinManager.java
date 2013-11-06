@@ -62,18 +62,15 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
 		ECKey ecKey = wallet.getKeys().get(0);
 		return ecKey.toAddress(networkParams).toString();
 	}
-	
-	public BigInteger getBalance()
-	{
-		return wallet.getBalance();
-	}
-    
-    public String getBalanceString()
+
+    public int getBalance()
     {
-        if (wallet != null)
-            return getBalance().toString();
-        
-        return null;
+        return (wallet != null) ? wallet.getBalance().intValue() : 0;
+    }
+
+    public int getEstimatedBalance()
+    {
+        return (wallet != null) ? wallet.getBalance(Wallet.BalanceType.ESTIMATED).intValue() : 0;
     }
 
 	private String getJSONFromTransaction(Transaction tx) throws ScriptException
