@@ -314,7 +314,7 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         BlockChain chain = new BlockChain(networkParams, wallet, blockStore);
         // Connect to the localhost node. One minute timeout since we won't try any other peers
         peerGroup = new PeerGroup(networkParams, chain);
-//        peerGroup.setUserAgent("BitcoinKit", "1.0");
+        peerGroup.setUserAgent("BitcoinJKit", "0.9");
         if (networkParams == RegTestParams.get()) {
             peerGroup.addAddress(InetAddress.getLocalHost());
         } else {
