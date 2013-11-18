@@ -442,7 +442,10 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     [_balanceChecker invalidate];
     _balanceChecker = nil;
 
-    [self callVoidMethodWithName:"stop" signature:"()V"];
+    if (_managerObject)
+    {
+        [self callVoidMethodWithName:"stop" signature:"()V"];
+    }
 
     [self willChangeValueForKey:@"isRunning"];
     _isRunning = NO;

@@ -365,9 +365,22 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
 	{
 		try {
             System.out.print("Shutting down ... ");
-            peerGroup.stopAndWait();
-            wallet.saveToFile(walletFile);
-            blockStore.close();
+
+            if (peerGroup != null)
+            {
+                peerGroup.stopAndWait();
+            }
+
+            if (wallet != null)
+            {
+                wallet.saveToFile(walletFile);
+            }
+
+            if (blockStore != null)
+            {
+                blockStore.close();
+            }
+
             System.out.print("done ");
         } catch (Exception e) {
             throw new RuntimeException(e);
