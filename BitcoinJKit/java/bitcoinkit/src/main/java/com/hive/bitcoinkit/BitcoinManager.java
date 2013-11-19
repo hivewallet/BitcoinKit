@@ -22,7 +22,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.InetAddress;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 public class BitcoinManager implements PeerEventListener, Thread.UncaughtExceptionHandler {
@@ -166,9 +168,12 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
 
         conns.append("]");
 
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+
         return "{ \"amount\": " + tx.getValue(wallet) +
                 ", \"txid\": \"" + tx.getHashAsString()  + "\"" +
-                ", \"time\": \""  + tx.getUpdateTime() + "\"" +
+                ", \"time\": \""  + dateFormat.format(tx.getUpdateTime()) + "\"" +
                 ", \"confidence\": \""   +confidence + "\"" +
                 ", \"details\": "   + conns.toString() +
                 "}";

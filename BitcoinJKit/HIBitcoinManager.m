@@ -347,8 +347,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     {
         _dateFormatter = [[NSDateFormatter alloc] init];
         _dateFormatter.locale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en_GB"] autorelease];
-        _dateFormatter.dateFormat = @"EEE MMM dd HH:mm:ss zzz yyyy";
-
+        _dateFormatter.dateFormat = @"yyyy-MM-dd HH:mm:ss z";
         _connections = 0;
         _sending = NO;
         _syncProgress = 0;
