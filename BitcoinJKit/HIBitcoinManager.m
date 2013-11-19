@@ -19,6 +19,7 @@
     BOOL _sending;
     void(^sendCompletionBlock)(NSString *hash);
     uint64_t _lastBalance;
+    uint64_t _lastEstimatedBalance;
     NSTimer *_balanceChecker;
 }
 
@@ -619,11 +620,14 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
 - (void)checkBalance:(NSTimer *)timer
 {
-    uint64_t lastBalance = _lastBalance;
-
-    if (lastBalance != self.balance)
+    if (self.balance != _lastBalance)
     {
         [self onBalanceChanged];
+    }
+
+    if (self.estimatedBalance != _lastEstimatedBalance)
+    {
+        [self onEstimatedBalanceChanged];
     }
 }
 
@@ -639,7 +643,17 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self willChangeValueForKey:@"balance"];
+        _lastBalance = self.balance;
         [self didChangeValueForKey:@"balance"];
+    });
+}
+
+- (void)onEstimatedBalanceChanged
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self willChangeValueForKey:@"estimatedBalance"];
+        _lastEstimatedBalance = self.estimatedBalance;
+        [self didChangeValueForKey:@"estimatedBalance"];
     });
 }
 
@@ -655,10 +669,8 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 - (void)onTransactionChanged:(NSString *)txid
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self willChangeValueForKey:@"balance"];
         [[NSNotificationCenter defaultCenter] postNotificationName:kHIBitcoinManagerTransactionChangedNotification
                                                             object:txid];
-        [self didChangeValueForKey:@"balance"];
     });
 }
 
