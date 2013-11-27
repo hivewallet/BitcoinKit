@@ -360,18 +360,44 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
                                                                              inDomains:NSUserDomainMask];
         self.dataURL = [[applicationSupport lastObject] URLByAppendingPathComponent:BitcoinJKitBundleIdentifier];
 
-        JavaVMOption options[_vmArgs.nOptions];
+        int numOptions = 1;
+#ifdef DEBUG
+        const char *debugPort = getenv("HIVE_JAVA_DEBUG_PORT");
+        BOOL doDebug = debugPort && debugPort[0];
+        if (doDebug) {
+            numOptions++;
+        }
+#endif
+        JavaVMOption options[numOptions];
         NSBundle *myBundle = [NSBundle bundleWithIdentifier:BitcoinJKitBundleIdentifier];
         NSString *bootJarPath = [myBundle pathForResource:@"boot" ofType:@"jar"];
         options[0].optionString = (char *) [[NSString stringWithFormat:@"-Djava.class.path=%@", bootJarPath] UTF8String];
 
+#ifdef DEBUG
+        NSString *debugOptionString =
+            [NSString stringWithFormat:@"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=%s", debugPort];
+        if (doDebug) {
+            options[numOptions - 1].optionString = [debugOptionString UTF8String];
+        }
+#endif
+
         _vmArgs.version = JNI_VERSION_1_2;
-        _vmArgs.nOptions = 1;
+        _vmArgs.nOptions = numOptions;
         _vmArgs.ignoreUnrecognized = JNI_TRUE;
         _vmArgs.options = options;
 
         JavaVM *vm;
         JNI_CreateJavaVM(&vm, (void *) &_jniEnv, &_vmArgs);
+
+#ifdef DEBUG
+        // Optionally wait here to give the Java debugger a chance to attach before anything happens.
+        const char *debugDelay = getenv("HIVE_JAVA_DEBUG_DELAY");
+        if (doDebug && debugDelay && debugDelay[0]) {
+            long seconds = strtol(debugDelay, NULL, 10);
+            NSLog(@"Waiting %d seconds for Java debugger to connect...", seconds);
+            sleep(seconds);
+        }
+#endif
 
         // We need to create the manager object
         _managerClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];
