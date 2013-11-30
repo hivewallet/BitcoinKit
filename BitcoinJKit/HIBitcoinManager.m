@@ -7,6 +7,8 @@
 //
 
 #import "HIBitcoinManager.h"
+
+#import "HIBitcoinErrorCodes.h"
 #import <JavaVM/jni.h>
 
 @interface HIBitcoinManager ()
@@ -113,13 +115,11 @@ static JNINativeMethod methods[] = {
     {"onException",             "(Ljava/lang/Throwable;)V",                (void *)&onException}
 };
 
-
 NSString * const kHIBitcoinManagerTransactionChangedNotification = @"kJHIBitcoinManagerTransactionChangedNotification";
 NSString * const kHIBitcoinManagerStartedNotification = @"kJHIBitcoinManagerStartedNotification";
 NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStoppedNotification";
 
 static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
-
 
 @implementation HIBitcoinManager
 
@@ -242,10 +242,10 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     // the toString() call returns nil and throws a new exception (java.lang.StackOverflowException)
     dispatch_block_t processException = ^{
         NSError *error = [NSError errorWithDomain:@"BitcoinKit"
-                                             code:0
+                                             code:[self errorCodeForJavaException:exception]
                                          userInfo:[self createUserInfoForJavaException:exception]];
 
-        if (returnedError)
+        if (returnedError && error.code != kHIBitcoinManagerUnexpectedError)
         {
             // The caller wants to handle errors.
             *returnedError = error;
@@ -277,6 +277,27 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
         // if this is the main thread, we can't use dispatch_sync or the whole thing will lock up
         processException();
     }
+}
+
+- (NSInteger)errorCodeForJavaException:(jthrowable)exception
+{
+    NSString *exceptionClass = [self getJavaExceptionClassName:exception];
+    if ([exceptionClass isEqual:@"com.google.bitcoin.store.UnreadableWalletException"]) {
+        return kHIBitcoinManagerUnreadableWallet;
+    } else {
+        return kHIBitcoinManagerUnexpectedError;
+    }
+}
+
+- (NSString *)getJavaExceptionClassName:(jthrowable)exception
+{
+    jclass exceptionClass = (*_jniEnv)->GetObjectClass(_jniEnv, exception);
+    jmethodID getClassMethod = (*_jniEnv)->GetMethodID(_jniEnv, exceptionClass, "getClass", "()Ljava/lang/Class;");
+    jobject classObject = (*_jniEnv)->CallObjectMethod(_jniEnv, exception, getClassMethod);
+    jobject class = (*_jniEnv)->GetObjectClass(_jniEnv, classObject);
+    jmethodID getNameMethod = (*_jniEnv)->GetMethodID(_jniEnv, class, "getName", "()Ljava/lang/String;");
+    jstring name = (*_jniEnv)->CallObjectMethod(_jniEnv, exceptionClass, getNameMethod);
+    return NSStringFromJString(_jniEnv, name);
 }
 
 - (NSDictionary *)createUserInfoForJavaException:(jthrowable)exception

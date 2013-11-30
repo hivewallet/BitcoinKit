@@ -40,6 +40,7 @@ static std::string HIDecodeDumpString(const std::string &str) {
     }
     return ret.str();
 }
+
 NSString * const kHIBitcoinManagerTransactionChangedNotification = @"kHIBitcoinManagerTransactionChangedNotification";
 NSString * const kHIBitcoinManagerStartedNotification = @"kHIBitcoinManagerStartedNotification";
 NSString * const kHIBitcoinManagerStoppedNotification = @"kHIBitcoinManagerStoppedNotification";
