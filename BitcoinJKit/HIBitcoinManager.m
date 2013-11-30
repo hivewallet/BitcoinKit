@@ -282,9 +282,16 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 - (NSInteger)errorCodeForJavaException:(jthrowable)exception
 {
     NSString *exceptionClass = [self getJavaExceptionClassName:exception];
-    if ([exceptionClass isEqual:@"com.google.bitcoin.store.UnreadableWalletException"]) {
+    if ([exceptionClass isEqual:@"com.google.bitcoin.store.UnreadableWalletException"])
+    {
         return kHIBitcoinManagerUnreadableWallet;
-    } else {
+    }
+    else if ([exceptionClass isEqual:@"com.google.bitcoin.store.BlockStoreException"])
+    {
+        return kHIBitcoinManagerBlockStoreError;
+    }
+    else
+    {
         return kHIBitcoinManagerUnexpectedError;
     }
 }

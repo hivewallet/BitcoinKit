@@ -11,3 +11,6 @@ extern NSInteger const kHIBitcoinManagerUnexpectedError;
 
 /* The wallet file exists but could not be read. */
 extern NSInteger const kHIBitcoinManagerUnreadableWallet;
+
+/* Storing a block failed (e.g. because the file is locked or the volume is full). */
+extern NSInteger const kHIBitcoinManagerBlockStoreError;
