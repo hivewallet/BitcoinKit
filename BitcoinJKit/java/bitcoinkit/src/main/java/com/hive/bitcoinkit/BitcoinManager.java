@@ -225,12 +225,15 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
 		
 		return txs.toString();
 	}
-	
+
+	public String feeForSendingCoins(String amount) throws AddressFormatException {
+		return Transaction.REFERENCE_DEFAULT_MIN_TX_FEE.toString();
+	}
+
 	public void sendCoins(String amount, final String sendToAddressString)
 	{
 		  try {
 			  BigInteger aToSend = new BigInteger(amount);
-			  aToSend = aToSend.subtract(Transaction.REFERENCE_DEFAULT_MIN_TX_FEE);
 			  Address sendToAddress = new Address(networkParams, sendToAddressString);
 	          final Wallet.SendResult sendResult = wallet.sendCoins(peerGroup, sendToAddress, aToSend);
 	          Futures.addCallback(sendResult.broadcastComplete, new FutureCallback<Transaction>() {

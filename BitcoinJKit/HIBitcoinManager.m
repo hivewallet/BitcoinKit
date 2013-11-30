@@ -626,6 +626,15 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
             JStringFromNSString(_jniEnv, address)];
 }
 
+- (uint64_t)calculateTransactionFeeForSendingCoins:(uint64_t)coins
+{
+    jstring fee =
+        [self callObjectMethodWithName:"feeForSendingCoins"
+                             signature:"(Ljava/lang/String;)Ljava/lang/String;",
+                                       JStringFromNSString(_jniEnv, [NSString stringWithFormat:@"%lld", coins])];
+    return [NSStringFromJString(_jniEnv, fee) longLongValue];
+}
+
 - (void)sendCoins:(uint64_t)coins
       toRecipient:(NSString *)recipient
           comment:(NSString *)comment

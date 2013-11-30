@@ -156,6 +156,12 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;
  */
 - (BOOL)isAddressValid:(NSString *)address;
 
+/** Calculates the transaction fee when sending coins.
+ *
+ * @param coins Amount of coins for the recipient to receive in satoshis
+ */
+- (uint64_t)calculateTransactionFeeForSendingCoins:(uint64_t)coins;
+
 /** Sends amount of coins to recipient
  *
  * @param coins Amount of coins to be sent in satoshis
