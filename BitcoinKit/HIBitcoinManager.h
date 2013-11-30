@@ -100,8 +100,12 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;
  * One should start the manager only once. After configuring the singleton.
  * Every time one will try to do that again - it will crash
  * This is due to bitcoind implementation that uses too many globals.
+ *
+ * @param error A pointer to an error object (or NULL to throw an exception on errors)
+ *
+ * @returns NO if an error prevented proper initialization.
  */
-- (void)start;
+- (BOOL)start:(NSError **)error;
 
 /** Stops the manager and stores all up-to-date information in data folder
  *

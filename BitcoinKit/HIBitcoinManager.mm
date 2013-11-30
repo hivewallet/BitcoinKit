@@ -108,10 +108,10 @@ static void NotifyTransactionChanged(HIBitcoinManager *manager, CWallet *wallet,
     return self;
 }
 
-- (void)start
+- (BOOL)start:(NSError **)error
 {
     if (_isRunning || _isStarting)
-        return;
+        return YES;
     
     fHaveGUI = true;
     [[NSFileManager defaultManager] createDirectoryAtURL:_dataURL withIntermediateDirectories:YES attributes:0 error:NULL];
@@ -160,6 +160,8 @@ static void NotifyTransactionChanged(HIBitcoinManager *manager, CWallet *wallet,
             });
         }
     });
+
+    return YES;
 }
 
 - (void)stop

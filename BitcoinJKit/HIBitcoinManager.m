@@ -28,7 +28,6 @@
 - (void)onTransactionChanged:(NSString *)txid;
 - (void)onTransactionSucceeded:(NSString *)txid;
 - (void)onTransactionFailed;
-- (void)handleJavaException:(jthrowable)exception useExceptionHandler:(BOOL)useHandler;
 
 @end
 
@@ -100,7 +99,7 @@ JNIEXPORT void JNICALL onTransactionFailed(JNIEnv *env, jobject thisobject)
 JNIEXPORT void JNICALL onException(JNIEnv *env, jobject thisobject, jthrowable jexception)
 {
     NSAutoreleasePool *pool = [NSAutoreleasePool new];
-    [[HIBitcoinManager defaultManager] handleJavaException:jexception useExceptionHandler:YES];
+    [[HIBitcoinManager defaultManager] handleJavaException:jexception useExceptionHandler:YES error:NULL];
     [pool release];
 }
 
@@ -146,7 +145,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 {
     jclass cls = (*_jniEnv)->FindClass(_jniEnv, [class UTF8String]);
 
-    [self handleJavaExceptions];
+    [self handleJavaExceptions:NULL];
 
     return cls;
 }
@@ -174,7 +173,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     jboolean result = (*_jniEnv)->CallBooleanMethodV(_jniEnv, _managerObject, method, args);
     va_end(args);
 
-    [self handleJavaExceptions];
+    [self handleJavaExceptions:NULL];
 
     return result;
 }
@@ -188,7 +187,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     jint result = (*_jniEnv)->CallIntMethodV(_jniEnv, _managerObject, method, args);
     va_end(args);
 
-    [self handleJavaExceptions];
+    [self handleJavaExceptions:NULL];
 
     return result;
 }
@@ -202,12 +201,12 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     jobject result = (*_jniEnv)->CallObjectMethodV(_jniEnv, _managerObject, method, args);
     va_end(args);
 
-    [self handleJavaExceptions];
+    [self handleJavaExceptions:NULL];
 
     return result;
 }
 
-- (void)callVoidMethodWithName:(char *)name signature:(char *)signature, ...
+- (BOOL)callVoidMethodWithName:(char *)name error:(NSError **)error signature:(char *)signature, ...
 {
     jmethodID method = [self jMethodWithName:name signature:signature];
 
@@ -216,21 +215,21 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     (*_jniEnv)->CallVoidMethodV(_jniEnv, _managerObject, method, args);
     va_end(args);
 
-    [self handleJavaExceptions];
+    [self handleJavaExceptions:error];
 }
 
-- (void)handleJavaExceptions
+- (void)handleJavaExceptions:(NSError **)error
 {
     if ((*_jniEnv)->ExceptionCheck(_jniEnv))
     {
         // get the exception object
         jthrowable exception = (*_jniEnv)->ExceptionOccurred(_jniEnv);
 
-        [self handleJavaException:exception useExceptionHandler:NO];
+        [self handleJavaException:exception useExceptionHandler:NO error:error];
     }
 }
 
-- (void)handleJavaException:(jthrowable)exception useExceptionHandler:(BOOL)useHandler
+- (void)handleJavaException:(jthrowable)exception useExceptionHandler:(BOOL)useHandler error:(NSError **)returnedError
 {
     // log exception to console
     (*_jniEnv)->ExceptionDescribe(_jniEnv);
@@ -246,9 +245,10 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
                                              code:0
                                          userInfo:[self createUserInfoForJavaException:exception]];
 
-        if (useHandler && self.exceptionHandler)
+        if (returnedError)
         {
-            self.exceptionHandler(error);
+            // The caller wants to handle errors.
+            *returnedError = error;
         }
         else
         {
@@ -441,7 +441,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     [super dealloc];
 }
 
-- (void)start
+- (BOOL)start:(NSError **)error
 {
     [[NSFileManager defaultManager] createDirectoryAtURL:self.dataURL
                              withIntermediateDirectories:YES
@@ -450,15 +450,19 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     
     if (_testingNetwork)
     {
-        [self callVoidMethodWithName:"setTestingNetwork" signature:"(Z)V", true];
+        [self callVoidMethodWithName:"setTestingNetwork" error:NULL signature:"(Z)V", true];
     }
     
     // Now set the folder
-    [self callVoidMethodWithName:"setDataDirectory" signature:"(Ljava/lang/String;)V",
+    [self callVoidMethodWithName:"setDataDirectory" error:NULL signature:"(Ljava/lang/String;)V",
      JStringFromNSString(_jniEnv, self.dataURL.path)];
 
     // We're ready! Let's start
-    [self callVoidMethodWithName:"start" signature:"()V"];
+    [self callVoidMethodWithName:"start" error:error signature:"()V"];
+    if (*error)
+    {
+        return NO;
+    }
 
     [self willChangeValueForKey:@"isRunning"];
     _isRunning = YES;
@@ -468,6 +472,8 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
     [self willChangeValueForKey:@"walletAddress"];
     [self didChangeValueForKey:@"walletAddress"];
+
+    return YES;
 }
 
 - (NSString *)walletAddress
@@ -483,7 +489,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
     if (_managerObject)
     {
-        [self callVoidMethodWithName:"stop" signature:"()V"];
+        [self callVoidMethodWithName:"stop" error:NULL signature:"()V"];
     }
 
     [self willChangeValueForKey:@"isRunning"];
@@ -612,7 +618,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     [sendCompletionBlock release];
     sendCompletionBlock = [completion copy];
     
-    [self callVoidMethodWithName:"sendCoins" signature:"(Ljava/lang/String;Ljava/lang/String;)V",
+    [self callVoidMethodWithName:"sendCoins" error:NULL signature:"(Ljava/lang/String;Ljava/lang/String;)V",
      JStringFromNSString(_jniEnv, [NSString stringWithFormat:@"%lld", coins]),
      JStringFromNSString(_jniEnv, recipient)];
 }
