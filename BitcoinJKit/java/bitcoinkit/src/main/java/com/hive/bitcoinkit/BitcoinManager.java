@@ -290,7 +290,8 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
             if (walletFile.exists())
             	wallet = Wallet.loadFromFile(walletFile);
         } catch (UnreadableWalletException e) {
-            // Fall through.
+            // Better not continue!
+            throw e;
         }
         if (wallet == null) {
             wallet = new Wallet(networkParams);

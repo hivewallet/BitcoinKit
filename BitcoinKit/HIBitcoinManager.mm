@@ -40,6 +40,7 @@ static std::string HIDecodeDumpString(const std::string &str) {
     }
     return ret.str();
 }
+
 NSString * const kHIBitcoinManagerTransactionChangedNotification = @"kHIBitcoinManagerTransactionChangedNotification";
 NSString * const kHIBitcoinManagerStartedNotification = @"kHIBitcoinManagerStartedNotification";
 NSString * const kHIBitcoinManagerStoppedNotification = @"kHIBitcoinManagerStoppedNotification";
@@ -108,10 +109,10 @@ static void NotifyTransactionChanged(HIBitcoinManager *manager, CWallet *wallet,
     return self;
 }
 
-- (void)start
+- (BOOL)start:(NSError **)error
 {
     if (_isRunning || _isStarting)
-        return;
+        return YES;
     
     fHaveGUI = true;
     [[NSFileManager defaultManager] createDirectoryAtURL:_dataURL withIntermediateDirectories:YES attributes:0 error:NULL];
@@ -160,6 +161,8 @@ static void NotifyTransactionChanged(HIBitcoinManager *manager, CWallet *wallet,
             });
         }
     });
+
+    return YES;
 }
 
 - (void)stop
