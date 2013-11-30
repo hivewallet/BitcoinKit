@@ -242,27 +242,27 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     // note: we need to do this on the main thread - if this is called from a background thread,
     // the toString() call returns nil and throws a new exception (java.lang.StackOverflowException)
     dispatch_block_t processException = ^{
-        NSString *reason = [self getJavaExceptionMessage:exception];
-
-        if (!reason)
-        {
-            reason = @"Java VM raised an exception";
-        }
-
-        NSString *stackTrace = [self getJavaExceptionStackTrace:exception];
-        NSDictionary *info = stackTrace ? @{ @"stackTrace": stackTrace } : @{};
-
-        NSException *wrappedException = [NSException exceptionWithName:@"JavaException"
-                                                                reason:reason
-                                                              userInfo:info];
+        NSError *error = [NSError errorWithDomain:@"BitcoinKit"
+                                             code:0
+                                         userInfo:[self createUserInfoForJavaException:exception]];
 
         if (useHandler && self.exceptionHandler)
         {
-            self.exceptionHandler(wrappedException);
+            self.exceptionHandler(error);
         }
         else
         {
-            @throw wrappedException;
+            NSException *exception = [NSException exceptionWithName:@"Java exception"
+                                                             reason:error.userInfo[NSLocalizedFailureReasonErrorKey]
+                                                           userInfo:nil];
+            if (useHandler && self.exceptionHandler)
+            {
+                self.exceptionHandler(error);
+            }
+            else
+            {
+                @throw exception;
+            }
         }
     };
 
@@ -277,6 +277,19 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
         // if this is the main thread, we can't use dispatch_sync or the whole thing will lock up
         processException();
     }
+}
+
+- (NSDictionary *)createUserInfoForJavaException:(jthrowable)exception
+{
+    NSMutableDictionary *userInfo = [NSMutableDictionary new];
+    userInfo[NSLocalizedFailureReasonErrorKey] = [self getJavaExceptionMessage:exception] ?: @"Java VM raised an exception";
+
+    NSString *stackTrace = [self getJavaExceptionStackTrace:exception];
+    if (stackTrace)
+    {
+        userInfo[@"stackTrace"] = stackTrace;
+    }
+    return userInfo;
 }
 
 - (NSString *)getJavaExceptionMessage:(jthrowable)exception
