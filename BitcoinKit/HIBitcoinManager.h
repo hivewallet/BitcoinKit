@@ -95,7 +95,7 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;
  */
 + (HIBitcoinManager *)defaultManager;
 
-/** Starts the manager initializing all data and starting network sync. 
+/** Starts the manager initializing all data and starting network sync.
  *
  * One should start the manager only once. After configuring the singleton.
  * Every time one will try to do that again - it will crash

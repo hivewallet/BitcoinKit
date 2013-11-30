@@ -30,6 +30,7 @@
 - (void)onTransactionChanged:(NSString *)txid;
 - (void)onTransactionSucceeded:(NSString *)txid;
 - (void)onTransactionFailed;
+- (void)handleJavaException:(jthrowable)exception useExceptionHandler:(BOOL)useHandler error:(NSError **)returnedError;
 
 @end
 
@@ -206,7 +207,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     return result;
 }
 
-- (BOOL)callVoidMethodWithName:(char *)name error:(NSError **)error signature:(char *)signature, ...
+- (void)callVoidMethodWithName:(char *)name error:(NSError **)error signature:(char *)signature, ...
 {
     jmethodID method = [self jMethodWithName:name signature:signature];
 
@@ -257,7 +258,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
                                                            userInfo:nil];
             if (useHandler && self.exceptionHandler)
             {
-                self.exceptionHandler(error);
+                self.exceptionHandler(exception);
             }
             else
             {
@@ -435,8 +436,8 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
         const char *debugDelay = getenv("HIVE_JAVA_DEBUG_DELAY");
         if (doDebug && debugDelay && debugDelay[0]) {
             long seconds = strtol(debugDelay, NULL, 10);
-            NSLog(@"Waiting %d seconds for Java debugger to connect...", seconds);
-            sleep(seconds);
+            NSLog(@"Waiting %ld seconds for Java debugger to connect...", seconds);
+            sleep((int)seconds);
         }
 #endif
 
