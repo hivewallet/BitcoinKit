@@ -289,14 +289,10 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         // Try to read the wallet from storage, create a new one if not possible.
         wallet = null;
         walletFile = new File(dataDirectory + "/bitcoinkit.wallet");
-        try {
-            if (walletFile.exists())
-            	wallet = Wallet.loadFromFile(walletFile);
-        } catch (UnreadableWalletException e) {
-            // Better not continue!
-            throw e;
-        }
-        if (wallet == null) {
+
+        if (walletFile.exists()) {
+            wallet = Wallet.loadFromFile(walletFile);
+        } else {
             wallet = new Wallet(networkParams);
             wallet.addKey(new ECKey());
             wallet.saveToFile(walletFile);
