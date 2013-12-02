@@ -9,7 +9,8 @@
 /* Begin PBXBuildFile section */
 		1AA1033F6DD63EF5E851CCFD /* HIBitcoinErrorCodes.m in Sources */ = {isa = PBXBuildFile; fileRef = 1AA100C593FFECFB22A71227 /* HIBitcoinErrorCodes.m */; };
 		1AA1064A8BC67BEF0D8F6886 /* HIBitcoinErrorCodes.m in Sources */ = {isa = PBXBuildFile; fileRef = 1AA100C593FFECFB22A71227 /* HIBitcoinErrorCodes.m */; };
-		1AA107566B0DF3F8ACE54C53 /* HIBitcoinErrorCodes.h in Headers */ = {isa = PBXBuildFile; fileRef = 1AA10ADEBE687496D41D082B /* HIBitcoinErrorCodes.h */; };
+		1AA107566B0DF3F8ACE54C53 /* HIBitcoinErrorCodes.h in Headers */ = {isa = PBXBuildFile; fileRef = 1AA10ADEBE687496D41D082B /* HIBitcoinErrorCodes.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		24D21A60184D24ED00FF296A /* HIBitcoinErrorCodes.h in Headers */ = {isa = PBXBuildFile; fileRef = 1AA10ADEBE687496D41D082B /* HIBitcoinErrorCodes.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D901F49917AF9DAB0071780D /* JavaVM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D901F49817AF9DAA0071780D /* JavaVM.framework */; };
 		D901F50017B279EA0071780D /* boot.jar in Resources */ = {isa = PBXBuildFile; fileRef = D901F49A17AF9DDB0071780D /* boot.jar */; };
 		D91FE4F2178EB1F1001B37D8 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D91FE4F1178EB1F1001B37D8 /* Cocoa.framework */; };
@@ -846,6 +847,7 @@
 			files = (
 				D91FE769178EC170001B37D8 /* HIBitcoinManager.h in Headers */,
 				D91FE7B5178FED10001B37D8 /* BitcoinKit.h in Headers */,
+				1AA107566B0DF3F8ACE54C53 /* HIBitcoinErrorCodes.h in Headers */,
 				D91FE5F0178EB375001B37D8 /* addrman.h in Headers */,
 				D91FE5F2178EB375001B37D8 /* alert.h in Headers */,
 				D91FE5F3178EB375001B37D8 /* allocators.h in Headers */,
@@ -943,7 +945,6 @@
 				D91FE6C5178EB375001B37D8 /* version.h in Headers */,
 				D91FE6C7178EB375001B37D8 /* wallet.h in Headers */,
 				D91FE6C9178EB375001B37D8 /* walletdb.h in Headers */,
-				1AA107566B0DF3F8ACE54C53 /* HIBitcoinErrorCodes.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -960,6 +961,7 @@
 			files = (
 				D958B0BD17A2A41800B0EDD5 /* HIBitcoinManager.h in Headers */,
 				D958B0BE17A2A41A00B0EDD5 /* BitcoinJKit.h in Headers */,
+				24D21A60184D24ED00FF296A /* HIBitcoinErrorCodes.h in Headers */,
 				D958B0AF17A29CE200B0EDD5 /* jni_md.h in Headers */,
 				D958B0B017A29CE200B0EDD5 /* jni.h in Headers */,
 				D958B0C117A2A50A00B0EDD5 /* HIJavaBridge.h in Headers */,
