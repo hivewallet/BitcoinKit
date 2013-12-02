@@ -233,8 +233,13 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
 - (void)handleJavaException:(jthrowable)exception useExceptionHandler:(BOOL)useHandler error:(NSError **)returnedError
 {
-    // log exception to console
-    (*_jniEnv)->ExceptionDescribe(_jniEnv);
+    BOOL callerWantsToHandleErrors = returnedError != nil;
+
+    if (!callerWantsToHandleErrors)
+    {
+        // log exception to console
+        (*_jniEnv)->ExceptionDescribe(_jniEnv);
+    }
 
     // exception has to be cleared if it exists
     (*_jniEnv)->ExceptionClear(_jniEnv);
@@ -247,9 +252,8 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
                                              code:[self errorCodeForJavaException:exception]
                                          userInfo:[self createUserInfoForJavaException:exception]];
 
-        if (returnedError && error.code != kHIBitcoinManagerUnexpectedError)
+        if (callerWantsToHandleErrors && error.code != kHIBitcoinManagerUnexpectedError)
         {
-            // The caller wants to handle errors.
             *returnedError = error;
         }
         else
