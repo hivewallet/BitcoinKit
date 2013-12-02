@@ -193,7 +193,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     return result;
 }
 
-- (jobject)callObjectMethodWithName:(char *)name signature:(char *)signature, ...
+- (jobject)callObjectMethodWithName:(char *)name error:(NSError **)error signature:(char *)signature, ...
 {
     jmethodID method = [self jMethodWithName:name signature:signature];
 
@@ -202,7 +202,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     jobject result = (*_jniEnv)->CallObjectMethodV(_jniEnv, _managerObject, method, args);
     va_end(args);
 
-    [self handleJavaExceptions:NULL];
+    [self handleJavaExceptions:error];
 
     return result;
 }
@@ -507,7 +507,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
 - (NSString *)walletAddress
 {
-    jstring address = [self callObjectMethodWithName:"getWalletAddress" signature:"()Ljava/lang/String;"];
+    jstring address = [self callObjectMethodWithName:"getWalletAddress" error:NULL signature:"()Ljava/lang/String;"];
     return NSStringFromJString(_jniEnv, address);
 }
 
@@ -548,6 +548,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 - (NSDictionary *)transactionForHash:(NSString *)hash
 {
     jstring transactionJString = [self callObjectMethodWithName:"getTransaction"
+                                                          error:NULL
                                                        signature:"(Ljava/lang/String;)Ljava/lang/String;",
                                   JStringFromNSString(_jniEnv, hash)];
 
@@ -562,8 +563,9 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
 - (NSDictionary *)transactionAtIndex:(NSUInteger)index
 {
-    jstring transactionJString = [self callObjectMethodWithName:"getTransaction" signature:"(I)Ljava/lang/String;",
-                                  index];
+    jstring transactionJString = [self callObjectMethodWithName:"getTransaction"
+                                                          error:NULL
+                                                      signature:"(I)Ljava/lang/String;", index];
 
     if (transactionJString)
     {
@@ -576,7 +578,9 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
 - (NSArray *)allTransactions
 {
-    jstring transactionsJString = [self callObjectMethodWithName:"getAllTransactions" signature:"()Ljava/lang/String;"];
+    jstring transactionsJString = [self callObjectMethodWithName:"getAllTransactions"
+                                                           error:NULL
+                                                       signature:"()Ljava/lang/String;"];
 
     if (transactionsJString)
     {
@@ -596,7 +600,9 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
 - (NSArray *)transactionsWithRange:(NSRange)range
 {
-    jstring transactionsJString = [self callObjectMethodWithName:"getTransaction" signature:"(II)Ljava/lang/String;",
+    jstring transactionsJString = [self callObjectMethodWithName:"getTransaction"
+                                                           error:NULL
+                                                       signature:"(II)Ljava/lang/String;",
                                    range.location, range.length];
 
     if (transactionsJString)
@@ -617,7 +623,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
 - (NSString *)walletDebuggingInfo
 {
-    jstring info = [self callObjectMethodWithName:"getWalletDebuggingInfo" signature:"()Ljava/lang/String;"];
+    jstring info = [self callObjectMethodWithName:"getWalletDebuggingInfo" error:NULL signature:"()Ljava/lang/String;"];
     return NSStringFromJString(_jniEnv, info);
 }
 
@@ -631,6 +637,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 {
     jstring fee =
         [self callObjectMethodWithName:"feeForSendingCoins"
+                                 error:NULL
                              signature:"(Ljava/lang/String;)Ljava/lang/String;",
                                        JStringFromNSString(_jniEnv, [NSString stringWithFormat:@"%lld", coins])];
     return [NSStringFromJString(_jniEnv, fee) longLongValue];
