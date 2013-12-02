@@ -9,6 +9,7 @@
 #import "HIBitcoinManager.h"
 
 #import "HIBitcoinErrorCodes.h"
+#import "HIBitcoinInternalErrorCodes.h"
 #import <JavaVM/jni.h>
 
 @interface HIBitcoinManager ()
