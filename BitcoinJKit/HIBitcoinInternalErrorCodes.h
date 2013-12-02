@@ -8,3 +8,5 @@
 
 /* Unknown error: This should have been mapped to an error code. */
 extern NSInteger const kHIBitcoinManagerUnexpectedError;
+
+extern NSInteger const kHIIllegalArgumentException;

@@ -292,6 +292,10 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     {
         return kHIBitcoinManagerBlockStoreError;
     }
+    else if ([exceptionClass isEqual:@"java.lang.IllegalArgumentException"])
+    {
+        return kHIIllegalArgumentException;
+    }
     else
     {
         return kHIBitcoinManagerUnexpectedError;
@@ -548,12 +552,13 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
 - (NSDictionary *)transactionForHash:(NSString *)hash
 {
+    NSError *error;
     jstring transactionJString = [self callObjectMethodWithName:"getTransaction"
-                                                          error:NULL
+                                                          error:&error
                                                        signature:"(Ljava/lang/String;)Ljava/lang/String;",
                                   JStringFromNSString(_jniEnv, hash)];
 
-    if (transactionJString)
+    if (transactionJString && !error)
     {
         NSDictionary *transactionData = [self objectFromJSONString:NSStringFromJString(_jniEnv, transactionJString)];
         return [self modifiedTransactionForTransaction:transactionData];
