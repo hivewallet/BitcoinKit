@@ -180,13 +180,27 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     return result;
 }
 
-- (NSInteger)callIntegerMethodWithName:(char *)name signature:(char *)signature, ...
+- (int)callIntegerMethodWithName:(char *)name signature:(char *)signature, ...
 {
     jmethodID method = [self jMethodWithName:name signature:signature];
 
     va_list args;
     va_start(args, signature);
     jint result = (*_jniEnv)->CallIntMethodV(_jniEnv, _managerObject, method, args);
+    va_end(args);
+
+    [self handleJavaExceptions:NULL];
+
+    return result;
+}
+
+- (long)callLongMethodWithName:(char *)name signature:(char *)signature, ...
+{
+    jmethodID method = [self jMethodWithName:name signature:signature];
+
+    va_list args;
+    va_start(args, signature);
+    jlong result = (*_jniEnv)->CallLongMethodV(_jniEnv, _managerObject, method, args);
     va_end(args);
 
     [self handleJavaExceptions:NULL];
@@ -710,12 +724,12 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
 - (uint64_t)balance
 {
-    return [self callIntegerMethodWithName:"getBalance" signature:"()I"];
+    return [self callLongMethodWithName:"getBalance" signature:"()J"];
 }
 
 - (uint64_t)estimatedBalance
 {
-    return [self callIntegerMethodWithName:"getEstimatedBalance" signature:"()I"];
+    return [self callLongMethodWithName:"getEstimatedBalance" signature:"()J"];
 }
 
 - (void)checkBalance:(NSTimer *)timer
