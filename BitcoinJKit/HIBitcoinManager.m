@@ -243,13 +243,21 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
         [self handleJavaException:exception useExceptionHandler:NO error:error];
     }
+    else if (error)
+    {
+        *error = nil;
+    }
 }
 
 - (void)handleJavaException:(jthrowable)exception useExceptionHandler:(BOOL)useHandler error:(NSError **)returnedError
 {
     BOOL callerWantsToHandleErrors = returnedError != nil;
 
-    if (!callerWantsToHandleErrors)
+    if (callerWantsToHandleErrors)
+    {
+        *returnedError = nil;
+    }
+    else
     {
         // log exception to console
         (*_jniEnv)->ExceptionDescribe(_jniEnv);
@@ -570,7 +578,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
 - (NSDictionary *)transactionForHash:(NSString *)hash
 {
-    NSError *error;
+    NSError *error = nil;
     jstring transactionJString = [self callObjectMethodWithName:"getTransaction"
                                                           error:&error
                                                        signature:"(Ljava/lang/String;)Ljava/lang/String;",
