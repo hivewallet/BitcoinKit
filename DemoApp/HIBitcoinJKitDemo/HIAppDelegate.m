@@ -6,11 +6,7 @@
 //  Copyright (c) 2013 Hive Developers. All rights reserved.
 //
 
-#ifdef USE_BITCOINJ
 #import <BitcoinJKit/BitcoinJKit.h>
-#else
-#import <BitcoinKit/BitcoinKit.h>
-#endif //USE_BITCOINJ
 #import "HIAppDelegate.h"
 #import "HISendWindowController.h"
 
