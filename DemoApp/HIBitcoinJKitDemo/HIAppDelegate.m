@@ -40,7 +40,7 @@
     [_progressIndicator startAnimation:self];
     [HIBitcoinManager defaultManager].testingNetwork = YES;
 //    [HIBitcoinManager defaultManager].enableMining = YES;
-    [[HIBitcoinManager defaultManager] start];
+    [[HIBitcoinManager defaultManager] start:NULL];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(transactionUpdated:) name:kHIBitcoinManagerTransactionChangedNotification object:nil];
 }
 

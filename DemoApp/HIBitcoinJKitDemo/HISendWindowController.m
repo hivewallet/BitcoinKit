@@ -62,7 +62,10 @@
     }
     else
     {
-        [[HIBitcoinManager defaultManager] sendCoins:(amount * 100000000) toReceipent:address comment:nil completion:^(NSString *hash)
+        [[HIBitcoinManager defaultManager] sendCoins:(amount * 100000000)
+                                         toRecipient:address
+                                             comment:nil
+                                          completion:^(NSString *hash)
         {
             if (hash)
             {
