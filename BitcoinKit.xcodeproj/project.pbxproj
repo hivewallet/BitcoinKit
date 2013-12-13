@@ -7,196 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1AA1033F6DD63EF5E851CCFD /* HIBitcoinErrorCodes.m in Sources */ = {isa = PBXBuildFile; fileRef = 1AA100C593FFECFB22A71227 /* HIBitcoinErrorCodes.m */; };
 		1AA1064A8BC67BEF0D8F6886 /* HIBitcoinErrorCodes.m in Sources */ = {isa = PBXBuildFile; fileRef = 1AA100C593FFECFB22A71227 /* HIBitcoinErrorCodes.m */; };
-		1AA107566B0DF3F8ACE54C53 /* HIBitcoinErrorCodes.h in Headers */ = {isa = PBXBuildFile; fileRef = 1AA10ADEBE687496D41D082B /* HIBitcoinErrorCodes.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		24D21A60184D24ED00FF296A /* HIBitcoinErrorCodes.h in Headers */ = {isa = PBXBuildFile; fileRef = 1AA10ADEBE687496D41D082B /* HIBitcoinErrorCodes.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		24D21A63184D550A00FF296A /* HIBitcoinInternalErrorCodes.h in Headers */ = {isa = PBXBuildFile; fileRef = 24D21A61184D550A00FF296A /* HIBitcoinInternalErrorCodes.h */; };
 		24D21A64184D550A00FF296A /* HIBitcoinInternalErrorCodes.m in Sources */ = {isa = PBXBuildFile; fileRef = 24D21A62184D550A00FF296A /* HIBitcoinInternalErrorCodes.m */; };
 		D901F49917AF9DAB0071780D /* JavaVM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D901F49817AF9DAA0071780D /* JavaVM.framework */; };
 		D901F50017B279EA0071780D /* boot.jar in Resources */ = {isa = PBXBuildFile; fileRef = D901F49A17AF9DDB0071780D /* boot.jar */; };
-		D91FE4F2178EB1F1001B37D8 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D91FE4F1178EB1F1001B37D8 /* Cocoa.framework */; };
-		D91FE4FC178EB1F1001B37D8 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D91FE4FA178EB1F1001B37D8 /* InfoPlist.strings */; };
-		D91FE5F0178EB375001B37D8 /* addrman.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE508178EB374001B37D8 /* addrman.h */; };
-		D91FE5F2178EB375001B37D8 /* alert.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE50A178EB374001B37D8 /* alert.h */; };
-		D91FE5F3178EB375001B37D8 /* allocators.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE50B178EB374001B37D8 /* allocators.h */; };
-		D91FE5F4178EB375001B37D8 /* base58.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE50C178EB374001B37D8 /* base58.h */; };
-		D91FE5F5178EB375001B37D8 /* bignum.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE50D178EB374001B37D8 /* bignum.h */; };
-		D91FE5F8178EB375001B37D8 /* bitcoinrpc.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE510178EB374001B37D8 /* bitcoinrpc.h */; };
-		D91FE5FA178EB375001B37D8 /* bloom.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE512178EB374001B37D8 /* bloom.h */; };
-		D91FE5FC178EB375001B37D8 /* chainparams.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE514178EB374001B37D8 /* chainparams.h */; };
-		D91FE5FE178EB375001B37D8 /* checkpoints.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE516178EB374001B37D8 /* checkpoints.h */; };
-		D91FE5FF178EB375001B37D8 /* checkqueue.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE517178EB374001B37D8 /* checkqueue.h */; };
-		D91FE600178EB375001B37D8 /* clientversion.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE518178EB374001B37D8 /* clientversion.h */; };
-		D91FE601178EB375001B37D8 /* compat.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE519178EB374001B37D8 /* compat.h */; };
-		D91FE603178EB375001B37D8 /* core.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE51B178EB374001B37D8 /* core.h */; };
-		D91FE605178EB375001B37D8 /* crypter.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE51D178EB374001B37D8 /* crypter.h */; };
-		D91FE607178EB375001B37D8 /* db.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE51F178EB374001B37D8 /* db.h */; };
-		D91FE609178EB375001B37D8 /* hash.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE521178EB374001B37D8 /* hash.h */; };
-		D91FE60B178EB375001B37D8 /* init.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE523178EB374001B37D8 /* init.h */; };
-		D91FE60C178EB375001B37D8 /* json_spirit.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE525178EB374001B37D8 /* json_spirit.h */; };
-		D91FE60D178EB375001B37D8 /* json_spirit_error_position.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE526178EB374001B37D8 /* json_spirit_error_position.h */; };
-		D91FE60F178EB375001B37D8 /* json_spirit_reader.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE528178EB374001B37D8 /* json_spirit_reader.h */; };
-		D91FE610178EB375001B37D8 /* json_spirit_reader_template.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE529178EB374001B37D8 /* json_spirit_reader_template.h */; };
-		D91FE611178EB375001B37D8 /* json_spirit_stream_reader.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE52A178EB374001B37D8 /* json_spirit_stream_reader.h */; };
-		D91FE612178EB375001B37D8 /* json_spirit_utils.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE52B178EB374001B37D8 /* json_spirit_utils.h */; };
-		D91FE614178EB375001B37D8 /* json_spirit_value.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE52D178EB374001B37D8 /* json_spirit_value.h */; };
-		D91FE616178EB375001B37D8 /* json_spirit_writer.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE52F178EB374001B37D8 /* json_spirit_writer.h */; };
-		D91FE617178EB375001B37D8 /* json_spirit_writer_template.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE530178EB374001B37D8 /* json_spirit_writer_template.h */; };
-		D91FE61A178EB375001B37D8 /* key.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE533178EB374001B37D8 /* key.h */; };
-		D91FE61C178EB375001B37D8 /* keystore.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE535178EB374001B37D8 /* keystore.h */; };
-		D91FE621178EB375001B37D8 /* builder.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE53C178EB374001B37D8 /* builder.h */; };
-		D91FE627178EB375001B37D8 /* db_impl.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE542178EB374001B37D8 /* db_impl.h */; };
-		D91FE629178EB375001B37D8 /* db_iter.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE544178EB374001B37D8 /* db_iter.h */; };
-		D91FE62C178EB375001B37D8 /* dbformat.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE547178EB374001B37D8 /* dbformat.h */; };
-		D91FE62F178EB375001B37D8 /* filename.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE54A178EB374001B37D8 /* filename.h */; };
-		D91FE632178EB375001B37D8 /* log_format.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE54D178EB374001B37D8 /* log_format.h */; };
-		D91FE634178EB375001B37D8 /* log_reader.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE54F178EB374001B37D8 /* log_reader.h */; };
-		D91FE637178EB375001B37D8 /* log_writer.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE552178EB374001B37D8 /* log_writer.h */; };
-		D91FE639178EB375001B37D8 /* memtable.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE554178EB374001B37D8 /* memtable.h */; };
-		D91FE63B178EB375001B37D8 /* skiplist.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE556178EB374001B37D8 /* skiplist.h */; };
-		D91FE63D178EB375001B37D8 /* snapshot.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE558178EB374001B37D8 /* snapshot.h */; };
-		D91FE63F178EB375001B37D8 /* table_cache.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE55A178EB374001B37D8 /* table_cache.h */; };
-		D91FE641178EB375001B37D8 /* version_edit.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE55C178EB374001B37D8 /* version_edit.h */; };
-		D91FE644178EB375001B37D8 /* version_set.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE55F178EB374001B37D8 /* version_set.h */; };
-		D91FE647178EB375001B37D8 /* write_batch_internal.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE562178EB374001B37D8 /* write_batch_internal.h */; };
-		D91FE652178EB375001B37D8 /* memenv.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE571178EB374001B37D8 /* memenv.h */; };
-		D91FE654178EB375001B37D8 /* c.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE575178EB374001B37D8 /* c.h */; };
-		D91FE655178EB375001B37D8 /* cache.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE576178EB374001B37D8 /* cache.h */; };
-		D91FE656178EB375001B37D8 /* comparator.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE577178EB374001B37D8 /* comparator.h */; };
-		D91FE657178EB375001B37D8 /* db.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE578178EB374001B37D8 /* db.h */; };
-		D91FE658178EB375001B37D8 /* env.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE579178EB374001B37D8 /* env.h */; };
-		D91FE659178EB375001B37D8 /* filter_policy.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE57A178EB374001B37D8 /* filter_policy.h */; };
-		D91FE65A178EB375001B37D8 /* iterator.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE57B178EB374001B37D8 /* iterator.h */; };
-		D91FE65B178EB375001B37D8 /* options.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE57C178EB374001B37D8 /* options.h */; };
-		D91FE65C178EB375001B37D8 /* slice.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE57D178EB374001B37D8 /* slice.h */; };
-		D91FE65D178EB375001B37D8 /* status.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE57E178EB374001B37D8 /* status.h */; };
-		D91FE65E178EB375001B37D8 /* table.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE57F178EB374001B37D8 /* table.h */; };
-		D91FE65F178EB375001B37D8 /* table_builder.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE580178EB374001B37D8 /* table_builder.h */; };
-		D91FE660178EB375001B37D8 /* write_batch.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE581178EB374001B37D8 /* write_batch.h */; };
-		D91FE664178EB375001B37D8 /* atomic_pointer.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE586178EB374001B37D8 /* atomic_pointer.h */; };
-		D91FE665178EB375001B37D8 /* port.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE587178EB374001B37D8 /* port.h */; };
-		D91FE666178EB375001B37D8 /* port_example.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE588178EB374001B37D8 /* port_example.h */; };
-		D91FE668178EB375001B37D8 /* port_posix.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE58A178EB374001B37D8 /* port_posix.h */; };
-		D91FE66C178EB375001B37D8 /* thread_annotations.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE58E178EB374001B37D8 /* thread_annotations.h */; };
-		D91FE672178EB375001B37D8 /* block_builder.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE596178EB374001B37D8 /* block_builder.h */; };
-		D91FE674178EB375001B37D8 /* filter_block.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE598178EB374001B37D8 /* filter_block.h */; };
-		D91FE677178EB375001B37D8 /* format.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE59B178EB374001B37D8 /* format.h */; };
-		D91FE679178EB375001B37D8 /* iterator_wrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE59D178EB374001B37D8 /* iterator_wrapper.h */; };
-		D91FE67B178EB375001B37D8 /* merger.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE59F178EB374001B37D8 /* merger.h */; };
-		D91FE680178EB375001B37D8 /* two_level_iterator.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE5A4178EB374001B37D8 /* two_level_iterator.h */; };
-		D91FE683178EB375001B37D8 /* arena.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE5A8178EB374001B37D8 /* arena.h */; };
-		D91FE68A178EB375001B37D8 /* coding.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE5AF178EB374001B37D8 /* coding.h */; };
-		D91FE68E178EB375001B37D8 /* crc32c.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE5B3178EB374001B37D8 /* crc32c.h */; };
-		D91FE696178EB375001B37D8 /* hash.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE5BB178EB374001B37D8 /* hash.h */; };
-		D91FE698178EB375001B37D8 /* histogram.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE5BD178EB374001B37D8 /* histogram.h */; };
-		D91FE69A178EB375001B37D8 /* logging.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE5BF178EB374001B37D8 /* logging.h */; };
-		D91FE69B178EB375001B37D8 /* mutexlock.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE5C0178EB374001B37D8 /* mutexlock.h */; };
-		D91FE69D178EB375001B37D8 /* posix_logger.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE5C2178EB374001B37D8 /* posix_logger.h */; };
-		D91FE69E178EB375001B37D8 /* random.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE5C3178EB374001B37D8 /* random.h */; };
-		D91FE6A1178EB375001B37D8 /* testharness.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE5C6178EB374001B37D8 /* testharness.h */; };
-		D91FE6A3178EB375001B37D8 /* testutil.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE5C8178EB374001B37D8 /* testutil.h */; };
-		D91FE6A6178EB375001B37D8 /* leveldb.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE5CB178EB374001B37D8 /* leveldb.h */; };
-		D91FE6A7178EB375001B37D8 /* limitedmap.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE5CC178EB374001B37D8 /* limitedmap.h */; };
-		D91FE6A9178EB375001B37D8 /* main.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE5CE178EB374001B37D8 /* main.h */; };
-		D91FE6AA178EB375001B37D8 /* mruset.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE5CF178EB374001B37D8 /* mruset.h */; };
-		D91FE6AC178EB375001B37D8 /* net.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE5D1178EB375001B37D8 /* net.h */; };
-		D91FE6AE178EB375001B37D8 /* netbase.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE5D3178EB375001B37D8 /* netbase.h */; };
-		D91FE6B1178EB375001B37D8 /* protocol.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE5D6178EB375001B37D8 /* protocol.h */; };
-		D91FE6B9178EB375001B37D8 /* script.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE5DE178EB375001B37D8 /* script.h */; };
-		D91FE6BA178EB375001B37D8 /* serialize.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE5DF178EB375001B37D8 /* serialize.h */; };
-		D91FE6BC178EB375001B37D8 /* sync.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE5E1178EB375001B37D8 /* sync.h */; };
-		D91FE6BD178EB375001B37D8 /* threadsafety.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE5E2178EB375001B37D8 /* threadsafety.h */; };
-		D91FE6BF178EB375001B37D8 /* txdb.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE5E4178EB375001B37D8 /* txdb.h */; };
-		D91FE6C0178EB375001B37D8 /* ui_interface.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE5E5178EB375001B37D8 /* ui_interface.h */; };
-		D91FE6C1178EB375001B37D8 /* uint256.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE5E6178EB375001B37D8 /* uint256.h */; };
-		D91FE6C3178EB375001B37D8 /* util.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE5E8178EB375001B37D8 /* util.h */; };
-		D91FE6C5178EB375001B37D8 /* version.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE5EA178EB375001B37D8 /* version.h */; };
-		D91FE6C7178EB375001B37D8 /* wallet.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE5EC178EB375001B37D8 /* wallet.h */; };
-		D91FE6C9178EB375001B37D8 /* walletdb.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE5EE178EB375001B37D8 /* walletdb.h */; };
-		D91FE6CB178EB53A001B37D8 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D91FE6CA178EB53A001B37D8 /* libsqlite3.dylib */; };
-		D91FE706178EB8C5001B37D8 /* bitcoin.cp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE705178EB8C5001B37D8 /* bitcoin.cp */; };
-		D91FE714178EB996001B37D8 /* builder.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE53B178EB374001B37D8 /* builder.cc */; };
-		D91FE715178EB996001B37D8 /* c.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE53D178EB374001B37D8 /* c.cc */; };
-		D91FE717178EB996001B37D8 /* db_impl.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE541178EB374001B37D8 /* db_impl.cc */; };
-		D91FE718178EB996001B37D8 /* db_iter.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE543178EB374001B37D8 /* db_iter.cc */; };
-		D91FE719178EB996001B37D8 /* dbformat.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE546178EB374001B37D8 /* dbformat.cc */; };
-		D91FE71A178EB996001B37D8 /* filename.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE549178EB374001B37D8 /* filename.cc */; };
-		D91FE71C178EB996001B37D8 /* log_reader.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE54E178EB374001B37D8 /* log_reader.cc */; };
-		D91FE71D178EB996001B37D8 /* log_writer.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE551178EB374001B37D8 /* log_writer.cc */; };
-		D91FE71E178EB996001B37D8 /* memtable.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE553178EB374001B37D8 /* memtable.cc */; };
-		D91FE71F178EB996001B37D8 /* repair.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE555178EB374001B37D8 /* repair.cc */; };
-		D91FE720178EB996001B37D8 /* table_cache.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE559178EB374001B37D8 /* table_cache.cc */; };
-		D91FE721178EB996001B37D8 /* version_edit.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE55B178EB374001B37D8 /* version_edit.cc */; };
-		D91FE722178EB996001B37D8 /* version_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE55E178EB374001B37D8 /* version_set.cc */; };
-		D91FE723178EB996001B37D8 /* write_batch.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE561178EB374001B37D8 /* write_batch.cc */; };
-		D91FE724178EB996001B37D8 /* memenv.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE570178EB374001B37D8 /* memenv.cc */; };
-		D91FE725178EB996001B37D8 /* port_posix.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE589178EB374001B37D8 /* port_posix.cc */; };
-		D91FE726178EB996001B37D8 /* block.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE593178EB374001B37D8 /* block.cc */; };
-		D91FE727178EB99B001B37D8 /* block_builder.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE595178EB374001B37D8 /* block_builder.cc */; };
-		D91FE728178EB99B001B37D8 /* filter_block.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE597178EB374001B37D8 /* filter_block.cc */; };
-		D91FE729178EB99B001B37D8 /* format.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE59A178EB374001B37D8 /* format.cc */; };
-		D91FE72A178EB99B001B37D8 /* iterator.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE59C178EB374001B37D8 /* iterator.cc */; };
-		D91FE72B178EB99B001B37D8 /* merger.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE59E178EB374001B37D8 /* merger.cc */; };
-		D91FE72C178EB99B001B37D8 /* table.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5A0178EB374001B37D8 /* table.cc */; };
-		D91FE72D178EB99B001B37D8 /* table_builder.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5A1178EB374001B37D8 /* table_builder.cc */; };
-		D91FE72E178EB99B001B37D8 /* two_level_iterator.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5A3178EB374001B37D8 /* two_level_iterator.cc */; };
-		D91FE72F178EB9A0001B37D8 /* arena.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5A7178EB374001B37D8 /* arena.cc */; };
-		D91FE730178EB9A0001B37D8 /* bloom.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5AA178EB374001B37D8 /* bloom.cc */; };
-		D91FE731178EB9A0001B37D8 /* cache.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5AC178EB374001B37D8 /* cache.cc */; };
-		D91FE732178EB9A0001B37D8 /* coding.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5AE178EB374001B37D8 /* coding.cc */; };
-		D91FE733178EB9A0001B37D8 /* comparator.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5B1178EB374001B37D8 /* comparator.cc */; };
-		D91FE734178EB9A0001B37D8 /* crc32c.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5B2178EB374001B37D8 /* crc32c.cc */; };
-		D91FE735178EB9A0001B37D8 /* env.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5B5178EB374001B37D8 /* env.cc */; };
-		D91FE736178EB9A0001B37D8 /* env_posix.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5B6178EB374001B37D8 /* env_posix.cc */; };
-		D91FE737178EB9A0001B37D8 /* env_win.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5B8178EB374001B37D8 /* env_win.cc */; };
-		D91FE738178EB9A0001B37D8 /* filter_policy.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5B9178EB374001B37D8 /* filter_policy.cc */; };
-		D91FE739178EB9A0001B37D8 /* hash.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5BA178EB374001B37D8 /* hash.cc */; };
-		D91FE73A178EB9A0001B37D8 /* histogram.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5BC178EB374001B37D8 /* histogram.cc */; };
-		D91FE73B178EB9A0001B37D8 /* logging.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5BE178EB374001B37D8 /* logging.cc */; };
-		D91FE73C178EB9A0001B37D8 /* options.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5C1178EB374001B37D8 /* options.cc */; };
-		D91FE73D178EB9A0001B37D8 /* status.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5C4178EB374001B37D8 /* status.cc */; };
-		D91FE73E178EB9A0001B37D8 /* testharness.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5C5178EB374001B37D8 /* testharness.cc */; };
-		D91FE73F178EB9A0001B37D8 /* testutil.cc in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5C7178EB374001B37D8 /* testutil.cc */; };
-		D91FE740178EB9A8001B37D8 /* addrman.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE507178EB374001B37D8 /* addrman.cpp */; };
-		D91FE741178EB9A8001B37D8 /* alert.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE509178EB374001B37D8 /* alert.cpp */; };
-		D91FE743178EB9A8001B37D8 /* bitcoinrpc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE50F178EB374001B37D8 /* bitcoinrpc.cpp */; };
-		D91FE744178EB9A8001B37D8 /* bloom.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE511178EB374001B37D8 /* bloom.cpp */; };
-		D91FE745178EB9A8001B37D8 /* chainparams.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE513178EB374001B37D8 /* chainparams.cpp */; };
-		D91FE746178EB9A8001B37D8 /* checkpoints.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE515178EB374001B37D8 /* checkpoints.cpp */; };
-		D91FE747178EB9A8001B37D8 /* core.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE51A178EB374001B37D8 /* core.cpp */; };
-		D91FE748178EB9A8001B37D8 /* crypter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE51C178EB374001B37D8 /* crypter.cpp */; };
-		D91FE749178EB9A8001B37D8 /* db.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE51E178EB374001B37D8 /* db.cpp */; };
-		D91FE74A178EB9A8001B37D8 /* hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE520178EB374001B37D8 /* hash.cpp */; };
-		D91FE74B178EB9A8001B37D8 /* init.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE522178EB374001B37D8 /* init.cpp */; };
-		D91FE74C178EB9AC001B37D8 /* json_spirit_reader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE527178EB374001B37D8 /* json_spirit_reader.cpp */; };
-		D91FE74D178EB9AC001B37D8 /* json_spirit_value.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE52C178EB374001B37D8 /* json_spirit_value.cpp */; };
-		D91FE74E178EB9AC001B37D8 /* json_spirit_writer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE52E178EB374001B37D8 /* json_spirit_writer.cpp */; };
-		D91FE74F178EB9B0001B37D8 /* key.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE532178EB374001B37D8 /* key.cpp */; };
-		D91FE750178EB9B0001B37D8 /* keystore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE534178EB374001B37D8 /* keystore.cpp */; };
-		D91FE751178EB9B0001B37D8 /* leveldb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5CA178EB374001B37D8 /* leveldb.cpp */; };
-		D91FE752178EB9B0001B37D8 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5CD178EB374001B37D8 /* main.cpp */; };
-		D91FE753178EB9B0001B37D8 /* net.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5D0178EB375001B37D8 /* net.cpp */; };
-		D91FE754178EB9B0001B37D8 /* netbase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5D2178EB375001B37D8 /* netbase.cpp */; };
-		D91FE755178EB9B0001B37D8 /* noui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5D4178EB375001B37D8 /* noui.cpp */; };
-		D91FE756178EB9B0001B37D8 /* protocol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5D5178EB375001B37D8 /* protocol.cpp */; };
-		D91FE757178EB9B0001B37D8 /* rpcblockchain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5D7178EB375001B37D8 /* rpcblockchain.cpp */; };
-		D91FE758178EB9B0001B37D8 /* rpcdump.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5D8178EB375001B37D8 /* rpcdump.cpp */; };
-		D91FE759178EB9B0001B37D8 /* rpcmining.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5D9178EB375001B37D8 /* rpcmining.cpp */; };
-		D91FE75A178EB9B0001B37D8 /* rpcnet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5DA178EB375001B37D8 /* rpcnet.cpp */; };
-		D91FE75B178EB9B0001B37D8 /* rpcrawtransaction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5DB178EB375001B37D8 /* rpcrawtransaction.cpp */; };
-		D91FE75C178EB9B0001B37D8 /* rpcwallet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5DC178EB375001B37D8 /* rpcwallet.cpp */; };
-		D91FE75D178EB9B0001B37D8 /* script.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5DD178EB375001B37D8 /* script.cpp */; };
-		D91FE75E178EB9B0001B37D8 /* sync.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5E0178EB375001B37D8 /* sync.cpp */; };
-		D91FE75F178EB9B0001B37D8 /* txdb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5E3178EB375001B37D8 /* txdb.cpp */; };
-		D91FE760178EB9B0001B37D8 /* util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5E7178EB375001B37D8 /* util.cpp */; };
-		D91FE761178EB9B0001B37D8 /* version.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5E9178EB375001B37D8 /* version.cpp */; };
-		D91FE762178EB9B0001B37D8 /* wallet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5EB178EB375001B37D8 /* wallet.cpp */; };
-		D91FE763178EB9B0001B37D8 /* walletdb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91FE5ED178EB375001B37D8 /* walletdb.cpp */; };
-		D91FE766178EB9F3001B37D8 /* bitcoin.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D91FE6FD178EB8C5001B37D8 /* bitcoin.a */; };
-		D91FE769178EC170001B37D8 /* HIBitcoinManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE767178EC170001B37D8 /* HIBitcoinManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		D91FE76A178EC170001B37D8 /* HIBitcoinManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = D91FE768178EC170001B37D8 /* HIBitcoinManager.mm */; };
-		D91FE7B5178FED10001B37D8 /* BitcoinKit.h in Headers */ = {isa = PBXBuildFile; fileRef = D91FE4FE178EB1F1001B37D8 /* BitcoinKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D958B09E17A29B0500B0EDD5 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D91FE4F1178EB1F1001B37D8 /* Cocoa.framework */; };
 		D958B0A417A29B0500B0EDD5 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D958B0A217A29B0500B0EDD5 /* InfoPlist.strings */; };
 		D958B0AF17A29CE200B0EDD5 /* jni_md.h in Headers */ = {isa = PBXBuildFile; fileRef = D958B0AD17A29CE200B0EDD5 /* jni_md.h */; };
@@ -207,16 +23,6 @@
 		D958B0C117A2A50A00B0EDD5 /* HIJavaBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = D958B0BF17A2A50A00B0EDD5 /* HIJavaBridge.h */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		D91FE7B817900DAE001B37D8 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = D91FE4E5178EB1F1001B37D8 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = D91FE6FC178EB8C5001B37D8;
-			remoteInfo = bitcoin;
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXFileReference section */
 		1AA100C593FFECFB22A71227 /* HIBitcoinErrorCodes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HIBitcoinErrorCodes.m; sourceTree = "<group>"; };
 		1AA10ADEBE687496D41D082B /* HIBitcoinErrorCodes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HIBitcoinErrorCodes.h; sourceTree = "<group>"; };
@@ -225,7 +31,6 @@
 		D901F49817AF9DAA0071780D /* JavaVM.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaVM.framework; path = System/Library/Frameworks/JavaVM.framework; sourceTree = SDKROOT; };
 		D901F49A17AF9DDB0071780D /* boot.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = boot.jar; sourceTree = SOURCE_ROOT; };
 		D901F4EC17B2479C0071780D /* BitcoinManager.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; name = BitcoinManager.java; path = java/bitcoinkit/src/main/java/com/hive/bitcoinkit/BitcoinManager.java; sourceTree = "<group>"; };
-		D91FE4EE178EB1F1001B37D8 /* BitcoinKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = BitcoinKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D91FE4F1178EB1F1001B37D8 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		D91FE4F4178EB1F1001B37D8 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		D91FE4F5178EB1F1001B37D8 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
@@ -412,7 +217,6 @@
 		D91FE5ED178EB375001B37D8 /* walletdb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = walletdb.cpp; path = bitcoind/src/walletdb.cpp; sourceTree = "<group>"; };
 		D91FE5EE178EB375001B37D8 /* walletdb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = walletdb.h; path = bitcoind/src/walletdb.h; sourceTree = "<group>"; };
 		D91FE6CA178EB53A001B37D8 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
-		D91FE6FD178EB8C5001B37D8 /* bitcoin.a */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = bitcoin.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D91FE700178EB8C5001B37D8 /* bitcoin-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "bitcoin-Prefix.pch"; sourceTree = "<group>"; };
 		D91FE701178EB8C5001B37D8 /* bitcoinProj.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = bitcoinProj.xcconfig; sourceTree = "<group>"; };
 		D91FE702178EB8C5001B37D8 /* bitcoinTarget.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = bitcoinTarget.xcconfig; sourceTree = "<group>"; };
@@ -434,23 +238,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		D91FE4EA178EB1F1001B37D8 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				D91FE766178EB9F3001B37D8 /* bitcoin.a in Frameworks */,
-				D91FE6CB178EB53A001B37D8 /* libsqlite3.dylib in Frameworks */,
-				D91FE4F2178EB1F1001B37D8 /* Cocoa.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		D91FE6FA178EB8C5001B37D8 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		D958B09917A29B0500B0EDD5 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -480,8 +267,6 @@
 		D91FE4EF178EB1F1001B37D8 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				D91FE4EE178EB1F1001B37D8 /* BitcoinKit.framework */,
-				D91FE6FD178EB8C5001B37D8 /* bitcoin.a */,
 				D958B09D17A29B0500B0EDD5 /* BitcoinJKit.framework */,
 			);
 			name = Products;
@@ -847,120 +632,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		D91FE4EB178EB1F1001B37D8 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				D91FE769178EC170001B37D8 /* HIBitcoinManager.h in Headers */,
-				D91FE7B5178FED10001B37D8 /* BitcoinKit.h in Headers */,
-				1AA107566B0DF3F8ACE54C53 /* HIBitcoinErrorCodes.h in Headers */,
-				D91FE5F0178EB375001B37D8 /* addrman.h in Headers */,
-				D91FE5F2178EB375001B37D8 /* alert.h in Headers */,
-				D91FE5F3178EB375001B37D8 /* allocators.h in Headers */,
-				D91FE5F4178EB375001B37D8 /* base58.h in Headers */,
-				D91FE5F5178EB375001B37D8 /* bignum.h in Headers */,
-				D91FE5F8178EB375001B37D8 /* bitcoinrpc.h in Headers */,
-				D91FE5FA178EB375001B37D8 /* bloom.h in Headers */,
-				D91FE5FC178EB375001B37D8 /* chainparams.h in Headers */,
-				D91FE5FE178EB375001B37D8 /* checkpoints.h in Headers */,
-				D91FE5FF178EB375001B37D8 /* checkqueue.h in Headers */,
-				D91FE600178EB375001B37D8 /* clientversion.h in Headers */,
-				D91FE601178EB375001B37D8 /* compat.h in Headers */,
-				D91FE603178EB375001B37D8 /* core.h in Headers */,
-				D91FE605178EB375001B37D8 /* crypter.h in Headers */,
-				D91FE607178EB375001B37D8 /* db.h in Headers */,
-				D91FE609178EB375001B37D8 /* hash.h in Headers */,
-				D91FE60B178EB375001B37D8 /* init.h in Headers */,
-				D91FE60C178EB375001B37D8 /* json_spirit.h in Headers */,
-				D91FE60D178EB375001B37D8 /* json_spirit_error_position.h in Headers */,
-				D91FE60F178EB375001B37D8 /* json_spirit_reader.h in Headers */,
-				D91FE610178EB375001B37D8 /* json_spirit_reader_template.h in Headers */,
-				D91FE611178EB375001B37D8 /* json_spirit_stream_reader.h in Headers */,
-				D91FE612178EB375001B37D8 /* json_spirit_utils.h in Headers */,
-				D91FE614178EB375001B37D8 /* json_spirit_value.h in Headers */,
-				D91FE616178EB375001B37D8 /* json_spirit_writer.h in Headers */,
-				D91FE617178EB375001B37D8 /* json_spirit_writer_template.h in Headers */,
-				D91FE61A178EB375001B37D8 /* key.h in Headers */,
-				D91FE61C178EB375001B37D8 /* keystore.h in Headers */,
-				D91FE621178EB375001B37D8 /* builder.h in Headers */,
-				D91FE627178EB375001B37D8 /* db_impl.h in Headers */,
-				D91FE629178EB375001B37D8 /* db_iter.h in Headers */,
-				D91FE62C178EB375001B37D8 /* dbformat.h in Headers */,
-				D91FE62F178EB375001B37D8 /* filename.h in Headers */,
-				D91FE632178EB375001B37D8 /* log_format.h in Headers */,
-				D91FE634178EB375001B37D8 /* log_reader.h in Headers */,
-				D91FE637178EB375001B37D8 /* log_writer.h in Headers */,
-				D91FE639178EB375001B37D8 /* memtable.h in Headers */,
-				D91FE63B178EB375001B37D8 /* skiplist.h in Headers */,
-				D91FE63D178EB375001B37D8 /* snapshot.h in Headers */,
-				D91FE63F178EB375001B37D8 /* table_cache.h in Headers */,
-				D91FE641178EB375001B37D8 /* version_edit.h in Headers */,
-				D91FE644178EB375001B37D8 /* version_set.h in Headers */,
-				D91FE647178EB375001B37D8 /* write_batch_internal.h in Headers */,
-				D91FE652178EB375001B37D8 /* memenv.h in Headers */,
-				D91FE654178EB375001B37D8 /* c.h in Headers */,
-				D91FE655178EB375001B37D8 /* cache.h in Headers */,
-				D91FE656178EB375001B37D8 /* comparator.h in Headers */,
-				D91FE657178EB375001B37D8 /* db.h in Headers */,
-				D91FE658178EB375001B37D8 /* env.h in Headers */,
-				D91FE659178EB375001B37D8 /* filter_policy.h in Headers */,
-				D91FE65A178EB375001B37D8 /* iterator.h in Headers */,
-				D91FE65B178EB375001B37D8 /* options.h in Headers */,
-				D91FE65C178EB375001B37D8 /* slice.h in Headers */,
-				D91FE65D178EB375001B37D8 /* status.h in Headers */,
-				D91FE65E178EB375001B37D8 /* table.h in Headers */,
-				D91FE65F178EB375001B37D8 /* table_builder.h in Headers */,
-				D91FE660178EB375001B37D8 /* write_batch.h in Headers */,
-				D91FE664178EB375001B37D8 /* atomic_pointer.h in Headers */,
-				D91FE665178EB375001B37D8 /* port.h in Headers */,
-				D91FE666178EB375001B37D8 /* port_example.h in Headers */,
-				D91FE668178EB375001B37D8 /* port_posix.h in Headers */,
-				D91FE66C178EB375001B37D8 /* thread_annotations.h in Headers */,
-				D91FE672178EB375001B37D8 /* block_builder.h in Headers */,
-				D91FE674178EB375001B37D8 /* filter_block.h in Headers */,
-				D91FE677178EB375001B37D8 /* format.h in Headers */,
-				D91FE679178EB375001B37D8 /* iterator_wrapper.h in Headers */,
-				D91FE67B178EB375001B37D8 /* merger.h in Headers */,
-				D91FE680178EB375001B37D8 /* two_level_iterator.h in Headers */,
-				D91FE683178EB375001B37D8 /* arena.h in Headers */,
-				D91FE68A178EB375001B37D8 /* coding.h in Headers */,
-				D91FE68E178EB375001B37D8 /* crc32c.h in Headers */,
-				D91FE696178EB375001B37D8 /* hash.h in Headers */,
-				D91FE698178EB375001B37D8 /* histogram.h in Headers */,
-				D91FE69A178EB375001B37D8 /* logging.h in Headers */,
-				D91FE69B178EB375001B37D8 /* mutexlock.h in Headers */,
-				D91FE69D178EB375001B37D8 /* posix_logger.h in Headers */,
-				D91FE69E178EB375001B37D8 /* random.h in Headers */,
-				D91FE6A1178EB375001B37D8 /* testharness.h in Headers */,
-				D91FE6A3178EB375001B37D8 /* testutil.h in Headers */,
-				D91FE6A6178EB375001B37D8 /* leveldb.h in Headers */,
-				D91FE6A7178EB375001B37D8 /* limitedmap.h in Headers */,
-				D91FE6A9178EB375001B37D8 /* main.h in Headers */,
-				D91FE6AA178EB375001B37D8 /* mruset.h in Headers */,
-				D91FE6AC178EB375001B37D8 /* net.h in Headers */,
-				D91FE6AE178EB375001B37D8 /* netbase.h in Headers */,
-				D91FE6B1178EB375001B37D8 /* protocol.h in Headers */,
-				D91FE6B9178EB375001B37D8 /* script.h in Headers */,
-				D91FE6BA178EB375001B37D8 /* serialize.h in Headers */,
-				D91FE6BC178EB375001B37D8 /* sync.h in Headers */,
-				D91FE6BD178EB375001B37D8 /* threadsafety.h in Headers */,
-				D91FE6BF178EB375001B37D8 /* txdb.h in Headers */,
-				D91FE6C0178EB375001B37D8 /* ui_interface.h in Headers */,
-				D91FE6C1178EB375001B37D8 /* uint256.h in Headers */,
-				D91FE6C3178EB375001B37D8 /* util.h in Headers */,
-				D91FE6C5178EB375001B37D8 /* version.h in Headers */,
-				D91FE6C7178EB375001B37D8 /* wallet.h in Headers */,
-				D91FE6C9178EB375001B37D8 /* walletdb.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		D91FE6FB178EB8C5001B37D8 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		D958B09A17A29B0500B0EDD5 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -978,42 +649,6 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		D91FE4ED178EB1F1001B37D8 /* BitcoinKit */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = D91FE503178EB1F1001B37D8 /* Build configuration list for PBXNativeTarget "BitcoinKit" */;
-			buildPhases = (
-				D91FE4E9178EB1F1001B37D8 /* Sources */,
-				D91FE4EA178EB1F1001B37D8 /* Frameworks */,
-				D91FE4EB178EB1F1001B37D8 /* Headers */,
-				D91FE4EC178EB1F1001B37D8 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				D91FE7B917900DAE001B37D8 /* PBXTargetDependency */,
-			);
-			name = BitcoinKit;
-			productName = BitcoinKit;
-			productReference = D91FE4EE178EB1F1001B37D8 /* BitcoinKit.framework */;
-			productType = "com.apple.product-type.framework";
-		};
-		D91FE6FC178EB8C5001B37D8 /* bitcoin */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = D91FE707178EB8C5001B37D8 /* Build configuration list for PBXNativeTarget "bitcoin" */;
-			buildPhases = (
-				D91FE6F9178EB8C5001B37D8 /* Sources */,
-				D91FE6FA178EB8C5001B37D8 /* Frameworks */,
-				D91FE6FB178EB8C5001B37D8 /* Headers */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = bitcoin;
-			productName = bitcoin;
-			productReference = D91FE6FD178EB8C5001B37D8 /* bitcoin.a */;
-			productType = "com.apple.product-type.library.dynamic";
-		};
 		D958B09C17A29B0500B0EDD5 /* BitcoinJKit */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = D958B0AB17A29B0500B0EDD5 /* Build configuration list for PBXNativeTarget "BitcoinJKit" */;
@@ -1054,22 +689,12 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				D91FE4ED178EB1F1001B37D8 /* BitcoinKit */,
-				D91FE6FC178EB8C5001B37D8 /* bitcoin */,
 				D958B09C17A29B0500B0EDD5 /* BitcoinJKit */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		D91FE4EC178EB1F1001B37D8 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				D91FE4FC178EB1F1001B37D8 /* InfoPlist.strings in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		D958B09B17A29B0500B0EDD5 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1098,100 +723,6 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		D91FE4E9178EB1F1001B37D8 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				D91FE76A178EC170001B37D8 /* HIBitcoinManager.mm in Sources */,
-				1AA1033F6DD63EF5E851CCFD /* HIBitcoinErrorCodes.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		D91FE6F9178EB8C5001B37D8 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				D91FE706178EB8C5001B37D8 /* bitcoin.cp in Sources */,
-				D91FE714178EB996001B37D8 /* builder.cc in Sources */,
-				D91FE715178EB996001B37D8 /* c.cc in Sources */,
-				D91FE717178EB996001B37D8 /* db_impl.cc in Sources */,
-				D91FE718178EB996001B37D8 /* db_iter.cc in Sources */,
-				D91FE719178EB996001B37D8 /* dbformat.cc in Sources */,
-				D91FE71A178EB996001B37D8 /* filename.cc in Sources */,
-				D91FE71C178EB996001B37D8 /* log_reader.cc in Sources */,
-				D91FE71D178EB996001B37D8 /* log_writer.cc in Sources */,
-				D91FE71E178EB996001B37D8 /* memtable.cc in Sources */,
-				D91FE71F178EB996001B37D8 /* repair.cc in Sources */,
-				D91FE720178EB996001B37D8 /* table_cache.cc in Sources */,
-				D91FE721178EB996001B37D8 /* version_edit.cc in Sources */,
-				D91FE722178EB996001B37D8 /* version_set.cc in Sources */,
-				D91FE723178EB996001B37D8 /* write_batch.cc in Sources */,
-				D91FE724178EB996001B37D8 /* memenv.cc in Sources */,
-				D91FE725178EB996001B37D8 /* port_posix.cc in Sources */,
-				D91FE726178EB996001B37D8 /* block.cc in Sources */,
-				D91FE727178EB99B001B37D8 /* block_builder.cc in Sources */,
-				D91FE728178EB99B001B37D8 /* filter_block.cc in Sources */,
-				D91FE729178EB99B001B37D8 /* format.cc in Sources */,
-				D91FE72A178EB99B001B37D8 /* iterator.cc in Sources */,
-				D91FE72B178EB99B001B37D8 /* merger.cc in Sources */,
-				D91FE72C178EB99B001B37D8 /* table.cc in Sources */,
-				D91FE72D178EB99B001B37D8 /* table_builder.cc in Sources */,
-				D91FE72E178EB99B001B37D8 /* two_level_iterator.cc in Sources */,
-				D91FE72F178EB9A0001B37D8 /* arena.cc in Sources */,
-				D91FE730178EB9A0001B37D8 /* bloom.cc in Sources */,
-				D91FE731178EB9A0001B37D8 /* cache.cc in Sources */,
-				D91FE732178EB9A0001B37D8 /* coding.cc in Sources */,
-				D91FE733178EB9A0001B37D8 /* comparator.cc in Sources */,
-				D91FE734178EB9A0001B37D8 /* crc32c.cc in Sources */,
-				D91FE735178EB9A0001B37D8 /* env.cc in Sources */,
-				D91FE736178EB9A0001B37D8 /* env_posix.cc in Sources */,
-				D91FE737178EB9A0001B37D8 /* env_win.cc in Sources */,
-				D91FE738178EB9A0001B37D8 /* filter_policy.cc in Sources */,
-				D91FE739178EB9A0001B37D8 /* hash.cc in Sources */,
-				D91FE73A178EB9A0001B37D8 /* histogram.cc in Sources */,
-				D91FE73B178EB9A0001B37D8 /* logging.cc in Sources */,
-				D91FE73C178EB9A0001B37D8 /* options.cc in Sources */,
-				D91FE73D178EB9A0001B37D8 /* status.cc in Sources */,
-				D91FE73E178EB9A0001B37D8 /* testharness.cc in Sources */,
-				D91FE73F178EB9A0001B37D8 /* testutil.cc in Sources */,
-				D91FE740178EB9A8001B37D8 /* addrman.cpp in Sources */,
-				D91FE741178EB9A8001B37D8 /* alert.cpp in Sources */,
-				D91FE743178EB9A8001B37D8 /* bitcoinrpc.cpp in Sources */,
-				D91FE744178EB9A8001B37D8 /* bloom.cpp in Sources */,
-				D91FE745178EB9A8001B37D8 /* chainparams.cpp in Sources */,
-				D91FE746178EB9A8001B37D8 /* checkpoints.cpp in Sources */,
-				D91FE747178EB9A8001B37D8 /* core.cpp in Sources */,
-				D91FE748178EB9A8001B37D8 /* crypter.cpp in Sources */,
-				D91FE749178EB9A8001B37D8 /* db.cpp in Sources */,
-				D91FE74A178EB9A8001B37D8 /* hash.cpp in Sources */,
-				D91FE74B178EB9A8001B37D8 /* init.cpp in Sources */,
-				D91FE74C178EB9AC001B37D8 /* json_spirit_reader.cpp in Sources */,
-				D91FE74D178EB9AC001B37D8 /* json_spirit_value.cpp in Sources */,
-				D91FE74E178EB9AC001B37D8 /* json_spirit_writer.cpp in Sources */,
-				D91FE74F178EB9B0001B37D8 /* key.cpp in Sources */,
-				D91FE750178EB9B0001B37D8 /* keystore.cpp in Sources */,
-				D91FE751178EB9B0001B37D8 /* leveldb.cpp in Sources */,
-				D91FE752178EB9B0001B37D8 /* main.cpp in Sources */,
-				D91FE753178EB9B0001B37D8 /* net.cpp in Sources */,
-				D91FE754178EB9B0001B37D8 /* netbase.cpp in Sources */,
-				D91FE755178EB9B0001B37D8 /* noui.cpp in Sources */,
-				D91FE756178EB9B0001B37D8 /* protocol.cpp in Sources */,
-				D91FE757178EB9B0001B37D8 /* rpcblockchain.cpp in Sources */,
-				D91FE758178EB9B0001B37D8 /* rpcdump.cpp in Sources */,
-				D91FE759178EB9B0001B37D8 /* rpcmining.cpp in Sources */,
-				D91FE75A178EB9B0001B37D8 /* rpcnet.cpp in Sources */,
-				D91FE75B178EB9B0001B37D8 /* rpcrawtransaction.cpp in Sources */,
-				D91FE75C178EB9B0001B37D8 /* rpcwallet.cpp in Sources */,
-				D91FE75D178EB9B0001B37D8 /* script.cpp in Sources */,
-				D91FE75E178EB9B0001B37D8 /* sync.cpp in Sources */,
-				D91FE75F178EB9B0001B37D8 /* txdb.cpp in Sources */,
-				D91FE760178EB9B0001B37D8 /* util.cpp in Sources */,
-				D91FE761178EB9B0001B37D8 /* version.cpp in Sources */,
-				D91FE762178EB9B0001B37D8 /* wallet.cpp in Sources */,
-				D91FE763178EB9B0001B37D8 /* walletdb.cpp in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		D958B09817A29B0500B0EDD5 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1203,14 +734,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		D91FE7B917900DAE001B37D8 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = D91FE6FC178EB8C5001B37D8 /* bitcoin */;
-			targetProxy = D91FE7B817900DAE001B37D8 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		D91FE4FA178EB1F1001B37D8 /* InfoPlist.strings */ = {
@@ -1289,148 +812,6 @@
 			};
 			name = Release;
 		};
-		D91FE504178EB1F1001B37D8 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COMBINE_HIDPI_IMAGES = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				FRAMEWORK_VERSION = A;
-				GCC_C_LANGUAGE_STANDARD = "compiler-default";
-				GCC_LINK_WITH_DYNAMIC_LIBRARIES = YES;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "BitcoinKit/BitcoinKit-Prefix.pch";
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
-				GCC_WARN_UNINITIALIZED_AUTOS = NO;
-				HEADER_SEARCH_PATHS = (
-					/usr/local/include,
-					"/usr/local/opt/berkeley-db4/include/",
-				);
-				INFOPLIST_FILE = "BitcoinKit/BitcoinKit-Info.plist";
-				INSTALL_PATH = "@executable_path/../Frameworks";
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
-				OTHER_LDFLAGS = (
-					/usr/local/opt/openssl/lib/libcrypto.a,
-					/usr/local/opt/openssl/lib/libssl.a,
-					"/usr/local/opt/berkeley-db4/lib/libdb_cxx.a",
-					"/usr/local/opt/kyoto-cabinet/lib/libkyotocabinet.a",
-					"/usr/local/opt/boost/lib/libboost_system-mt.a",
-					"/usr/local/opt/boost/lib/libboost_filesystem-mt.a",
-					"/usr/local/opt/boost/lib/libboost_program_options-mt.a",
-					"/usr/local/opt/boost/lib/libboost_chrono-mt.a",
-					"/usr/local/opt/boost/lib/libboost_thread-mt.a",
-				);
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				WRAPPER_EXTENSION = framework;
-			};
-			name = Debug;
-		};
-		D91FE505178EB1F1001B37D8 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COMBINE_HIDPI_IMAGES = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				FRAMEWORK_VERSION = A;
-				GCC_C_LANGUAGE_STANDARD = "compiler-default";
-				GCC_LINK_WITH_DYNAMIC_LIBRARIES = YES;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "BitcoinKit/BitcoinKit-Prefix.pch";
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
-				GCC_WARN_UNINITIALIZED_AUTOS = NO;
-				HEADER_SEARCH_PATHS = (
-					/usr/local/include,
-					"/usr/local/opt/berkeley-db4/include/",
-				);
-				INFOPLIST_FILE = "BitcoinKit/BitcoinKit-Info.plist";
-				INSTALL_PATH = "@executable_path/../Frameworks";
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
-				OTHER_LDFLAGS = (
-					/usr/local/opt/openssl/lib/libcrypto.a,
-					/usr/local/opt/openssl/lib/libssl.a,
-					"/usr/local/opt/berkeley-db4/lib/libdb_cxx.a",
-					"/usr/local/opt/kyoto-cabinet/lib/libkyotocabinet.a",
-					"/usr/local/opt/boost/lib/libboost_system-mt.a",
-					"/usr/local/opt/boost/lib/libboost_filesystem-mt.a",
-					"/usr/local/opt/boost/lib/libboost_program_options-mt.a",
-					"/usr/local/opt/boost/lib/libboost_chrono-mt.a",
-					"/usr/local/opt/boost/lib/libboost_thread-mt.a",
-				);
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				WRAPPER_EXTENSION = framework;
-			};
-			name = Release;
-		};
-		D91FE708178EB8C5001B37D8 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				EXECUTABLE_EXTENSION = a;
-				GCC_C_LANGUAGE_STANDARD = "compiler-default";
-				GCC_LINK_WITH_DYNAMIC_LIBRARIES = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-					"LEVELDB_PLATFORM_POSIX=1",
-					"OS_MACOSX=1",
-					"MSG_NOSIGNAL=0",
-					"BOOST_SPIRIT_THREADSAFE=1",
-				);
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
-				HEADER_SEARCH_PATHS = (
-					/usr/local/include/,
-					bitcoind/src/leveldb/,
-					bitcoind/src/leveldb/include/,
-					bitcoind/src/leveldb/helpers/,
-					"/usr/local/opt/berkeley-db4/include/",
-					"/usr/local/opt/kyoto-cabinet/include/",
-				);
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				MACH_O_TYPE = staticlib;
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-			};
-			name = Debug;
-		};
-		D91FE709178EB8C5001B37D8 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				EXECUTABLE_EXTENSION = a;
-				GCC_C_LANGUAGE_STANDARD = "compiler-default";
-				GCC_LINK_WITH_DYNAMIC_LIBRARIES = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"LEVELDB_PLATFORM_POSIX=1",
-					"OS_MACOSX=1",
-					"BOOST_SPIRIT_THREADSAFE=1",
-					"MSG_NOSIGNAL=0",
-				);
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
-				HEADER_SEARCH_PATHS = (
-					/usr/local/include/,
-					bitcoind/src/leveldb/,
-					bitcoind/src/leveldb/include/,
-					bitcoind/src/leveldb/helpers/,
-					"/usr/local/opt/berkeley-db4/include/",
-					"/usr/local/opt/kyoto-cabinet/include/",
-				);
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				MACH_O_TYPE = staticlib;
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-			};
-			name = Release;
-		};
 		D958B0A917A29B0500B0EDD5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1489,24 +870,6 @@
 			buildConfigurations = (
 				D91FE501178EB1F1001B37D8 /* Debug */,
 				D91FE502178EB1F1001B37D8 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		D91FE503178EB1F1001B37D8 /* Build configuration list for PBXNativeTarget "BitcoinKit" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				D91FE504178EB1F1001B37D8 /* Debug */,
-				D91FE505178EB1F1001B37D8 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		D91FE707178EB8C5001B37D8 /* Build configuration list for PBXNativeTarget "bitcoin" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				D91FE708178EB8C5001B37D8 /* Debug */,
-				D91FE709178EB8C5001B37D8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
