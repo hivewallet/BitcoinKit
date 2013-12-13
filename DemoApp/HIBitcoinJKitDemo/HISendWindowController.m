@@ -9,19 +9,16 @@
 #import "HISendWindowController.h"
 
 
-@interface HISendWindowController ()
-
-@end
-
 @implementation HISendWindowController
 
 - (id)initWithWindow:(NSWindow *)window
 {
     self = [super initWithWindow:window];
+
     if (self) {
         // Initialization code here.
     }
-    
+
     return self;
 }
 
@@ -29,7 +26,8 @@
 {
     [super windowDidLoad];
     
-    // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
+    // Implement this method to handle any initialization after your window controller's window has been loaded
+    // from its nib file.
 }
 
 - (IBAction)cancelClicked:(NSButton *)sender
@@ -40,32 +38,42 @@
 
 - (IBAction)sendClicked:(NSButton *)sender
 {
+    HIBitcoinManager *manager = [HIBitcoinManager defaultManager];
+
     // Sanity check first
     NSString *address = _addressField.stringValue;
     CGFloat amount = [_amountField.stringValue floatValue];
-    NSLog(@"Balance %llu and amount %llu", [[HIBitcoinManager defaultManager] balance], (long long)(amount * 100000000));
+    NSLog(@"Balance %llu and amount %llu", [manager balance], (long long) (amount * 100000000));
+
     if (amount <= 0 ||
-        [[HIBitcoinManager defaultManager] balance] < (long long)(amount * 100000000) ||
-        ![[HIBitcoinManager defaultManager] isAddressValid:address])
+        [manager balance] < (long long) (amount * 100000000) ||
+        ![manager isAddressValid:address])
     {
         NSAlert *alert = [[NSAlert alloc] init];
         [alert setMessageText:@"Cannot send money"];
+
         if (amount <= 0)
+        {
             [alert setInformativeText:@"Your amount is invalid"];
-        else if ([[HIBitcoinManager defaultManager] balance] < (long long)(amount * 100000000))
+        }
+        else if ([manager balance] < (long long)(amount * 100000000))
+        {
             [alert setInformativeText:@"You can't send more than you own"];
-        else if (![[HIBitcoinManager defaultManager] isAddressValid:address])
+        }
+        else if (![manager isAddressValid:address])
+        {
             [alert setInformativeText:@"Given receipent address is invalid"];
+        }
+
         [alert addButtonWithTitle:@"Ok"];
-        
         [alert runModal];
     }
     else
     {
-        [[HIBitcoinManager defaultManager] sendCoins:(amount * 100000000)
-                                         toRecipient:address
-                                             comment:nil
-                                          completion:^(NSString *hash)
+        [manager sendCoins:(amount * 100000000)
+               toRecipient:address
+                   comment:nil
+                completion:^(NSString *hash)
         {
             if (hash)
             {
@@ -82,4 +90,5 @@
         }];
     }
 }
+
 @end

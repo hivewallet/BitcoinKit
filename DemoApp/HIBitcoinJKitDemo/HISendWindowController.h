@@ -9,9 +9,11 @@
 #import <Cocoa/Cocoa.h>
 
 @interface HISendWindowController : NSWindowController
+
 @property (weak) IBOutlet NSTextField *addressField;
 @property (weak) IBOutlet NSTextField *amountField;
 
 - (IBAction)cancelClicked:(NSButton *)sender;
 - (IBAction)sendClicked:(NSButton *)sender;
+
 @end
