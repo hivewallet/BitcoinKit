@@ -517,10 +517,18 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     [self callVoidMethodWithName:"setDataDirectory" error:NULL signature:"(Ljava/lang/String;)V",
      JStringFromNSString(_jniEnv, self.dataURL.path)];
 
+    NSError *startError = nil;
+
     // We're ready! Let's start
-    [self callVoidMethodWithName:"start" error:error signature:"()V"];
-    if (*error)
+    [self callVoidMethodWithName:"start" error:&startError signature:"()V"];
+
+    if (startError)
     {
+        if (error)
+        {
+            *error = startError;
+        }
+
         return NO;
     }
 
