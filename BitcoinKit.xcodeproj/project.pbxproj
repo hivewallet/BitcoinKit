@@ -15,7 +15,6 @@
 		D901F49917AF9DAB0071780D /* JavaVM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D901F49817AF9DAA0071780D /* JavaVM.framework */; };
 		D901F50017B279EA0071780D /* boot.jar in Resources */ = {isa = PBXBuildFile; fileRef = D901F49A17AF9DDB0071780D /* boot.jar */; };
 		D958B09E17A29B0500B0EDD5 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D91FE4F1178EB1F1001B37D8 /* Cocoa.framework */; };
-		D958B0A417A29B0500B0EDD5 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D958B0A217A29B0500B0EDD5 /* InfoPlist.strings */; };
 		D958B0AF17A29CE200B0EDD5 /* jni_md.h in Headers */ = {isa = PBXBuildFile; fileRef = D958B0AD17A29CE200B0EDD5 /* jni_md.h */; };
 		D958B0B017A29CE200B0EDD5 /* jni.h in Headers */ = {isa = PBXBuildFile; fileRef = D958B0AE17A29CE200B0EDD5 /* jni.h */; };
 		D958B0BC17A2A40600B0EDD5 /* HIBitcoinManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D958B0BA17A2A40600B0EDD5 /* HIBitcoinManager.m */; };
@@ -39,7 +38,6 @@
 		D91FE6CA178EB53A001B37D8 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		D958B09D17A29B0500B0EDD5 /* BitcoinJKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = BitcoinJKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D958B0A117A29B0500B0EDD5 /* BitcoinJKit-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "BitcoinJKit-Info.plist"; sourceTree = "<group>"; };
-		D958B0A317A29B0500B0EDD5 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		D958B0A517A29B0500B0EDD5 /* BitcoinJKit-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "BitcoinJKit-Prefix.pch"; sourceTree = "<group>"; };
 		D958B0A617A29B0500B0EDD5 /* BitcoinJKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BitcoinJKit.h; sourceTree = "<group>"; };
 		D958B0AD17A29CE200B0EDD5 /* jni_md.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jni_md.h; sourceTree = "<group>"; };
@@ -125,7 +123,6 @@
 			isa = PBXGroup;
 			children = (
 				D958B0A117A29B0500B0EDD5 /* BitcoinJKit-Info.plist */,
-				D958B0A217A29B0500B0EDD5 /* InfoPlist.strings */,
 				D958B0A517A29B0500B0EDD5 /* BitcoinJKit-Prefix.pch */,
 			);
 			name = "Supporting Files";
@@ -201,7 +198,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D958B0A417A29B0500B0EDD5 /* InfoPlist.strings in Resources */,
 				D901F50017B279EA0071780D /* boot.jar in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -236,17 +232,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXVariantGroup section */
-		D958B0A217A29B0500B0EDD5 /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				D958B0A317A29B0500B0EDD5 /* en */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		D91FE501178EB1F1001B37D8 /* Debug */ = {
