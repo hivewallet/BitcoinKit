@@ -54,8 +54,14 @@
                   context:NULL];
 
     [_progressIndicator startAnimation:self];
+
+    NSArray *applicationSupport = [[NSFileManager defaultManager] URLsForDirectory:NSApplicationSupportDirectory
+                                                                         inDomains:NSUserDomainMask];
+
     _manager.testingNetwork = YES;
-//    _manager.enableMining = YES;
+    _manager.dataURL = [[applicationSupport lastObject] URLByAppendingPathComponent:@"BitcoinKitDemo"];
+    // _manager.enableMining = YES;
+
     [_manager start:NULL];
 
     [[NSNotificationCenter defaultCenter] addObserver:self
