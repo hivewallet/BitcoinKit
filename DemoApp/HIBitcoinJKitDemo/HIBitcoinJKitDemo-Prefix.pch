@@ -2,8 +2,6 @@
 // Prefix header for all source files of the 'HIBitcoinJKitDemo' target in the 'HIBitcoinJKitDemo' project
 //
 
-#define USE_BITCOINJ
-
 #ifdef __OBJC__
     #import <Cocoa/Cocoa.h>
 #endif
