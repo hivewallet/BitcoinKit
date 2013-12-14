@@ -1,9 +1,6 @@
 package com.hive.bitcoinkit;
 
-import static com.google.bitcoin.core.Utils.bytesToHexString;
-
 import com.google.bitcoin.core.*;
-import com.google.bitcoin.crypto.KeyCrypterException;
 import com.google.bitcoin.discovery.DnsDiscovery;
 import com.google.bitcoin.params.MainNetParams;
 import com.google.bitcoin.params.RegTestParams;
@@ -11,15 +8,12 @@ import com.google.bitcoin.params.TestNet3Params;
 import com.google.bitcoin.script.Script;
 import com.google.bitcoin.store.BlockStore;
 import com.google.bitcoin.store.SPVBlockStore;
-import com.google.bitcoin.store.UnreadableWalletException;
-import com.google.bitcoin.utils.BriefLogFormatter;
 import com.google.bitcoin.utils.Threading;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.text.SimpleDateFormat;
@@ -27,11 +21,12 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
-public class BitcoinManager implements PeerEventListener, Thread.UncaughtExceptionHandler {
-	private NetworkParameters networkParams;
-	private Wallet wallet;
-	private String dataDirectory;
-	
+public class BitcoinManager implements PeerEventListener, Thread.UncaughtExceptionHandler
+{
+    private NetworkParameters networkParams;
+    private Wallet wallet;
+    private String dataDirectory;
+
     private PeerGroup peerGroup;
     private BlockStore blockStore;
     private File walletFile;
@@ -42,28 +37,28 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         Threading.uncaughtExceptionHandler = this;
     }
 
-	public void setTestingNetwork(boolean testing)
-	{
-		if (testing)
-		{
-			this.networkParams = TestNet3Params.get();
-		}
-		else
-		{
-			this.networkParams = MainNetParams.get();
-		}
-	}
-	
-	public void setDataDirectory(String path)
-	{
-		dataDirectory = path;
-	}
-	
-	public String getWalletAddress()
-	{
-		ECKey ecKey = wallet.getKeys().get(0);
-		return ecKey.toAddress(networkParams).toString();
-	}
+    public void setTestingNetwork(boolean testing)
+    {
+        if (testing)
+        {
+            this.networkParams = TestNet3Params.get();
+        }
+        else
+        {
+            this.networkParams = MainNetParams.get();
+        }
+    }
+
+    public void setDataDirectory(String path)
+    {
+        dataDirectory = path;
+    }
+
+    public String getWalletAddress()
+    {
+        ECKey ecKey = wallet.getKeys().get(0);
+        return ecKey.toAddress(networkParams).toString();
+    }
 
     public String getWalletDebuggingInfo()
     {
@@ -80,9 +75,9 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         return (wallet != null) ? wallet.getBalance(Wallet.BalanceType.ESTIMATED).longValue() : 0;
     }
 
-	private String getJSONFromTransaction(Transaction tx) throws ScriptException
-	{
-		if (tx == null)
+    private String getJSONFromTransaction(Transaction tx) throws ScriptException
+    {
+        if (tx == null)
         {
             return null;
         }
@@ -123,7 +118,8 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
 
             conns.append("{ ");
 
-            try {
+            try
+            {
                 Script scriptSig = in.getScriptSig();
 
                 if (scriptSig.getChunks().size() == 2)
@@ -134,7 +130,9 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
                 conns.append(" ,\"category\": \"received\" }");
 
                 connCount++;
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
 
             }
         }
@@ -150,7 +148,8 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
 
             conns.append("{ ");
 
-            try {
+            try
+            {
                 Script scriptPubKey = out.getScriptPubKey();
 
                 if (scriptPubKey.isSentToAddress())
@@ -161,7 +160,9 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
                 conns.append(" ,\"category\": \"sent\" }");
 
                 connCount++;
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
 
             }
         }
@@ -172,86 +173,93 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
 
         return "{ \"amount\": " + tx.getValue(wallet) +
-                ", \"txid\": \"" + tx.getHashAsString()  + "\"" +
-                ", \"time\": \""  + dateFormat.format(tx.getUpdateTime()) + "\"" +
-                ", \"confidence\": \""   +confidence + "\"" +
-                ", \"details\": "   + conns.toString() +
+                ", \"txid\": \"" + tx.getHashAsString() + "\"" +
+                ", \"time\": \"" + dateFormat.format(tx.getUpdateTime()) + "\"" +
+                ", \"confidence\": \"" + confidence + "\"" +
+                ", \"details\": " + conns.toString() +
                 "}";
-	}
+    }
 
-	public int getTransactionCount()
-	{
-		return wallet.getTransactionsByTime().size();
-	}
-    
+    public int getTransactionCount()
+    {
+        return wallet.getTransactionsByTime().size();
+    }
+
     public String getAllTransactions() throws ScriptException
     {
         return getTransactions(0, getTransactionCount());
     }
-	
-	public String getTransaction(String tx) throws ScriptException
-	{
-		Sha256Hash hash = new Sha256Hash(tx);
-		return getJSONFromTransaction(wallet.getTransaction(hash));
-	}
-	
-	public String getTransaction(int idx) throws ScriptException
-	{	
-		return getJSONFromTransaction(wallet.getTransactionsByTime().get(idx));
-	}
-	
-	public String getTransactions(int from, int count) throws ScriptException
-	{
-		List<Transaction> transactions = wallet.getTransactionsByTime();
-		
-		if (from >= transactions.size())
-			return null;
-		
-		int to = (from + count < transactions.size()) ? from + count : transactions.size();
-		
-		StringBuffer txs = new StringBuffer();
-		txs.append("[\n");
-		boolean first = true;
-		for (; from < to; from++)
-		{
-			if (first)
-				first = false;
-			else
-				txs.append("\n,");
-			
-			txs.append(getJSONFromTransaction(transactions.get(from)));
-		}
-		txs.append("]\n");
-		
-		return txs.toString();
-	}
 
-	public String feeForSendingCoins(String amount) throws AddressFormatException {
-		return Transaction.REFERENCE_DEFAULT_MIN_TX_FEE.toString();
-	}
+    public String getTransaction(String tx) throws ScriptException
+    {
+        Sha256Hash hash = new Sha256Hash(tx);
+        return getJSONFromTransaction(wallet.getTransaction(hash));
+    }
 
-	public void sendCoins(String amount, final String sendToAddressString)
-	{
-		  try {
-			  BigInteger aToSend = new BigInteger(amount);
-			  Address sendToAddress = new Address(networkParams, sendToAddressString);
-	          final Wallet.SendResult sendResult = wallet.sendCoins(peerGroup, sendToAddress, aToSend);
-	          Futures.addCallback(sendResult.broadcastComplete, new FutureCallback<Transaction>() {
-	               public void onSuccess(Transaction transaction) {
-                       onTransactionSuccess(sendResult.tx.getHashAsString());
-	            	   onTransactionChanged(sendResult.tx.getHashAsString());
-	                }
+    public String getTransaction(int idx) throws ScriptException
+    {
+        return getJSONFromTransaction(wallet.getTransactionsByTime().get(idx));
+    }
 
-	                public void onFailure(Throwable throwable) {
-	                	
-	                	onTransactionFailed();
-	                    throwable.printStackTrace();
-	                }
-	            });
-	       } catch (Exception e) {
-	    	   onTransactionFailed();   	   
-	       }		
-	}
+    public String getTransactions(int from, int count) throws ScriptException
+    {
+        List<Transaction> transactions = wallet.getTransactionsByTime();
+
+        if (from >= transactions.size())
+            return null;
+
+        int to = (from + count < transactions.size()) ? from + count : transactions.size();
+
+        StringBuffer txs = new StringBuffer();
+        txs.append("[\n");
+        boolean first = true;
+        for (; from < to; from++)
+        {
+            if (first)
+                first = false;
+            else
+                txs.append("\n,");
+
+            txs.append(getJSONFromTransaction(transactions.get(from)));
+        }
+        txs.append("]\n");
+
+        return txs.toString();
+    }
+
+    public String feeForSendingCoins(String amount) throws AddressFormatException
+    {
+        return Transaction.REFERENCE_DEFAULT_MIN_TX_FEE.toString();
+    }
+
+    public void sendCoins(String amount, final String sendToAddressString)
+    {
+        try
+        {
+            BigInteger aToSend = new BigInteger(amount);
+            Address sendToAddress = new Address(networkParams, sendToAddressString);
+            final Wallet.SendResult sendResult = wallet.sendCoins(peerGroup, sendToAddress, aToSend);
+            Futures.addCallback(sendResult.broadcastComplete, new FutureCallback<Transaction>()
+            {
+                public void onSuccess(Transaction transaction)
+                {
+                    onTransactionSuccess(sendResult.tx.getHashAsString());
+                    onTransactionChanged(sendResult.tx.getHashAsString());
+                }
+
+                public void onFailure(Throwable throwable)
+                {
+
+                    onTransactionFailed();
+                    throwable.printStackTrace();
+                }
+            });
+        }
+        catch (Exception e)
+        {
+            onTransactionFailed();
+        }
+    }
 
     public String getExceptionStackTrace(Throwable exception)
     {
@@ -267,7 +275,8 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
 
     public boolean isAddressValid(String address)
     {
-        try {
+        try
+        {
             Address addr = new Address(networkParams, address);
             return (addr != null);
         }
@@ -276,9 +285,9 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
             return false;
         }
     }
-	
-	public void start() throws Exception
-	{
+
+    public void start() throws Exception
+    {
         if (networkParams == null)
         {
             setTestingNetwork(false);
@@ -290,9 +299,12 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         wallet = null;
         walletFile = new File(dataDirectory + "/bitcoinkit.wallet");
 
-        if (walletFile.exists()) {
+        if (walletFile.exists())
+        {
             wallet = Wallet.loadFromFile(walletFile);
-        } else {
+        }
+        else
+        {
             wallet = new Wallet(networkParams);
             wallet.addKey(new ECKey());
             wallet.saveToFile(walletFile);
@@ -300,7 +312,7 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
 
         //make wallet autosave
         wallet.autosaveToFile(walletFile, 1, TimeUnit.SECONDS, null);
-        
+
 
         // Fetch the first key in the wallet (should be the only key).
         ECKey key = wallet.getKeys().iterator().next();
@@ -308,41 +320,53 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         // Load the block chain, if there is one stored locally. If it's going to be freshly created, checkpoint it.
         boolean chainExistedAlready = chainFile.exists();
         blockStore = new SPVBlockStore(networkParams, chainFile);
-        if (!chainExistedAlready) {
+        if (!chainExistedAlready)
+        {
             File checkpointsFile = new File(dataDirectory + "/bitcoinkit.checkpoints");
-            if (checkpointsFile.exists()) {
+            if (checkpointsFile.exists())
+            {
                 FileInputStream stream = new FileInputStream(checkpointsFile);
                 CheckpointManager.checkpoint(networkParams, stream, blockStore, key.getCreationTimeSeconds());
             }
         }
-     
+
         BlockChain chain = new BlockChain(networkParams, wallet, blockStore);
         // Connect to the localhost node. One minute timeout since we won't try any other peers
         peerGroup = new PeerGroup(networkParams, chain);
         peerGroup.setUserAgent("BitcoinJKit", "0.9");
-        if (networkParams == RegTestParams.get()) {
+        if (networkParams == RegTestParams.get())
+        {
             peerGroup.addAddress(InetAddress.getLocalHost());
-        } else {
+        }
+        else
+        {
             peerGroup.addPeerDiscovery(new DnsDiscovery(networkParams));
         }
         peerGroup.addWallet(wallet);
-        
+
 
         // We want to know when the balance changes.
-        wallet.addEventListener(new AbstractWalletEventListener() {
+        wallet.addEventListener(new AbstractWalletEventListener()
+        {
             @Override
-            public void onCoinsReceived(Wallet w, Transaction tx, BigInteger prevBalance, BigInteger newBalance) {
+            public void onCoinsReceived(Wallet w, Transaction tx, BigInteger prevBalance, BigInteger newBalance)
+            {
                 assert !newBalance.equals(BigInteger.ZERO);
                 if (!tx.isPending()) return;
                 // It was broadcast, but we can't really verify it's valid until it appears in a block.
                 BigInteger value = tx.getValueSentToMe(w);
                 onTransactionChanged(tx.getHashAsString());
-                tx.getConfidence().addEventListener(new TransactionConfidence.Listener() {
-                    public void onConfidenceChanged(final Transaction tx2, TransactionConfidence.Listener.ChangeReason reason) {
-                        if (tx2.getConfidence().getConfidenceType() == TransactionConfidence.ConfidenceType.BUILDING) {
+                tx.getConfidence().addEventListener(new TransactionConfidence.Listener()
+                {
+                    public void onConfidenceChanged(final Transaction tx2, TransactionConfidence.Listener.ChangeReason reason)
+                    {
+                        if (tx2.getConfidence().getConfidenceType() == TransactionConfidence.ConfidenceType.BUILDING)
+                        {
                             // Coins were confirmed (appeared in a block).
                             tx2.getConfidence().removeEventListener(this);
-                        } else {
+                        }
+                        else
+                        {
 //                            System.out.println(String.format("Confidence of %s changed, is now: %s",
 //                                    tx2.getHashAsString(), tx2.getConfidence().toString()));
                         }
@@ -350,8 +374,8 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
                     }
                 });
             }
-        });   
-        
+        });
+
         peerGroup.startAndWait();
         peerGroup.start();
 
@@ -359,16 +383,17 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
 
         peerGroup.startBlockChainDownload(this);
 
-	}
+    }
 
     public void uncaughtException(Thread thread, Throwable exception)
     {
         onException(exception);
     }
 
-	public void stop()
-	{
-		try {
+    public void stop()
+    {
+        try
+        {
             System.out.print("Shutting down ... ");
 
             if (peerGroup != null)
@@ -387,28 +412,30 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
             }
 
             System.out.print("done ");
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new RuntimeException(e);
         }
-	}
-	
-	public void walletExport(String path)
-	{
-		
-	}
+    }
+
+    public void walletExport(String path)
+    {
+
+    }
 
 
 	/* Implementing native callbacks here */
-	
-	public native void onTransactionChanged(String txid);
-    
-	public native void onTransactionFailed();
-	
-    public native void onTransactionSuccess(String txid);
-    
-	public native void onSynchronizationUpdate(int percent);
 
-	public native void onBalanceChanged();
+    public native void onTransactionChanged(String txid);
+
+    public native void onTransactionFailed();
+
+    public native void onTransactionSuccess(String txid);
+
+    public native void onSynchronizationUpdate(int percent);
+
+    public native void onBalanceChanged();
 
     public native void onException(Throwable exception);
 
@@ -416,51 +443,51 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
 	/* Implementing peer listener */
 
     public void onPeerCountChange(int peersConnected)
-	{
+    {
         //		System.out.println("Peers " + peersConnected);
-	}
+    }
 
     public void onBlocksDownloaded(Peer peer, Block block, int blocksLeft)
-	{
-		int downloadedSoFar = blocksToDownload - blocksLeft;
-		if (blocksToDownload == 0)
-			onSynchronizationUpdate(10000);
-		else
-			onSynchronizationUpdate(10000*downloadedSoFar / blocksToDownload);
-	}
-	
-	public void onChainDownloadStarted(Peer peer, int blocksLeft)
-	{
-		blocksToDownload = blocksLeft;
-		if (blocksToDownload == 0)
-			onSynchronizationUpdate(10000);
-		else
-			onSynchronizationUpdate(0);
-	}
-	
-	public void onPeerConnected(Peer peer, int peerCount)
-	{
-		onPeerCountChange(peerCount);
-	}
-	
-	
-	public void onPeerDisconnected(Peer peer, int peerCount)
-	{
-		onPeerCountChange(peerCount);
-	}
-	
-	public Message onPreMessageReceived(Peer peer, Message m)
-	{
-		return m;
-	}
-	
-	public void onTransaction(Peer peer, Transaction t)
-	{
-		
-	}
-	
-	public List<Message> getData(Peer peer, GetDataMessage m)
-	{
-		return null;
-	}
+    {
+        int downloadedSoFar = blocksToDownload - blocksLeft;
+        if (blocksToDownload == 0)
+            onSynchronizationUpdate(10000);
+        else
+            onSynchronizationUpdate(10000 * downloadedSoFar / blocksToDownload);
+    }
+
+    public void onChainDownloadStarted(Peer peer, int blocksLeft)
+    {
+        blocksToDownload = blocksLeft;
+        if (blocksToDownload == 0)
+            onSynchronizationUpdate(10000);
+        else
+            onSynchronizationUpdate(0);
+    }
+
+    public void onPeerConnected(Peer peer, int peerCount)
+    {
+        onPeerCountChange(peerCount);
+    }
+
+
+    public void onPeerDisconnected(Peer peer, int peerCount)
+    {
+        onPeerCountChange(peerCount);
+    }
+
+    public Message onPreMessageReceived(Peer peer, Message m)
+    {
+        return m;
+    }
+
+    public void onTransaction(Peer peer, Transaction t)
+    {
+
+    }
+
+    public List<Message> getData(Peer peer, GetDataMessage m)
+    {
+        return null;
+    }
 }
