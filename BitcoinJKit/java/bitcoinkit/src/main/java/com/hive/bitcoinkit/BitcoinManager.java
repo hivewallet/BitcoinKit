@@ -27,6 +27,7 @@ import java.net.InetAddress;
 import java.nio.CharBuffer;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
@@ -290,7 +291,19 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         {
             throw new WrongPasswordException("Wallet is not protected.");
         }
-        return keyCrypter.deriveKey(CharBuffer.wrap(utf16Password));
+        return deriveKeyAndWipePassword(utf16Password, keyCrypter);
+    }
+
+    private KeyParameter deriveKeyAndWipePassword(char[] utf16Password, KeyCrypter keyCrypter)
+    {
+        try
+        {
+            return keyCrypter.deriveKey(CharBuffer.wrap(utf16Password));
+        }
+        finally
+        {
+            Arrays.fill(utf16Password, '\0');
+        }
     }
 
     public String getExceptionStackTrace(Throwable exception)
@@ -370,7 +383,7 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
     private void encryptWallet(char[] utf16Password, Wallet wallet)
     {
         KeyCrypterScrypt keyCrypter = createNewKeyCryptor();
-        KeyParameter aesKey = keyCrypter.deriveKey(CharBuffer.wrap(utf16Password));
+        KeyParameter aesKey = deriveKeyAndWipePassword(utf16Password, keyCrypter);
         wallet.encrypt(keyCrypter, aesKey);
     }
 
