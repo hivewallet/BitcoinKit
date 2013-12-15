@@ -52,6 +52,13 @@ jstring JStringFromNSString(JNIEnv *env, NSString *string)
     return (*env)->NewStringUTF(env, [string UTF8String]);
 }
 
+jarray JCharArrayFromNSData(JNIEnv *env, NSData *data)
+{
+    jsize length = (jsize)(data.length / sizeof(jchar));
+    jcharArray charArray = (*env)->NewCharArray(env, length);
+    (*env)->SetCharArrayRegion(env, charArray, 0, length, data.bytes);
+    return charArray;
+}
 
 #pragma mark - JNI callback functions
 
@@ -542,6 +549,30 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     {
         [self didStart];
     }
+}
+
+- (void)createWalletWithPassword:(NSData *)password
+                           error:(NSError **)error
+{
+    jarray charArray = JCharArrayFromNSData(_jniEnv, password);
+
+    *error = nil;
+    [self callVoidMethodWithName:"createWallet"
+                           error:error
+                       signature:"([C)V", charArray];
+
+    [self zeroCharArray:charArray size:password.length / sizeof(jchar)];
+
+    if (!*error)
+    {
+        [self didStart];
+    }
+}
+
+- (void)zeroCharArray:(jarray)charArray size:(jsize)size {
+    const char *zero[size];
+    memset(zero, 0, size);
+    (*_jniEnv)->SetCharArrayRegion(_jniEnv, charArray, 0, size, zero);
 }
 
 - (void)didStart

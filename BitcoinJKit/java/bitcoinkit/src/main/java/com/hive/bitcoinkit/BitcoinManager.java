@@ -1,6 +1,7 @@
 package com.hive.bitcoinkit;
 
 import com.google.bitcoin.core.*;
+import com.google.bitcoin.crypto.KeyCrypterScrypt;
 import com.google.bitcoin.discovery.DnsDiscovery;
 import com.google.bitcoin.params.MainNetParams;
 import com.google.bitcoin.params.RegTestParams;
@@ -13,12 +14,17 @@ import com.google.bitcoin.store.UnreadableWalletException;
 import com.google.bitcoin.utils.Threading;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import com.google.protobuf.ByteString;
+import org.bitcoinj.wallet.Protos;
+import org.spongycastle.crypto.params.KeyParameter;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.InetAddress;
+import java.nio.CharBuffer;
+import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.TimeZone;
@@ -311,6 +317,11 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
 
     public void createWallet() throws IOException, BlockStoreException, ExistingWalletException
     {
+        createWallet(null);
+    }
+
+    public void createWallet(char[] utf16Password) throws IOException, BlockStoreException, ExistingWalletException
+    {
         if (walletFile == null)
         {
             throw new IllegalStateException("createWallet cannot be called before start");
@@ -322,9 +333,32 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
 
         Wallet wallet = new Wallet(networkParams);
         wallet.addKey(new ECKey());
+
+        if (utf16Password != null)
+        {
+            encryptWallet(utf16Password, wallet);
+        }
+
         wallet.saveToFile(walletFile);
 
         useWallet(wallet);
+    }
+
+    private void encryptWallet(char[] utf16Password, Wallet wallet)
+    {
+        KeyCrypterScrypt keyCrypter = createNewKeyCryptor();
+        KeyParameter aesKey = keyCrypter.deriveKey(CharBuffer.wrap(utf16Password));
+        wallet.encrypt(keyCrypter, aesKey);
+    }
+
+    private KeyCrypterScrypt createNewKeyCryptor()
+    {
+        byte[] salt = new byte[KeyCrypterScrypt.SALT_LENGTH];
+        new SecureRandom().nextBytes(salt);
+        Protos.ScryptParameters.Builder scryptParametersBuilder
+                = Protos.ScryptParameters.newBuilder().setSalt(ByteString.copyFrom(salt));
+        Protos.ScryptParameters scryptParameters = scryptParametersBuilder.build();
+        return new KeyCrypterScrypt(scryptParameters);
     }
 
     private void useWallet(Wallet wallet) throws BlockStoreException, IOException
