@@ -1,22 +1,33 @@
 package com.hive.bitcoinkit;
 
 import com.google.bitcoin.core.*;
+import com.google.bitcoin.crypto.KeyCrypter;
+import com.google.bitcoin.crypto.KeyCrypterScrypt;
 import com.google.bitcoin.discovery.DnsDiscovery;
 import com.google.bitcoin.params.MainNetParams;
 import com.google.bitcoin.params.RegTestParams;
 import com.google.bitcoin.params.TestNet3Params;
 import com.google.bitcoin.script.Script;
 import com.google.bitcoin.store.BlockStore;
+import com.google.bitcoin.store.BlockStoreException;
 import com.google.bitcoin.store.SPVBlockStore;
+import com.google.bitcoin.store.UnreadableWalletException;
 import com.google.bitcoin.utils.Threading;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import com.google.protobuf.ByteString;
+import org.bitcoinj.wallet.Protos;
+import org.spongycastle.crypto.params.KeyParameter;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.net.InetAddress;
+import java.nio.CharBuffer;
+import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
@@ -234,22 +245,37 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
 
     public void sendCoins(String amount, final String sendToAddressString)
     {
+        sendCoins(amount, sendToAddressString, null);
+    }
+
+    public void sendCoins(String amount, final String sendToAddressString, char[] utf16Password)
+    {
+        KeyParameter aesKey = null;
         try
         {
             BigInteger aToSend = new BigInteger(amount);
             Address sendToAddress = new Address(networkParams, sendToAddressString);
-            final Wallet.SendResult sendResult = wallet.sendCoins(peerGroup, sendToAddress, aToSend);
+            final Wallet.SendRequest request = Wallet.SendRequest.to(sendToAddress, aToSend);
+
+            if (utf16Password != null)
+            {
+                aesKey = aesKeyForPassword(utf16Password);
+                request.aesKey = aesKey;
+            }
+
+            final Wallet.SendResult sendResult = wallet.sendCoins(peerGroup, request);
             Futures.addCallback(sendResult.broadcastComplete, new FutureCallback<Transaction>()
             {
                 public void onSuccess(Transaction transaction)
                 {
+                    wipeAesKey(request.aesKey);
                     onTransactionSuccess(sendResult.tx.getHashAsString());
                     onTransactionChanged(sendResult.tx.getHashAsString());
                 }
 
                 public void onFailure(Throwable throwable)
                 {
-
+                    wipeAesKey(request.aesKey);
                     onTransactionFailed();
                     throwable.printStackTrace();
                 }
@@ -257,7 +283,38 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         }
         catch (Exception e)
         {
+            wipeAesKey(aesKey);
             onTransactionFailed();
+        }
+    }
+
+    private KeyParameter aesKeyForPassword(char[] utf16Password) throws WrongPasswordException
+    {
+        KeyCrypter keyCrypter = wallet.getKeyCrypter();
+        if (keyCrypter == null)
+        {
+            throw new WrongPasswordException("Wallet is not protected.");
+        }
+        return deriveKeyAndWipePassword(utf16Password, keyCrypter);
+    }
+
+    private KeyParameter deriveKeyAndWipePassword(char[] utf16Password, KeyCrypter keyCrypter)
+    {
+        try
+        {
+            return keyCrypter.deriveKey(CharBuffer.wrap(utf16Password));
+        }
+        finally
+        {
+            Arrays.fill(utf16Password, '\0');
+        }
+    }
+
+    private void wipeAesKey(KeyParameter aesKey)
+    {
+        if (aesKey != null)
+        {
+            Arrays.fill(aesKey.getKey(), (byte) 0);
         }
     }
 
@@ -286,29 +343,82 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         }
     }
 
-    public void start() throws Exception
+    public void start() throws NoWalletException, UnreadableWalletException, IOException, BlockStoreException
     {
         if (networkParams == null)
         {
             setTestingNetwork(false);
         }
 
-        File chainFile = new File(dataDirectory + "/bitcoinkit.spvchain");
-
         // Try to read the wallet from storage, create a new one if not possible.
         wallet = null;
         walletFile = new File(dataDirectory + "/bitcoinkit.wallet");
 
-        if (walletFile.exists())
+        if (!walletFile.exists())
         {
-            wallet = Wallet.loadFromFile(walletFile);
+            // Stop here, because the caller might want to create an encrypted wallet and needs to supply a password.
+            throw new NoWalletException("No wallet file found at: " + walletFile);
         }
-        else
+
+        useWallet(Wallet.loadFromFile(walletFile));
+    }
+
+    public void createWallet() throws IOException, BlockStoreException, ExistingWalletException
+    {
+        createWallet(null);
+    }
+
+    public void createWallet(char[] utf16Password) throws IOException, BlockStoreException, ExistingWalletException
+    {
+        if (walletFile == null)
         {
-            wallet = new Wallet(networkParams);
-            wallet.addKey(new ECKey());
-            wallet.saveToFile(walletFile);
+            throw new IllegalStateException("createWallet cannot be called before start");
         }
+        else if (walletFile.exists())
+        {
+            throw new ExistingWalletException("Trying to create a wallet even though one exists: " + walletFile);
+        }
+
+        Wallet wallet = new Wallet(networkParams);
+        wallet.addKey(new ECKey());
+
+        if (utf16Password != null)
+        {
+            encryptWallet(utf16Password, wallet);
+        }
+
+        wallet.saveToFile(walletFile);
+
+        useWallet(wallet);
+    }
+
+    private void encryptWallet(char[] utf16Password, Wallet wallet)
+    {
+        KeyCrypterScrypt keyCrypter = createNewKeyCryptor();
+        KeyParameter aesKey = deriveKeyAndWipePassword(utf16Password, keyCrypter);
+        try
+        {
+            wallet.encrypt(keyCrypter, aesKey);
+        }
+        finally
+        {
+            wipeAesKey(aesKey);
+        }
+    }
+
+    private KeyCrypterScrypt createNewKeyCryptor()
+    {
+        byte[] salt = new byte[KeyCrypterScrypt.SALT_LENGTH];
+        new SecureRandom().nextBytes(salt);
+        Protos.ScryptParameters.Builder scryptParametersBuilder
+                = Protos.ScryptParameters.newBuilder().setSalt(ByteString.copyFrom(salt));
+        Protos.ScryptParameters scryptParameters = scryptParametersBuilder.build();
+        return new KeyCrypterScrypt(scryptParameters);
+    }
+
+    private void useWallet(Wallet wallet) throws BlockStoreException, IOException
+    {
+        this.wallet = wallet;
 
         //make wallet autosave
         wallet.autosaveToFile(walletFile, 1, TimeUnit.SECONDS, null);
@@ -318,6 +428,7 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         ECKey key = wallet.getKeys().iterator().next();
 
         // Load the block chain, if there is one stored locally. If it's going to be freshly created, checkpoint it.
+        File chainFile = new File(dataDirectory + "/bitcoinkit.spvchain");
         boolean chainExistedAlready = chainFile.exists();
         blockStore = new SPVBlockStore(networkParams, chainFile);
         if (!chainExistedAlready)
@@ -382,7 +493,11 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         onBalanceChanged();
 
         peerGroup.startBlockChainDownload(this);
+    }
 
+    public boolean isWalletEncrypted()
+    {
+        return wallet.getKeys().get(0).isEncrypted();
     }
 
     public void uncaughtException(Thread thread, Throwable exception)

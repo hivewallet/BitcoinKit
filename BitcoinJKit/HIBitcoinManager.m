@@ -52,6 +52,13 @@ jstring JStringFromNSString(JNIEnv *env, NSString *string)
     return (*env)->NewStringUTF(env, [string UTF8String]);
 }
 
+jarray JCharArrayFromNSData(JNIEnv *env, NSData *data)
+{
+    jsize length = (jsize)(data.length / sizeof(jchar));
+    jcharArray charArray = (*env)->NewCharArray(env, length);
+    (*env)->SetCharArrayRegion(env, charArray, 0, length, data.bytes);
+    return charArray;
+}
 
 #pragma mark - JNI callback functions
 
@@ -322,6 +329,14 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     {
         return kHIIllegalArgumentException;
     }
+    else if ([exceptionClass isEqual:@"com.hive.bitcoinkit.NoWalletException"])
+    {
+        return kHIBitcoinManagerNoWallet;
+    }
+    else if ([exceptionClass isEqual:@"com.hive.bitcoinkit.ExistingWalletException"])
+    {
+        return kHIBitcoinManagerWalletExists;
+    }
     else
     {
         return kHIBitcoinManagerUnexpectedError;
@@ -519,11 +534,49 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
     // We're ready! Let's start
     [self callVoidMethodWithName:"start" error:error signature:"()V"];
-    if (*error)
+    if (!*error)
     {
-        return NO;
+        [self didStart];
     }
+    return !*error;
+}
 
+- (void)createWallet:(NSError **)error
+{
+    *error = nil;
+    [self callVoidMethodWithName:"createWallet" error:error signature:"()V"];
+    if (!*error)
+    {
+        [self didStart];
+    }
+}
+
+- (void)createWalletWithPassword:(NSData *)password
+                           error:(NSError **)error
+{
+    jarray charArray = JCharArrayFromNSData(_jniEnv, password);
+
+    *error = nil;
+    [self callVoidMethodWithName:"createWallet"
+                           error:error
+                       signature:"([C)V", charArray];
+
+    [self zeroCharArray:charArray size:password.length / sizeof(jchar)];
+
+    if (!*error)
+    {
+        [self didStart];
+    }
+}
+
+- (void)zeroCharArray:(jarray)charArray size:(jsize)size {
+    const char *zero[size];
+    memset(zero, 0, size);
+    (*_jniEnv)->SetCharArrayRegion(_jniEnv, charArray, 0, size, zero);
+}
+
+- (void)didStart
+{
     [self willChangeValueForKey:@"isRunning"];
     _isRunning = YES;
     [self didChangeValueForKey:@"isRunning"];
@@ -532,8 +585,6 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
     [self willChangeValueForKey:@"walletAddress"];
     [self didChangeValueForKey:@"walletAddress"];
-
-    return YES;
 }
 
 - (NSString *)walletAddress
@@ -678,6 +729,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 - (void)sendCoins:(uint64_t)coins
       toRecipient:(NSString *)recipient
           comment:(NSString *)comment
+         password:(NSData *)password
        completion:(void(^)(NSString *hash))completion
 {
     if (_sending)
@@ -694,10 +746,26 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
     [sendCompletionBlock release];
     sendCompletionBlock = [completion copy];
-    
-    [self callVoidMethodWithName:"sendCoins" error:NULL signature:"(Ljava/lang/String;Ljava/lang/String;)V",
-     JStringFromNSString(_jniEnv, [NSString stringWithFormat:@"%lld", coins]),
-     JStringFromNSString(_jniEnv, recipient)];
+
+    jstring jAmount = JStringFromNSString(_jniEnv, [NSString stringWithFormat:@"%lld", coins]);
+    jstring jRecipient = JStringFromNSString(_jniEnv, recipient);
+    if (password)
+    {
+        jarray jPassword = JCharArrayFromNSData(_jniEnv, password);
+        [self callVoidMethodWithName:"sendCoins"
+                               error:NULL
+                           signature:"(Ljava/lang/String;Ljava/lang/String;[C)V", jAmount, jRecipient, jPassword];
+    }
+    else
+    {
+        [self callVoidMethodWithName:"sendCoins"
+                               error:NULL
+                           signature:"(Ljava/lang/String;Ljava/lang/String;)V", jAmount, jRecipient];
+    }
+}
+
+- (BOOL)isWalletEncrypted {
+    return [self callBooleanMethodWithName:"isWalletEncrypted" signature:"()Z"];
 }
 
 - (BOOL)encryptWalletWith:(NSString *)passwd
