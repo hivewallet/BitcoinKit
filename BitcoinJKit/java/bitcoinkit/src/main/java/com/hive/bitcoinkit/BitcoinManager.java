@@ -250,15 +250,17 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
 
     public void sendCoins(String amount, final String sendToAddressString, char[] utf16Password)
     {
+        KeyParameter aesKey = null;
         try
         {
             BigInteger aToSend = new BigInteger(amount);
             Address sendToAddress = new Address(networkParams, sendToAddressString);
-            Wallet.SendRequest request = Wallet.SendRequest.to(sendToAddress, aToSend);
+            final Wallet.SendRequest request = Wallet.SendRequest.to(sendToAddress, aToSend);
 
             if (utf16Password != null)
             {
-                request.aesKey = aesKeyForPassword(utf16Password);
+                aesKey = aesKeyForPassword(utf16Password);
+                request.aesKey = aesKey;
             }
 
             final Wallet.SendResult sendResult = wallet.sendCoins(peerGroup, request);
@@ -266,13 +268,14 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
             {
                 public void onSuccess(Transaction transaction)
                 {
+                    wipeAesKey(request.aesKey);
                     onTransactionSuccess(sendResult.tx.getHashAsString());
                     onTransactionChanged(sendResult.tx.getHashAsString());
                 }
 
                 public void onFailure(Throwable throwable)
                 {
-
+                    wipeAesKey(request.aesKey);
                     onTransactionFailed();
                     throwable.printStackTrace();
                 }
@@ -280,6 +283,7 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         }
         catch (Exception e)
         {
+            wipeAesKey(aesKey);
             onTransactionFailed();
         }
     }
@@ -303,6 +307,14 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         finally
         {
             Arrays.fill(utf16Password, '\0');
+        }
+    }
+
+    private void wipeAesKey(KeyParameter aesKey)
+    {
+        if (aesKey != null)
+        {
+            Arrays.fill(aesKey.getKey(), (byte) 0);
         }
     }
 
@@ -384,7 +396,14 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
     {
         KeyCrypterScrypt keyCrypter = createNewKeyCryptor();
         KeyParameter aesKey = deriveKeyAndWipePassword(utf16Password, keyCrypter);
-        wallet.encrypt(keyCrypter, aesKey);
+        try
+        {
+            wallet.encrypt(keyCrypter, aesKey);
+        }
+        finally
+        {
+            wipeAesKey(aesKey);
+        }
     }
 
     private KeyCrypterScrypt createNewKeyCryptor()
