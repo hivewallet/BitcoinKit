@@ -764,6 +764,10 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     }
 }
 
+- (BOOL)isWalletEncrypted {
+    return [self callBooleanMethodWithName:"isWalletEncrypted" signature:"()Z"];
+}
+
 - (BOOL)encryptWalletWith:(NSString *)passwd
 {
     return NO;

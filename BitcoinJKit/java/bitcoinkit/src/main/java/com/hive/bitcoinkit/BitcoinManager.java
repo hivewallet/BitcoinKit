@@ -463,6 +463,11 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         peerGroup.startBlockChainDownload(this);
     }
 
+    public boolean isWalletEncrypted()
+    {
+        return wallet.getKeys().get(0).isEncrypted();
+    }
+
     public void uncaughtException(Thread thread, Throwable exception)
     {
         onException(exception);
