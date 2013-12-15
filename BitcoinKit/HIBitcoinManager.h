@@ -107,6 +107,14 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;
  */
 - (BOOL)start:(NSError **)error;
 
+/**
+ * Creates a new unprotected wallet.
+ *
+ * Only call this if start returned kHIBitcoinManagerNoWallet.
+ * It will fail if a wallet already exists.
+ */
+- (void)createWallet:(NSError **)error;
+
 /** Stops the manager and stores all up-to-date information in data folder
  *
  * One should stop the manager only once. At the shutdown procedure.

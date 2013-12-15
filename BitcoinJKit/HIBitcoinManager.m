@@ -322,6 +322,14 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     {
         return kHIIllegalArgumentException;
     }
+    else if ([exceptionClass isEqual:@"com.hive.bitcoinkit.NoWalletException"])
+    {
+        return kHIBitcoinManagerNoWallet;
+    }
+    else if ([exceptionClass isEqual:@"com.hive.bitcoinkit.ExistingWalletException"])
+    {
+        return kHIBitcoinManagerWalletExists;
+    }
     else
     {
         return kHIBitcoinManagerUnexpectedError;
@@ -519,11 +527,25 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
     // We're ready! Let's start
     [self callVoidMethodWithName:"start" error:error signature:"()V"];
-    if (*error)
+    if (!*error)
     {
-        return NO;
+        [self didStart];
     }
+    return !*error;
+}
 
+- (void)createWallet:(NSError **)error
+{
+    *error = nil;
+    [self callVoidMethodWithName:"createWallet" error:error signature:"()V"];
+    if (!*error)
+    {
+        [self didStart];
+    }
+}
+
+- (void)didStart
+{
     [self willChangeValueForKey:@"isRunning"];
     _isRunning = YES;
     [self didChangeValueForKey:@"isRunning"];
@@ -532,8 +554,6 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
     [self willChangeValueForKey:@"walletAddress"];
     [self didChangeValueForKey:@"walletAddress"];
-
-    return YES;
 }
 
 - (NSString *)walletAddress

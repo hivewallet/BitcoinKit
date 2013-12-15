@@ -7,13 +7,16 @@ import com.google.bitcoin.params.RegTestParams;
 import com.google.bitcoin.params.TestNet3Params;
 import com.google.bitcoin.script.Script;
 import com.google.bitcoin.store.BlockStore;
+import com.google.bitcoin.store.BlockStoreException;
 import com.google.bitcoin.store.SPVBlockStore;
+import com.google.bitcoin.store.UnreadableWalletException;
 import com.google.bitcoin.utils.Threading;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.text.SimpleDateFormat;
@@ -286,29 +289,47 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         }
     }
 
-    public void start() throws Exception
+    public void start() throws NoWalletException, UnreadableWalletException, IOException, BlockStoreException
     {
         if (networkParams == null)
         {
             setTestingNetwork(false);
         }
 
-        File chainFile = new File(dataDirectory + "/bitcoinkit.spvchain");
-
         // Try to read the wallet from storage, create a new one if not possible.
         wallet = null;
         walletFile = new File(dataDirectory + "/bitcoinkit.wallet");
 
-        if (walletFile.exists())
+        if (!walletFile.exists())
         {
-            wallet = Wallet.loadFromFile(walletFile);
+            // Stop here, because the caller might want to create an encrypted wallet and needs to supply a password.
+            throw new NoWalletException("No wallet file found at: " + walletFile);
         }
-        else
+
+        useWallet(Wallet.loadFromFile(walletFile));
+    }
+
+    public void createWallet() throws IOException, BlockStoreException, ExistingWalletException
+    {
+        if (walletFile == null)
         {
-            wallet = new Wallet(networkParams);
-            wallet.addKey(new ECKey());
-            wallet.saveToFile(walletFile);
+            throw new IllegalStateException("createWallet cannot be called before start");
         }
+        else if (walletFile.exists())
+        {
+            throw new ExistingWalletException("Trying to create a wallet even though one exists: " + walletFile);
+        }
+
+        Wallet wallet = new Wallet(networkParams);
+        wallet.addKey(new ECKey());
+        wallet.saveToFile(walletFile);
+
+        useWallet(wallet);
+    }
+
+    private void useWallet(Wallet wallet) throws BlockStoreException, IOException
+    {
+        this.wallet = wallet;
 
         //make wallet autosave
         wallet.autosaveToFile(walletFile, 1, TimeUnit.SECONDS, null);
@@ -318,6 +339,7 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         ECKey key = wallet.getKeys().iterator().next();
 
         // Load the block chain, if there is one stored locally. If it's going to be freshly created, checkpoint it.
+        File chainFile = new File(dataDirectory + "/bitcoinkit.spvchain");
         boolean chainExistedAlready = chainFile.exists();
         blockStore = new SPVBlockStore(networkParams, chainFile);
         if (!chainExistedAlready)
@@ -382,7 +404,6 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         onBalanceChanged();
 
         peerGroup.startBlockChainDownload(this);
-
     }
 
     public void uncaughtException(Thread thread, Throwable exception)

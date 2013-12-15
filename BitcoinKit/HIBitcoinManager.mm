@@ -165,6 +165,11 @@ static void NotifyTransactionChanged(HIBitcoinManager *manager, CWallet *wallet,
     return YES;
 }
 
+- (void)createWallet:(NSError **)error
+{
+    // FIXME
+}
+
 - (void)stop
 {
     if (!_isRunning)
