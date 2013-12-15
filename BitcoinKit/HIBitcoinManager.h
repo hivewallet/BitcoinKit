@@ -189,7 +189,11 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;
  * @param complection Completion block where notification about created transaction hash will be sent
  *
  */
-- (void)sendCoins:(uint64_t)coins toRecipient:(NSString *)recipient comment:(NSString *)comment completion:(void(^)(NSString *hash))completion;
+- (void)sendCoins:(uint64_t)coins
+      toRecipient:(NSString *)recipient
+          comment:(NSString *)comment
+         password:(NSData *)password
+       completion:(void(^)(NSString *hash))completion;
 
 /** Encrypts wallet with given passphrase
  *

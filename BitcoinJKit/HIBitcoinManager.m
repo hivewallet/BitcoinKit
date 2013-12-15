@@ -729,6 +729,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 - (void)sendCoins:(uint64_t)coins
       toRecipient:(NSString *)recipient
           comment:(NSString *)comment
+         password:(NSData *)password
        completion:(void(^)(NSString *hash))completion
 {
     if (_sending)
@@ -745,10 +746,22 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
     [sendCompletionBlock release];
     sendCompletionBlock = [completion copy];
-    
-    [self callVoidMethodWithName:"sendCoins" error:NULL signature:"(Ljava/lang/String;Ljava/lang/String;)V",
-     JStringFromNSString(_jniEnv, [NSString stringWithFormat:@"%lld", coins]),
-     JStringFromNSString(_jniEnv, recipient)];
+
+    jstring jAmount = JStringFromNSString(_jniEnv, [NSString stringWithFormat:@"%lld", coins]);
+    jstring jRecipient = JStringFromNSString(_jniEnv, recipient);
+    if (password)
+    {
+        jarray jPassword = JCharArrayFromNSData(_jniEnv, password);
+        [self callVoidMethodWithName:"sendCoins"
+                               error:NULL
+                           signature:"(Ljava/lang/String;Ljava/lang/String;[C)V", jAmount, jRecipient, jPassword];
+    }
+    else
+    {
+        [self callVoidMethodWithName:"sendCoins"
+                               error:NULL
+                           signature:"(Ljava/lang/String;Ljava/lang/String;)V", jAmount, jRecipient];
+    }
 }
 
 - (BOOL)encryptWalletWith:(NSString *)passwd

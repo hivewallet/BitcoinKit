@@ -1,6 +1,7 @@
 package com.hive.bitcoinkit;
 
 import com.google.bitcoin.core.*;
+import com.google.bitcoin.crypto.KeyCrypter;
 import com.google.bitcoin.crypto.KeyCrypterScrypt;
 import com.google.bitcoin.discovery.DnsDiscovery;
 import com.google.bitcoin.params.MainNetParams;
@@ -243,11 +244,23 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
 
     public void sendCoins(String amount, final String sendToAddressString)
     {
+        sendCoins(amount, sendToAddressString, null);
+    }
+
+    public void sendCoins(String amount, final String sendToAddressString, char[] utf16Password)
+    {
         try
         {
             BigInteger aToSend = new BigInteger(amount);
             Address sendToAddress = new Address(networkParams, sendToAddressString);
-            final Wallet.SendResult sendResult = wallet.sendCoins(peerGroup, sendToAddress, aToSend);
+            Wallet.SendRequest request = Wallet.SendRequest.to(sendToAddress, aToSend);
+
+            if (utf16Password != null)
+            {
+                request.aesKey = aesKeyForPassword(utf16Password);
+            }
+
+            final Wallet.SendResult sendResult = wallet.sendCoins(peerGroup, request);
             Futures.addCallback(sendResult.broadcastComplete, new FutureCallback<Transaction>()
             {
                 public void onSuccess(Transaction transaction)
@@ -268,6 +281,16 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         {
             onTransactionFailed();
         }
+    }
+
+    private KeyParameter aesKeyForPassword(char[] utf16Password) throws WrongPasswordException
+    {
+        KeyCrypter keyCrypter = wallet.getKeyCrypter();
+        if (keyCrypter == null)
+        {
+            throw new WrongPasswordException("Wallet is not protected.");
+        }
+        return keyCrypter.deriveKey(CharBuffer.wrap(utf16Password));
     }
 
     public String getExceptionStackTrace(Throwable exception)
