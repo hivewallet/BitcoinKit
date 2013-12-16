@@ -757,6 +757,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
     jstring jAmount = JStringFromNSString(_jniEnv, [NSString stringWithFormat:@"%lld", coins]);
     jstring jRecipient = JStringFromNSString(_jniEnv, recipient);
+    *error = nil;
     if (password)
     {
         jarray jPassword = JCharArrayFromNSData(_jniEnv, password);
@@ -769,6 +770,10 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
         [self callVoidMethodWithName:"sendCoins"
                                error:error
                            signature:"(Ljava/lang/String;Ljava/lang/String;)V", jAmount, jRecipient];
+    }
+    if (*error)
+    {
+        [self endSending];
     }
 }
 
@@ -875,31 +880,29 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 - (void)onTransactionSucceeded:(NSString *)txid
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        _sending = NO;
-
         if (sendCompletionBlock)
         {
             sendCompletionBlock(txid);
         }
-
-        [sendCompletionBlock release];
-        sendCompletionBlock = nil;        
+        [self endSending];
     });
 }
 
 - (void)onTransactionFailed
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        _sending = NO;
-
         if (sendCompletionBlock)
         {
             sendCompletionBlock(nil);
         }
-
-        [sendCompletionBlock release];
-        sendCompletionBlock = nil;
+        [self endSending];
     });
+}
+
+- (void)endSending {
+    _sending = NO;
+    [sendCompletionBlock release];
+    sendCompletionBlock = nil;
 }
 
 @end
