@@ -15,17 +15,15 @@ import com.google.bitcoin.store.UnreadableWalletException;
 import com.google.bitcoin.utils.Threading;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
-import com.google.protobuf.ByteString;
-import org.bitcoinj.wallet.Protos;
 import org.spongycastle.crypto.params.KeyParameter;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.nio.CharBuffer;
-import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
@@ -360,7 +358,14 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
             throw new NoWalletException("No wallet file found at: " + walletFile);
         }
 
-        useWallet(Wallet.loadFromFile(walletFile));
+        try
+        {
+            useWallet(Wallet.loadFromFile(walletFile));
+        }
+        catch (FileNotFoundException e)
+        {
+            throw new NoWalletException("No wallet file found at: " + walletFile);
+        }
     }
 
     public void createWallet() throws IOException, BlockStoreException, ExistingWalletException
@@ -394,7 +399,7 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
 
     private void encryptWallet(char[] utf16Password, Wallet wallet)
     {
-        KeyCrypterScrypt keyCrypter = createNewKeyCryptor();
+        KeyCrypterScrypt keyCrypter = new KeyCrypterScrypt();
         KeyParameter aesKey = deriveKeyAndWipePassword(utf16Password, keyCrypter);
         try
         {
@@ -408,12 +413,7 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
 
     private KeyCrypterScrypt createNewKeyCryptor()
     {
-        byte[] salt = new byte[KeyCrypterScrypt.SALT_LENGTH];
-        new SecureRandom().nextBytes(salt);
-        Protos.ScryptParameters.Builder scryptParametersBuilder
-                = Protos.ScryptParameters.newBuilder().setSalt(ByteString.copyFrom(salt));
-        Protos.ScryptParameters scryptParameters = scryptParametersBuilder.build();
-        return new KeyCrypterScrypt(scryptParameters);
+        return new KeyCrypterScrypt();
     }
 
     private void useWallet(Wallet wallet) throws BlockStoreException, IOException

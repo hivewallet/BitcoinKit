@@ -121,7 +121,7 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;
  * Only call this if start returned kHIBitcoinManagerNoWallet.
  * It will fail if a wallet already exists.
  *
- * @param password The user password as an UTF8-encoded string.
+ * @param password The user password as an UTF-16-encoded string.
  */
 - (void)createWalletWithPassword:(NSData *)password
                            error:(NSError **)error;
