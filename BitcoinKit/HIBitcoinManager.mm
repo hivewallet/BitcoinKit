@@ -597,6 +597,7 @@ static void NotifyTransactionChanged(HIBitcoinManager *manager, CWallet *wallet,
       toRecipient:(NSString *)recipient
           comment:(NSString *)comment
          password:(NSData *)password
+            error:(NSError **)error
        completion:(void(^)(NSString *hash))completion
 {
     if (coins == 0 || coins > self.balance)

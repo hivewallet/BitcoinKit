@@ -337,6 +337,10 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     {
         return kHIBitcoinManagerWalletExists;
     }
+    else if ([exceptionClass isEqual:@"com.hive.bitcoinkit.WrongPasswordException"])
+    {
+        return kHIBitcoinManagerWalletExists;
+    }
     else
     {
         return kHIBitcoinManagerUnexpectedError;
@@ -733,6 +737,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
       toRecipient:(NSString *)recipient
           comment:(NSString *)comment
          password:(NSData *)password
+            error:(NSError **)error
        completion:(void(^)(NSString *hash))completion
 {
     if (_sending)
@@ -756,13 +761,13 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     {
         jarray jPassword = JCharArrayFromNSData(_jniEnv, password);
         [self callVoidMethodWithName:"sendCoins"
-                               error:NULL
+                               error:error
                            signature:"(Ljava/lang/String;Ljava/lang/String;[C)V", jAmount, jRecipient, jPassword];
     }
     else
     {
         [self callVoidMethodWithName:"sendCoins"
-                               error:NULL
+                               error:error
                            signature:"(Ljava/lang/String;Ljava/lang/String;)V", jAmount, jRecipient];
     }
 }

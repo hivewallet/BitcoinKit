@@ -17,3 +17,6 @@ extern NSInteger const kHIBitcoinManagerNoWallet;
 
 /* A wallet could not be created because it already exists. */
 extern NSInteger const kHIBitcoinManagerWalletExists;
+
+/* An operation could not be completed because a wrong password was specified. */
+extern NSInteger const kHIBitcoinManagerWalletExists;

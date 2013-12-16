@@ -2,6 +2,7 @@ package com.hive.bitcoinkit;
 
 import com.google.bitcoin.core.*;
 import com.google.bitcoin.crypto.KeyCrypter;
+import com.google.bitcoin.crypto.KeyCrypterException;
 import com.google.bitcoin.crypto.KeyCrypterScrypt;
 import com.google.bitcoin.discovery.DnsDiscovery;
 import com.google.bitcoin.params.MainNetParams;
@@ -241,12 +242,13 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         return Transaction.REFERENCE_DEFAULT_MIN_TX_FEE.toString();
     }
 
-    public void sendCoins(String amount, final String sendToAddressString)
+    public void sendCoins(String amount, final String sendToAddressString) throws WrongPasswordException
     {
         sendCoins(amount, sendToAddressString, null);
     }
 
     public void sendCoins(String amount, final String sendToAddressString, char[] utf16Password)
+            throws WrongPasswordException
     {
         KeyParameter aesKey = null;
         try
@@ -278,6 +280,11 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
                     throwable.printStackTrace();
                 }
             });
+        }
+        catch (KeyCrypterException e)
+        {
+            wipeAesKey(aesKey);
+            throw new WrongPasswordException(e);
         }
         catch (Exception e)
         {

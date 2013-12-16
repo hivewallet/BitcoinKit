@@ -193,6 +193,7 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;
       toRecipient:(NSString *)recipient
           comment:(NSString *)comment
          password:(NSData *)password
+            error:(NSError **)error
        completion:(void(^)(NSString *hash))completion;
 
 /** Encrypts wallet with given passphrase
