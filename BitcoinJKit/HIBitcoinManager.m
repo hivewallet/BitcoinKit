@@ -465,7 +465,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
         NSString *debugOptionString =
             [NSString stringWithFormat:@"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=%s", debugPort];
         if (doDebug) {
-            options[numOptions - 1].optionString = [debugOptionString UTF8String];
+            options[numOptions - 1].optionString = (char *)[debugOptionString UTF8String];
         }
 #endif
 
@@ -475,7 +475,10 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
         _vmArgs.options = options;
 
         JavaVM *vm;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated"
         JNI_CreateJavaVM(&vm, (void *) &_jniEnv, &_vmArgs);
+#pragma clang diagnostic pop
 
 #ifdef DEBUG
         // Optionally wait here to give the Java debugger a chance to attach before anything happens.
@@ -561,7 +564,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
                            error:error
                        signature:"([C)V", charArray];
 
-    [self zeroCharArray:charArray size:password.length / sizeof(jchar)];
+    [self zeroCharArray:charArray size:(jsize)(password.length / sizeof(jchar))];
 
     if (!*error)
     {
@@ -570,8 +573,8 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 }
 
 - (void)zeroCharArray:(jarray)charArray size:(jsize)size {
-    const char *zero[size];
-    memset(zero, 0, size);
+    jchar zero[size];
+    memset(zero, 0, size * sizeof(jchar));
     (*_jniEnv)->SetCharArrayRegion(_jniEnv, charArray, 0, size, zero);
 }
 
