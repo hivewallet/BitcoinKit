@@ -418,11 +418,6 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         }
     }
 
-    private KeyCrypterScrypt createNewKeyCryptor()
-    {
-        return new KeyCrypterScrypt();
-    }
-
     private void useWallet(Wallet wallet) throws BlockStoreException, IOException
     {
         this.wallet = wallet;
