@@ -542,11 +542,12 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
     // We're ready! Let's start
     [self callVoidMethodWithName:"start" error:error signature:"()V"];
-    if (!*error)
+    if (!error || !*error)
     {
         [self didStart];
+        return YES;
     }
-    return !*error;
+    return NO;
 }
 
 - (void)createWallet:(NSError **)error

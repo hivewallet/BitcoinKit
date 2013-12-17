@@ -20,6 +20,7 @@
 @property (weak) IBOutlet NSButton *sendMoneyBtn;
 @property (weak) IBOutlet NSButton *importBtn;
 @property (weak) IBOutlet NSButton *exportBtn;
+
 - (IBAction)sendMoneyClicked:(NSButton *)sender;
 - (IBAction)exportWalletClicked:(NSButton *)sender;
 - (IBAction)importWalletClicked:(NSButton *)sender;
