@@ -519,7 +519,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
     // We're ready! Let's start
     [self callVoidMethodWithName:"start" error:error signature:"()V"];
-    if (*error)
+    if (error && *error)
     {
         return NO;
     }
