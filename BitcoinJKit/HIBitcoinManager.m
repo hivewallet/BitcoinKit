@@ -10,6 +10,7 @@
 
 #import "HIBitcoinErrorCodes.h"
 #import "HIBitcoinInternalErrorCodes.h"
+#import "HILogger.h"
 #import <JavaVM/jni.h>
 
 @interface HIBitcoinManager ()
@@ -489,7 +490,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
         const char *debugDelay = getenv("HIVE_JAVA_DEBUG_DELAY");
         if (doDebug && debugDelay && debugDelay[0]) {
             long seconds = strtol(debugDelay, NULL, 10);
-            NSLog(@"Waiting %ld seconds for Java debugger to connect...", seconds);
+            HILogDebug(@"Waiting %ld seconds for Java debugger to connect...", seconds);
             sleep((int)seconds);
         }
 #endif

@@ -7,3 +7,4 @@
 //
 
 #import <BitcoinJKit/HIBitcoinManager.h>
+#import <BitcoinJKit/HILogger.h>
