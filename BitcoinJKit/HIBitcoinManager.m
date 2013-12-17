@@ -340,7 +340,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     }
     else if ([exceptionClass isEqual:@"com.hive.bitcoinkit.WrongPasswordException"])
     {
-        return kHIBitcoinManagerWalletExists;
+        return kHIBitcoinManagerWrongPassword;
     }
     else
     {

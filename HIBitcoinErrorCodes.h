@@ -19,4 +19,4 @@ extern NSInteger const kHIBitcoinManagerNoWallet;
 extern NSInteger const kHIBitcoinManagerWalletExists;
 
 /* An operation could not be completed because a wrong password was specified. */
-extern NSInteger const kHIBitcoinManagerWalletExists;
+extern NSInteger const kHIBitcoinManagerWrongPassword;
