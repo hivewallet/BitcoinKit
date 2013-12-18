@@ -9,18 +9,16 @@
 #import <Foundation/Foundation.h>
 
 typedef NS_ENUM(int, HILoggerLevel) {
-    HILoggerLevelVerbose = 1,
-    HILoggerLevelDebug = 2,
-    HILoggerLevelInfo = 3,
-    HILoggerLevelWarn = 4,
-    HILoggerLevelError = 5,
+    HILoggerLevelDebug = 1,
+    HILoggerLevelInfo = 2,
+    HILoggerLevelWarn = 3,
+    HILoggerLevelError = 4,
 };
 
 #define HILogError(...)   [[HILogger sharedLogger] logWithLevel:HILoggerLevelError message:__VA_ARGS__]
 #define HILogWarn(...)    [[HILogger sharedLogger] logWithLevel:HILoggerLevelWarn message:__VA_ARGS__]
 #define HILogInfo(...)    [[HILogger sharedLogger] logWithLevel:HILoggerLevelInfo message:__VA_ARGS__]
 #define HILogDebug(...)   [[HILogger sharedLogger] logWithLevel:HILoggerLevelDebug message:__VA_ARGS__]
-#define HILogVerbose(...) [[HILogger sharedLogger] logWithLevel:HILoggerLevelVerbose message:__VA_ARGS__]
 
 @interface HILogger : NSObject
 
