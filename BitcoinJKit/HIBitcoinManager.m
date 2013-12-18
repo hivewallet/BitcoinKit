@@ -578,6 +578,25 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     }
 }
 
+- (void)changeWalletPassword:(NSData *)fromPassword
+                  toPassword:(NSData *)toPassword
+                       error:(NSError **)error
+{
+
+    jarray fromCharArray = fromPassword ? JCharArrayFromNSData(_jniEnv, fromPassword) : NULL;
+    jarray toCharArray = JCharArrayFromNSData(_jniEnv, toPassword);
+
+    [self callVoidMethodWithName:"changeWalletPassword"
+                           error:error
+                       signature:"([C[C)V", fromCharArray, toCharArray];
+
+    if (fromCharArray)
+    {
+        [self zeroCharArray:fromCharArray size:(jsize)(fromPassword.length / sizeof(jchar))];
+    }
+    [self zeroCharArray:toCharArray size:(jsize)(toPassword.length / sizeof(jchar))];
+}
+
 - (void)zeroCharArray:(jarray)charArray size:(jsize)size {
     jchar zero[size];
     memset(zero, 0, size * sizeof(jchar));

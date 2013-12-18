@@ -126,6 +126,16 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;
 - (void)createWalletWithPassword:(NSData *)password
                            error:(NSError **)error;
 
+/** Changes the wallet's password.
+ *
+ * @param fromPassword The current wallet password as an UTF-16-encoded string.
+ * @param toPassword The new wallet password as an UTF-16-encoded string.
+ * @param error A pointer to an error object (or NULL to throw an exception on errors)
+ */
+- (void)changeWalletPassword:(NSData *)fromPassword
+                  toPassword:(NSData *)toPassword
+                       error:(NSError **)error;
+
 /** Stops the manager and stores all up-to-date information in data folder
  *
  * One should stop the manager only once. At the shutdown procedure.

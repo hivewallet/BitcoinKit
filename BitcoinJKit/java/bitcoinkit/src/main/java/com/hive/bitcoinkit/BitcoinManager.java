@@ -404,6 +404,32 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         useWallet(wallet);
     }
 
+    public void changeWalletPassword(char[] oldUtf16Password, char[] newUtf16Password) throws WrongPasswordException
+    {
+        if (isWalletEncrypted())
+        {
+            decryptWallet(oldUtf16Password);
+        }
+        encryptWallet(newUtf16Password, wallet);
+    }
+
+    private void decryptWallet(char[] oldUtf16Password) throws WrongPasswordException
+    {
+        KeyParameter oldAesKey = aesKeyForPassword(oldUtf16Password);
+        try
+        {
+            wallet.decrypt(oldAesKey);
+        }
+        catch (KeyCrypterException e)
+        {
+            throw new WrongPasswordException(e);
+        }
+        finally
+        {
+            wipeAesKey(oldAesKey);
+        }
+    }
+
     private void encryptWallet(char[] utf16Password, Wallet wallet)
     {
         KeyCrypterScrypt keyCrypter = new KeyCrypterScrypt();
