@@ -115,6 +115,13 @@ JNIEXPORT void JNICALL onException(JNIEnv *env, jobject thisobject, jthrowable j
     [pool release];
 }
 
+JNIEXPORT void JNICALL receiveLogFromJVM(JNIEnv *env, jobject thisobject, jint level, jstring msg)
+{
+    NSAutoreleasePool *pool = [NSAutoreleasePool new];
+    [[HILogger sharedLogger] logWithLevel:level message:NSStringFromJString(env, msg)];
+    [pool release];
+}
+
 
 static JNINativeMethod methods[] = {
     {"onBalanceChanged",        "()V",                                     (void *)&onBalanceChanged},
@@ -499,6 +506,10 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
         _managerClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];
         (*_jniEnv)->RegisterNatives(_jniEnv, _managerClass, methods, sizeof(methods)/sizeof(methods[0]));
 
+        jclass loggerClass = [self jClassForClass:@"org/slf4j/impl/CocoaLogger"];
+        JNINativeMethod loggerMethod = { "receiveLogFromJVM", "(ILjava/lang/String;)V", (void *)&receiveLogFromJVM };
+        (*_jniEnv)->RegisterNatives(_jniEnv, loggerClass, &loggerMethod, 1);
+
         jmethodID constructorMethod = [self jMethodWithName:"<init>" signature:"()V"];
         _managerObject = (*_jniEnv)->NewObject(_jniEnv, _managerClass, constructorMethod);
 
@@ -507,6 +518,9 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
                                                          selector:@selector(checkBalance:)
                                                          userInfo:nil
                                                           repeats:YES];
+
+        // this is the same as default log level in default (JDK) logger, i.e. before adding CocoaLogger
+        [self setLogLevel:HILoggerLevelInfo];
     }
 
     return self;
@@ -858,6 +872,23 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 - (NSUInteger)transactionCount
 {
     return [self callIntegerMethodWithName:"getTransactionCount" signature:"()I"];
+}
+
+- (void)setLogLevel:(HILoggerLevel)level
+{
+    jclass loggerClass = [self jClassForClass:@"org/slf4j/impl/CocoaLogger"];
+    jmethodID method = (*_jniEnv)->GetStaticMethodID(_jniEnv, loggerClass, "setLevel", "(I)V");
+
+    if (!method)
+    {
+        @throw [NSException exceptionWithName:@"Java exception"
+                                       reason:@"Method not found: setLevel"
+                                     userInfo:nil];
+    }
+
+    (*_jniEnv)->CallStaticVoidMethod(_jniEnv, loggerClass, method, level);
+
+    [self handleJavaExceptions:NULL];
 }
 
 
