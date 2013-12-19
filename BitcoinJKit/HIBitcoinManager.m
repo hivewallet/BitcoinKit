@@ -115,10 +115,17 @@ JNIEXPORT void JNICALL onException(JNIEnv *env, jobject thisobject, jthrowable j
     [pool release];
 }
 
-JNIEXPORT void JNICALL receiveLogFromJVM(JNIEnv *env, jobject thisobject, jint level, jstring msg)
+JNIEXPORT void JNICALL receiveLogFromJVM(JNIEnv *env, jobject thisobject, jstring fileName, jstring methodName,
+                                         int lineNumber, jint level, jstring msg)
 {
     NSAutoreleasePool *pool = [NSAutoreleasePool new];
-    HILoggerLog("JVM", "jvm", 0, level, NSStringFromJString(env, msg));
+    const char *fileNameString = (*env)->GetStringUTFChars(env, fileName, NULL);
+    const char *methodNameString = (*env)->GetStringUTFChars(env, methodName, NULL);
+
+    HILoggerLog(fileNameString, methodNameString, lineNumber, level, NSStringFromJString(env, msg));
+
+    (*env)->ReleaseStringUTFChars(env, fileName, fileNameString);
+    (*env)->ReleaseStringUTFChars(env, methodName, methodNameString);
     [pool release];
 }
 
@@ -506,8 +513,12 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
         _managerClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];
         (*_jniEnv)->RegisterNatives(_jniEnv, _managerClass, methods, sizeof(methods)/sizeof(methods[0]));
 
+        JNINativeMethod loggerMethod;
+        loggerMethod.name = "receiveLogFromJVM";
+        loggerMethod.signature = "(Ljava/lang/String;Ljava/lang/String;IILjava/lang/String;)V";
+        loggerMethod.fnPtr = &receiveLogFromJVM;
+
         jclass loggerClass = [self jClassForClass:@"org/slf4j/impl/CocoaLogger"];
-        JNINativeMethod loggerMethod = { "receiveLogFromJVM", "(ILjava/lang/String;)V", (void *)&receiveLogFromJVM };
         (*_jniEnv)->RegisterNatives(_jniEnv, loggerClass, &loggerMethod, 1);
 
         jmethodID constructorMethod = [self jMethodWithName:"<init>" signature:"()V"];

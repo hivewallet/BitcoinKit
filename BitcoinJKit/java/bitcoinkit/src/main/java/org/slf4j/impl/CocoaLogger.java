@@ -276,19 +276,33 @@ public class CocoaLogger extends MarkerIgnoringBase implements Logger
 
     private void log(String callerFQCN, int level, String msg, Throwable t)
     {
+        String fileName = null;
+        String methodName = null;
+        int lineNumber = 0;
+
+        StackTraceElement callerData = getCallerData(callerFQCN);
+        if (callerData != null)
+        {
+            fileName = callerData.getFileName();
+            lineNumber = callerData.getLineNumber();
+
+            String className = callerData.getClassName().replaceAll(".*\\.", "");
+            methodName = "[" + className + " " + callerData.getMethodName() + "]";
+        }
+
         if (msg != null)
         {
-            receiveLogFromJVM(level, msg);
+            receiveLogFromJVM(fileName, methodName, lineNumber, level, msg);
         }
 
         if (t != null)
         {
-            receiveLogFromJVM(level, "Exception logged: " + t);
+            receiveLogFromJVM(fileName, methodName, lineNumber, level, "Exception logged: " + t);
         }
     }
 
     // TODO
-    private String[] getCallerData(String callerFQCN)
+    private StackTraceElement getCallerData(String callerFQCN)
     {
         StackTraceElement[] steArray = new Throwable().getStackTrace();
 
@@ -316,8 +330,7 @@ public class CocoaLogger extends MarkerIgnoringBase implements Logger
 
         if (found != -1)
         {
-            StackTraceElement ste = steArray[found];
-            return new String[] { ste.getClassName(), ste.getMethodName() };
+            return steArray[found];
         }
         else
         {
@@ -325,5 +338,5 @@ public class CocoaLogger extends MarkerIgnoringBase implements Logger
         }
     }
 
-    public native void receiveLogFromJVM(int level, String msg);
+    public native void receiveLogFromJVM(String fileName, String methodName, int lineNumber, int level, String msg);
 }
