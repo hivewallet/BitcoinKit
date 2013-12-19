@@ -122,7 +122,7 @@ JNIEXPORT void JNICALL receiveLogFromJVM(JNIEnv *env, jobject thisobject, jstrin
     const char *fileNameString = (*env)->GetStringUTFChars(env, fileName, NULL);
     const char *methodNameString = (*env)->GetStringUTFChars(env, methodName, NULL);
 
-    HILoggerLog(fileNameString, methodNameString, lineNumber, level, NSStringFromJString(env, msg));
+    HILoggerLog(fileNameString, methodNameString, lineNumber, level, @"%@", NSStringFromJString(env, msg));
 
     (*env)->ReleaseStringUTFChars(env, fileName, fileNameString);
     (*env)->ReleaseStringUTFChars(env, methodName, methodNameString);

@@ -16,7 +16,7 @@ typedef NS_ENUM(int, HILoggerLevel) {
 };
 
 extern void HILoggerLog(const char *fileName, const char *functionName, int lineNumber,
-                        HILoggerLevel level, NSString *message, ...);
+                        HILoggerLevel level, NSString *message, ...) NS_FORMAT_FUNCTION(5, 6);
 
 #define HILogError(...)   HILoggerLog(__FILE__, __FUNCTION__, __LINE__, HILoggerLevelError, __VA_ARGS__)
 #define HILogWarn(...)    HILoggerLog(__FILE__, __FUNCTION__, __LINE__, HILoggerLevelWarn, __VA_ARGS__)
