@@ -8,6 +8,17 @@
 
 #import "HILogger.h"
 
+void HILoggerLog(const char *fileName, const char *functionName, int lineNumber,
+                 HILoggerLevel level, NSString *message, ...) {
+    va_list args;
+    va_start(args, message);
+    NSString *logText = [[NSString alloc] initWithFormat:message arguments:args];
+    va_end(args);
+
+    HILogger *logger = [HILogger sharedLogger];
+    logger.logHandler(fileName, functionName, lineNumber, level, logText);
+}
+
 @implementation HILogger
 
 + (HILogger *)sharedLogger {
@@ -17,22 +28,14 @@
     if (!sharedLogger) {
         dispatch_once(&oncePredicate, ^{
             sharedLogger = [[self alloc] init];
-            sharedLogger.logHandler = ^(HILoggerLevel level, NSString *message) {
+            sharedLogger.logHandler = ^(const char *fileName, const char *functionName, int lineNumber,
+                                        HILoggerLevel level, NSString *message) {
                 NSLog(@"%@", message);
             };
         });
     }
 
     return sharedLogger;
-}
-
-- (void)logWithLevel:(HILoggerLevel)level message:(NSString *)message, ... {
-    va_list args;
-    va_start(args, message);
-    NSString *logText = [[NSString alloc] initWithFormat:message arguments:args];
-    va_end(args);
-
-    self.logHandler(level, logText);
 }
 
 @end

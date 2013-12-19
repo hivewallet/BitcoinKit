@@ -118,7 +118,7 @@ JNIEXPORT void JNICALL onException(JNIEnv *env, jobject thisobject, jthrowable j
 JNIEXPORT void JNICALL receiveLogFromJVM(JNIEnv *env, jobject thisobject, jint level, jstring msg)
 {
     NSAutoreleasePool *pool = [NSAutoreleasePool new];
-    [[HILogger sharedLogger] logWithLevel:level message:NSStringFromJString(env, msg)];
+    HILoggerLog("JVM", "jvm", 0, level, NSStringFromJString(env, msg));
     [pool release];
 }
 

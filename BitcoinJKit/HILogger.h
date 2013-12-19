@@ -15,16 +15,20 @@ typedef NS_ENUM(int, HILoggerLevel) {
     HILoggerLevelError = 4,
 };
 
-#define HILogError(...)   [[HILogger sharedLogger] logWithLevel:HILoggerLevelError message:__VA_ARGS__]
-#define HILogWarn(...)    [[HILogger sharedLogger] logWithLevel:HILoggerLevelWarn message:__VA_ARGS__]
-#define HILogInfo(...)    [[HILogger sharedLogger] logWithLevel:HILoggerLevelInfo message:__VA_ARGS__]
-#define HILogDebug(...)   [[HILogger sharedLogger] logWithLevel:HILoggerLevelDebug message:__VA_ARGS__]
+extern void HILoggerLog(const char *fileName, const char *functionName, int lineNumber,
+                        HILoggerLevel level, NSString *message, ...);
+
+#define HILogError(...)   HILoggerLog(__FILE__, __FUNCTION__, __LINE__, HILoggerLevelError, __VA_ARGS__)
+#define HILogWarn(...)    HILoggerLog(__FILE__, __FUNCTION__, __LINE__, HILoggerLevelWarn, __VA_ARGS__)
+#define HILogInfo(...)    HILoggerLog(__FILE__, __FUNCTION__, __LINE__, HILoggerLevelInfo, __VA_ARGS__)
+#define HILogDebug(...)   HILoggerLog(__FILE__, __FUNCTION__, __LINE__, HILoggerLevelDebug, __VA_ARGS__)
+
 
 @interface HILogger : NSObject
 
-@property (strong) void (^logHandler)(HILoggerLevel level, NSString *message);
+@property (strong) void (^logHandler)(const char *fileName, const char *functionName, int lineNumber,
+                                      HILoggerLevel level, NSString *message);
 
 + (instancetype)sharedLogger;
-- (void)logWithLevel:(HILoggerLevel)level message:(NSString *)message, ...;
 
 @end
