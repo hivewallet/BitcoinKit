@@ -569,18 +569,22 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
     // We're ready! Let's start
     [self callVoidMethodWithName:"start" error:error signature:"()V"];
+
     if (!error || !*error)
     {
         [self didStart];
         return YES;
     }
+
     return NO;
 }
 
 - (void)createWallet:(NSError **)error
 {
     *error = nil;
+
     [self callVoidMethodWithName:"createWallet" error:error signature:"()V"];
+
     if (!*error)
     {
         [self didStart];
@@ -609,7 +613,6 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
                   toPassword:(NSData *)toPassword
                        error:(NSError **)error
 {
-
     jarray fromCharArray = fromPassword ? JCharArrayFromNSData(_jniEnv, fromPassword) : NULL;
     jarray toCharArray = JCharArrayFromNSData(_jniEnv, toPassword);
 
@@ -621,6 +624,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     {
         [self zeroCharArray:fromCharArray size:(jsize)(fromPassword.length / sizeof(jchar))];
     }
+
     [self zeroCharArray:toCharArray size:(jsize)(toPassword.length / sizeof(jchar))];
 }
 
@@ -819,6 +823,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
                                error:error
                            signature:"(Ljava/lang/String;Ljava/lang/String;)V", jAmount, jRecipient];
     }
+
     if (*error)
     {
         [self endSending];
@@ -949,6 +954,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
         {
             sendCompletionBlock(txid);
         }
+
         [self endSending];
     });
 }
@@ -960,6 +966,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
         {
             sendCompletionBlock(nil);
         }
+
         [self endSending];
     });
 }
