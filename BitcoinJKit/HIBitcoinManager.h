@@ -206,20 +206,12 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;
             error:(NSError **)error
        completion:(void(^)(NSString *hash))completion;
 
-/** Exports wallet to given file URL
+/** Exports (backs up) the wallet to given file URL.
  *
- * @param exportURL NSURL to local file where wallet should be dumped to
+ * @param exportURL NSURL to local file where the wallet file should be copied to
+ * @param error reference to error variable where error info will be written if backup fails
  *
- * @returns YES if dump was successful. NO - otherwise
  */
-- (BOOL)exportWalletTo:(NSURL *)exportURL;
-
-/** Import wallet from given file URL
- *
- * @param importURL NSURL to local file from which to import wallet data
- *
- * @returns YES if import was successful. NO - otherwise
- */
-- (BOOL)importWalletFrom:(NSURL *)importURL;
+- (void)exportWalletTo:(NSURL *)exportURL error:(NSError **)error;
 
 @end

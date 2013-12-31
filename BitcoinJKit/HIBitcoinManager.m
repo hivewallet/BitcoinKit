@@ -834,14 +834,10 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     return [self callBooleanMethodWithName:"isWalletEncrypted" signature:"()Z"];
 }
 
-- (BOOL)exportWalletTo:(NSURL *)exportURL
+- (void)exportWalletTo:(NSURL *)exportURL error:(NSError **)error
 {
-    return NO;
-}
-
-- (BOOL)importWalletFrom:(NSURL *)importURL
-{
-    return NO;
+    jstring path = JStringFromNSString(_jniEnv, exportURL.path);
+    [self callVoidMethodWithName:"exportWallet" error:error signature:"(Ljava/lang/String;)V", path];
 }
 
 - (uint64_t)balance

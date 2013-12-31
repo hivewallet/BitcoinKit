@@ -562,9 +562,10 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         }
     }
 
-    public void walletExport(String path)
+    public void exportWallet(String path) throws java.io.IOException
     {
-
+        File backupFile = new File(path);
+        wallet.saveToFile(backupFile);
     }
 
 
