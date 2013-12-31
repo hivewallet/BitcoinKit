@@ -206,34 +206,6 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;
             error:(NSError **)error
        completion:(void(^)(NSString *hash))completion;
 
-/** Encrypts wallet with given passphrase
- *
- * @param passwd NSString value of the passphrase to encrypt wallet with
- *
- * @returns YES if encryption was successful, NO - otherwise
- */
-- (BOOL)encryptWalletWith:(NSString *)passwd;
-
-/** Changes the encryption passphrase for the wallet
- *
- * @param oldpasswd Old passphrase that wallet is currently encrypted with
- * @param newpasswd New passphrase that wallet should be encrypted with
- *
- * @returns YES if recryption was successful, NO - otherwise
- */
-- (BOOL)changeWalletEncryptionKeyFrom:(NSString *)oldpasswd to:(NSString *)newpasswd;
-
-/** Unlocks wallet
- *
- * @param passwd Passphrase that wallet is locked with
- *
- * @returns YES if unlock was successful, NO - otherwise
- */
-- (BOOL)unlockWalletWith:(NSString *)passwd;
-
-/** Locks wallet */
-- (void)lockWallet;
-
 /** Exports wallet to given file URL
  *
  * @param exportURL NSURL to local file where wallet should be dumped to
