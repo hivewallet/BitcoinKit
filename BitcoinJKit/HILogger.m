@@ -25,15 +25,13 @@ void HILoggerLog(const char *fileName, const char *functionName, int lineNumber,
     static HILogger *sharedLogger = nil;
     static dispatch_once_t oncePredicate;
 
-    if (!sharedLogger) {
-        dispatch_once(&oncePredicate, ^{
-            sharedLogger = [[self alloc] init];
-            sharedLogger.logHandler = ^(const char *fileName, const char *functionName, int lineNumber,
-                                        HILoggerLevel level, NSString *message) {
-                NSLog(@"%@", message);
-            };
-        });
-    }
+    dispatch_once(&oncePredicate, ^{
+        sharedLogger = [[self alloc] init];
+        sharedLogger.logHandler = ^(const char *fileName, const char *functionName, int lineNumber,
+                                    HILoggerLevel level, NSString *message) {
+            NSLog(@"%@", message);
+        };
+    });
 
     return sharedLogger;
 }

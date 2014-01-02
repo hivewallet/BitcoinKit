@@ -46,11 +46,11 @@ bootJar(unsigned* size)
 {
     static HIJavaBridge *_sharedBridge = nil;
     static dispatch_once_t oncePredicate;
-    if (!_sharedBridge)
-        dispatch_once(&oncePredicate, ^{
-            _sharedBridge = [[self alloc] init];
-        });
-    
+
+    dispatch_once(&oncePredicate, ^{
+        _sharedBridge = [[self alloc] init];
+    });
+
     return _sharedBridge;
 }
 
