@@ -69,6 +69,9 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;
 // Returns global transaction cound for current wallet
 @property (nonatomic, readonly, getter = transactionCount) NSUInteger transactionCount;
 
+// Returns date when the wallet password was last changed, or when the wallet was created (might be null for old files)
+@property (nonatomic, readonly) NSDate *lastWalletChangeDate;
+
 // Proxy server in address:port format. Default is nil (no proxy). Warning! All changes to it has to be performed BEFORE start.
 @property (nonatomic, copy) NSString *proxyAddress;
 

@@ -863,6 +863,12 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     }
 }
 
+- (NSDate *)lastWalletChangeDate
+{
+    long timestamp = [self callLongMethodWithName:"getLastWalletChangeTimestamp" signature:"()J"];
+    return (timestamp > 0) ? [NSDate dateWithTimeIntervalSince1970:(timestamp / 1000.0)] : nil;
+}
+
 - (NSUInteger)transactionCount
 {
     return [self callIntegerMethodWithName:"getTransactionCount" signature:"()I"];

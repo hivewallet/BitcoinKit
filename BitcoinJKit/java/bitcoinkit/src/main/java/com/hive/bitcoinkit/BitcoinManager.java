@@ -395,6 +395,20 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         ext.setLastWalletChangeDate(new Date());
     }
 
+    public Date getLastWalletChange()
+    {
+        LastWalletChangeExtension ext =
+            (LastWalletChangeExtension) wallet.getExtensions().get(LastWalletChangeExtension.EXTENSION_ID);
+
+        return ext.getLastWalletChangeDate();
+    }
+
+    public long getLastWalletChangeTimestamp()
+    {
+        Date date = getLastWalletChange();
+        return (date != null) ? date.getTime() : 0;
+    }
+
     public Wallet loadWalletFromFile(File f) throws UnreadableWalletException
     {
         try
