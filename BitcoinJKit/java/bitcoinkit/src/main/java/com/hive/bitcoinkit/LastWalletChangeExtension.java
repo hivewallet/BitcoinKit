@@ -64,4 +64,9 @@ public class LastWalletChangeExtension implements WalletExtension
         long timestamp = buffer.getLong();
         lastWalletChangeDate = (timestamp > 0) ? new Date(timestamp) : null;
     }
+
+    @Override
+    public String toString() {
+        return "LastWalletChangeExtension: date = " + lastWalletChangeDate;
+    }
 }
