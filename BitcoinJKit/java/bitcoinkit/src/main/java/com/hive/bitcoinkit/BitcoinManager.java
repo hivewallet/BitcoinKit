@@ -13,9 +13,13 @@ import com.google.bitcoin.store.BlockStore;
 import com.google.bitcoin.store.BlockStoreException;
 import com.google.bitcoin.store.SPVBlockStore;
 import com.google.bitcoin.store.UnreadableWalletException;
+import com.google.bitcoin.store.WalletProtobufSerializer;
 import com.google.bitcoin.utils.Threading;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import org.bitcoinj.wallet.Protos;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spongycastle.crypto.params.KeyParameter;
 
 import java.io.File;
@@ -41,6 +45,8 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
     private BlockStore blockStore;
     private File walletFile;
     private int blocksToDownload;
+
+    private static final Logger log = LoggerFactory.getLogger(BitcoinManager.class);
 
     public BitcoinManager()
     {
@@ -367,11 +373,53 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
 
         try
         {
-            useWallet(Wallet.loadFromFile(walletFile));
+            useWallet(loadWalletFromFile(walletFile));
         }
         catch (FileNotFoundException e)
         {
             throw new NoWalletException("No wallet file found at: " + walletFile);
+        }
+    }
+
+    public void addExtensionsToWallet(Wallet wallet)
+    {
+        wallet.addExtension(new LastWalletChangeExtension());
+    }
+
+    public Wallet loadWalletFromFile(File f) throws UnreadableWalletException
+    {
+        try
+        {
+            FileInputStream stream = null;
+
+            try
+            {
+                stream = new FileInputStream(f);
+
+                Wallet wallet = new Wallet(networkParams);
+                addExtensionsToWallet(wallet);
+
+                Protos.Wallet walletData = WalletProtobufSerializer.parseToProto(stream);
+                new WalletProtobufSerializer().readWallet(walletData, wallet);
+
+                if (!wallet.isConsistent())
+                {
+                    log.error("Loaded an inconsistent wallet");
+                }
+
+                return wallet;
+            }
+            finally
+            {
+                if (stream != null)
+                {
+                    stream.close();
+                }
+            }
+        }
+        catch (IOException e)
+        {
+            throw new UnreadableWalletException("Could not open file", e);
         }
     }
 
@@ -392,6 +440,7 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         }
 
         Wallet wallet = new Wallet(networkParams);
+        addExtensionsToWallet(wallet);
         wallet.addKey(new ECKey());
 
         if (utf16Password != null)
