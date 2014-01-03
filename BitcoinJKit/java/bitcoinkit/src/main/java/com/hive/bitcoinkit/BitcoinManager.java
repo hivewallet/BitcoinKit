@@ -31,6 +31,7 @@ import java.net.InetAddress;
 import java.nio.CharBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
@@ -386,6 +387,14 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         wallet.addExtension(new LastWalletChangeExtension());
     }
 
+    public void updateLastWalletChange(Wallet wallet)
+    {
+        LastWalletChangeExtension ext =
+            (LastWalletChangeExtension) wallet.getExtensions().get(LastWalletChangeExtension.EXTENSION_ID);
+
+        ext.setLastWalletChangeDate(new Date());
+    }
+
     public Wallet loadWalletFromFile(File f) throws UnreadableWalletException
     {
         try
@@ -441,6 +450,7 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
 
         Wallet wallet = new Wallet(networkParams);
         addExtensionsToWallet(wallet);
+        updateLastWalletChange(wallet);
         wallet.addKey(new ECKey());
 
         if (utf16Password != null)
@@ -455,10 +465,13 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
 
     public void changeWalletPassword(char[] oldUtf16Password, char[] newUtf16Password) throws WrongPasswordException
     {
+        updateLastWalletChange(wallet);
+
         if (isWalletEncrypted())
         {
             decryptWallet(oldUtf16Password);
         }
+
         encryptWallet(newUtf16Password, wallet);
     }
 
