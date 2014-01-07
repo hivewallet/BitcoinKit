@@ -82,7 +82,7 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         return (wallet != null) ? wallet.toString() : null;
     }
 
-    public long getBalance()
+    public long getAvailableBalance()
     {
         return (wallet != null) ? wallet.getBalance().longValue() : 0;
     }

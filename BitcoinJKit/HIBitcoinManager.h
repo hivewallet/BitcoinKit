@@ -46,7 +46,7 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;
 @property (nonatomic, readonly) BOOL isRunning;
 
 // Actual balance of the wallet
-@property (nonatomic, readonly) uint64_t balance;
+@property (nonatomic, readonly) uint64_t availableBalance;
 
 // Balance calculated assuming all pending transactions are included into the best chain by miners
 @property (nonatomic, readonly) uint64_t estimatedBalance;

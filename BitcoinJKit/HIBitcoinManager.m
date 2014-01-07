@@ -22,12 +22,13 @@
     NSDateFormatter *_dateFormatter;
     BOOL _sending;
     void(^sendCompletionBlock)(NSString *hash);
-    uint64_t _lastBalance;
+    uint64_t _lastAvailableBalance;
     uint64_t _lastEstimatedBalance;
     NSTimer *_balanceChecker;
 }
 
-- (void)onBalanceChanged;
+- (void)onAvailableBalanceChanged;
+- (void)onEstimatedBalanceChanged;
 - (void)onSynchronizationChanged:(int)percent;
 - (void)onTransactionChanged:(NSString *)txid;
 - (void)onTransactionSucceeded:(NSString *)txid;
@@ -66,7 +67,8 @@ jarray JCharArrayFromNSData(JNIEnv *env, NSData *data)
 JNIEXPORT void JNICALL onBalanceChanged(JNIEnv *env, jobject thisobject)
 {
     NSAutoreleasePool *pool = [NSAutoreleasePool new];
-    [[HIBitcoinManager defaultManager] onBalanceChanged];
+    [[HIBitcoinManager defaultManager] onAvailableBalanceChanged];
+    [[HIBitcoinManager defaultManager] onEstimatedBalanceChanged];
     [pool release];
 }
 
@@ -840,9 +842,9 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     [self callVoidMethodWithName:"exportWallet" error:error signature:"(Ljava/lang/String;)V", path];
 }
 
-- (uint64_t)balance
+- (uint64_t)availableBalance
 {
-    return [self callLongMethodWithName:"getBalance" signature:"()J"];
+    return [self callLongMethodWithName:"getAvailableBalance" signature:"()J"];
 }
 
 - (uint64_t)estimatedBalance
@@ -852,9 +854,9 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
 - (void)checkBalance:(NSTimer *)timer
 {
-    if (self.balance != _lastBalance)
+    if (self.availableBalance != _lastAvailableBalance)
     {
-        [self onBalanceChanged];
+        [self onAvailableBalanceChanged];
     }
 
     if (self.estimatedBalance != _lastEstimatedBalance)
@@ -894,12 +896,12 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
 #pragma mark - Callbacks
 
-- (void)onBalanceChanged
+- (void)onAvailableBalanceChanged
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self willChangeValueForKey:@"balance"];
-        _lastBalance = self.balance;
-        [self didChangeValueForKey:@"balance"];
+        [self willChangeValueForKey:@"availableBalance"];
+        _lastAvailableBalance = self.availableBalance;
+        [self didChangeValueForKey:@"availableBalance"];
     });
 }
 
