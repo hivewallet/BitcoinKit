@@ -549,19 +549,11 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         }
 
         BlockChain chain = new BlockChain(networkParams, wallet, blockStore);
-        // Connect to the localhost node. One minute timeout since we won't try any other peers
+
         peerGroup = new PeerGroup(networkParams, chain);
         peerGroup.setUserAgent("BitcoinJKit", "0.9");
-        if (networkParams == RegTestParams.get())
-        {
-            peerGroup.addAddress(InetAddress.getLocalHost());
-        }
-        else
-        {
-            peerGroup.addPeerDiscovery(new DnsDiscovery(networkParams));
-        }
+        peerGroup.addPeerDiscovery(new DnsDiscovery(networkParams));
         peerGroup.addWallet(wallet);
-
 
         // We want to know when the balance changes.
         wallet.addEventListener(new AbstractWalletEventListener()
@@ -576,18 +568,15 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
                 onTransactionChanged(tx.getHashAsString());
                 tx.getConfidence().addEventListener(new TransactionConfidence.Listener()
                 {
-                    public void onConfidenceChanged(final Transaction tx2, TransactionConfidence.Listener.ChangeReason reason)
+                    public void onConfidenceChanged(final Transaction tx2,
+                        TransactionConfidence.Listener.ChangeReason reason)
                     {
                         if (tx2.getConfidence().getConfidenceType() == TransactionConfidence.ConfidenceType.BUILDING)
                         {
                             // Coins were confirmed (appeared in a block).
                             tx2.getConfidence().removeEventListener(this);
                         }
-                        else
-                        {
-//                            System.out.println(String.format("Confidence of %s changed, is now: %s",
-//                                    tx2.getHashAsString(), tx2.getConfidence().toString()));
-                        }
+
                         onTransactionChanged(tx2.getHashAsString());
                     }
                 });
@@ -595,7 +584,6 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         });
 
         peerGroup.startAndWait();
-        peerGroup.start();
 
         onBalanceChanged();
 
@@ -673,19 +661,29 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
     public void onBlocksDownloaded(Peer peer, Block block, int blocksLeft)
     {
         int downloadedSoFar = blocksToDownload - blocksLeft;
+
         if (blocksToDownload == 0)
+        {
             onSynchronizationUpdate(10000);
+        }
         else
+        {
             onSynchronizationUpdate(10000 * downloadedSoFar / blocksToDownload);
+        }
     }
 
     public void onChainDownloadStarted(Peer peer, int blocksLeft)
     {
         blocksToDownload = blocksLeft;
+
         if (blocksToDownload == 0)
+        {
             onSynchronizationUpdate(10000);
+        }
         else
+        {
             onSynchronizationUpdate(0);
+        }
     }
 
     public void onPeerConnected(Peer peer, int peerCount)
