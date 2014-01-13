@@ -660,29 +660,36 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
 
     public void onBlocksDownloaded(Peer peer, Block block, int blocksLeft)
     {
-        int downloadedSoFar = blocksToDownload - blocksLeft;
-
-        if (blocksToDownload == 0)
-        {
-            onSynchronizationUpdate(100.0f);
-        }
-        else
-        {
-            onSynchronizationUpdate(100.0f * downloadedSoFar / blocksToDownload);
-        }
+        updateBlocksLeft(blocksLeft);
     }
 
     public void onChainDownloadStarted(Peer peer, int blocksLeft)
     {
-        blocksToDownload = blocksLeft;
+        if (blocksToDownload == 0)
+        {
+            // remember the total amount
+            blocksToDownload = blocksLeft;
+            log.debug("onChainDownloadStarted: blocksToDownload := " + blocksLeft);
+        }
+        else
+        {
+            // we've already set that once and we're only downloading the remaining part
+            log.debug("onChainDownloadStarted: blocksToDownload = " + blocksToDownload + ", left = " + blocksLeft);
+        }
 
+        updateBlocksLeft(blocksLeft);
+    }
+
+    private void updateBlocksLeft(int blocksLeft)
+    {
         if (blocksToDownload == 0)
         {
             onSynchronizationUpdate(100.0f);
         }
         else
         {
-            onSynchronizationUpdate(0.0f);
+            int downloadedSoFar = blocksToDownload - blocksLeft;
+            onSynchronizationUpdate(100.0f * downloadedSoFar / blocksToDownload);
         }
     }
 
