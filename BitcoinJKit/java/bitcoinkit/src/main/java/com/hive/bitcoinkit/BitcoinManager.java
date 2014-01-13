@@ -644,7 +644,7 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
 
     public native void onTransactionSuccess(String txid);
 
-    public native void onSynchronizationUpdate(int percent);
+    public native void onSynchronizationUpdate(float percent);
 
     public native void onBalanceChanged();
 
@@ -664,11 +664,11 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
 
         if (blocksToDownload == 0)
         {
-            onSynchronizationUpdate(10000);
+            onSynchronizationUpdate(100.0f);
         }
         else
         {
-            onSynchronizationUpdate(10000 * downloadedSoFar / blocksToDownload);
+            onSynchronizationUpdate(100.0f * downloadedSoFar / blocksToDownload);
         }
     }
 
@@ -678,11 +678,11 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
 
         if (blocksToDownload == 0)
         {
-            onSynchronizationUpdate(10000);
+            onSynchronizationUpdate(100.0f);
         }
         else
         {
-            onSynchronizationUpdate(0);
+            onSynchronizationUpdate(0.0f);
         }
     }
 

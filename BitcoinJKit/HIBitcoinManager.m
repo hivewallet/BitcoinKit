@@ -29,7 +29,7 @@
 
 - (void)onAvailableBalanceChanged;
 - (void)onEstimatedBalanceChanged;
-- (void)onSynchronizationChanged:(int)percent;
+- (void)onSynchronizationChanged:(float)percent;
 - (void)onTransactionChanged:(NSString *)txid;
 - (void)onTransactionSucceeded:(NSString *)txid;
 - (void)onTransactionFailed;
@@ -72,10 +72,10 @@ JNIEXPORT void JNICALL onBalanceChanged(JNIEnv *env, jobject thisobject)
     [pool release];
 }
 
-JNIEXPORT void JNICALL onSynchronizationUpdate(JNIEnv *env, jobject thisobject, jint percent)
+JNIEXPORT void JNICALL onSynchronizationUpdate(JNIEnv *env, jobject thisobject, jfloat percent)
 {
     NSAutoreleasePool *pool = [NSAutoreleasePool new];
-    [[HIBitcoinManager defaultManager] onSynchronizationChanged:(int)percent];
+    [[HIBitcoinManager defaultManager] onSynchronizationChanged:(float)percent];
     [pool release];
 }
 
@@ -137,7 +137,7 @@ static JNINativeMethod methods[] = {
     {"onTransactionChanged",    "(Ljava/lang/String;)V",                   (void *)&onTransactionChanged},
     {"onTransactionSuccess",    "(Ljava/lang/String;)V",                   (void *)&onTransactionSucceeded},
     {"onTransactionFailed",     "()V",                                     (void *)&onTransactionFailed},
-    {"onSynchronizationUpdate", "(I)V",                                    (void *)&onSynchronizationUpdate},
+    {"onSynchronizationUpdate", "(F)V",                                    (void *)&onSynchronizationUpdate},
     {"onException",             "(Ljava/lang/Throwable;)V",                (void *)&onException}
 };
 
@@ -914,11 +914,11 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     });
 }
 
-- (void)onSynchronizationChanged:(int)percent
+- (void)onSynchronizationChanged:(float)percent
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self willChangeValueForKey:@"syncProgress"];
-        _syncProgress = (NSUInteger)percent;
+        _syncProgress = percent;
         [self didChangeValueForKey:@"syncProgress"];
     });
 }
