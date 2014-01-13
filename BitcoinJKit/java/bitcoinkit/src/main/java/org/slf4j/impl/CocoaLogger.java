@@ -9,34 +9,46 @@ import org.slf4j.helpers.MessageFormatter;
 
 public class CocoaLogger extends MarkerIgnoringBase implements Logger
 {
-    private static final int HILoggerLevelDebug = 1;
-    private static final int HILoggerLevelInfo = 2;
-    private static final int HILoggerLevelWarn = 3;
-    private static final int HILoggerLevelError = 4;
+    public static final int HILoggerLevelNotSet = -1;
+    public static final int HILoggerLevelDebug = 1;
+    public static final int HILoggerLevelInfo = 2;
+    public static final int HILoggerLevelWarn = 3;
+    public static final int HILoggerLevelError = 4;
 
     private static String SELF = CocoaLogger.class.getName();
     private static String SUPER = MarkerIgnoringBase.class.getName();
 
     private static int globalLevel = HILoggerLevelDebug;
+    private int level = HILoggerLevelNotSet;
+
+    public static int getGlobalLevel()
+    {
+        return globalLevel;
+    }
+
+    public static void setGlobalLevel(int newLevel)
+    {
+        globalLevel = newLevel;
+    }
 
     CocoaLogger(String name)
     {
         this.name = name;
     }
 
-    public static int getLevel()
+    public int getLevel()
     {
-        return globalLevel;
+        return (level == HILoggerLevelNotSet) ? globalLevel : level;
     }
 
-    public static void setLevel(int level)
+    public void setLevel(int newLevel)
     {
-        globalLevel = level;
+        level = newLevel;
     }
 
     public boolean isTraceEnabled()
     {
-        return globalLevel <= HILoggerLevelDebug;
+        return getLevel() <= HILoggerLevelDebug;
     }
 
     public void trace(String msg)
@@ -84,7 +96,7 @@ public class CocoaLogger extends MarkerIgnoringBase implements Logger
 
     public boolean isDebugEnabled()
     {
-        return globalLevel <= HILoggerLevelDebug;
+        return getLevel() <= HILoggerLevelDebug;
     }
 
     public void debug(String msg)
@@ -132,7 +144,7 @@ public class CocoaLogger extends MarkerIgnoringBase implements Logger
 
     public boolean isInfoEnabled()
     {
-        return globalLevel <= HILoggerLevelInfo;
+        return getLevel() <= HILoggerLevelInfo;
     }
 
     public void info(String msg)
@@ -180,7 +192,7 @@ public class CocoaLogger extends MarkerIgnoringBase implements Logger
 
     public boolean isWarnEnabled()
     {
-        return globalLevel <= HILoggerLevelWarn;
+        return getLevel() <= HILoggerLevelWarn;
     }
 
     public void warn(String msg)
@@ -228,7 +240,7 @@ public class CocoaLogger extends MarkerIgnoringBase implements Logger
 
     public boolean isErrorEnabled()
     {
-        return globalLevel <= HILoggerLevelError;
+        return getLevel() <= HILoggerLevelError;
     }
 
     public void error(String msg)

@@ -879,7 +879,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 - (void)setLogLevel:(HILoggerLevel)level
 {
     jclass loggerClass = [self jClassForClass:@"org/slf4j/impl/CocoaLogger"];
-    jmethodID method = (*_jniEnv)->GetStaticMethodID(_jniEnv, loggerClass, "setLevel", "(I)V");
+    jmethodID method = (*_jniEnv)->GetStaticMethodID(_jniEnv, loggerClass, "setGlobalLevel", "(I)V");
 
     if (!method)
     {

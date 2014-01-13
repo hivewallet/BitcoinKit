@@ -20,6 +20,7 @@ import com.google.common.util.concurrent.Futures;
 import org.bitcoinj.wallet.Protos;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.impl.CocoaLogger;
 import org.spongycastle.crypto.params.KeyParameter;
 
 import java.io.File;
@@ -52,6 +53,8 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
     public BitcoinManager()
     {
         Threading.uncaughtExceptionHandler = this;
+
+        ((CocoaLogger) log).setLevel(CocoaLogger.HILoggerLevelDebug);
     }
 
     public void setTestingNetwork(boolean testing)
