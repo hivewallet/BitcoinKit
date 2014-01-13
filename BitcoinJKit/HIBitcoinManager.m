@@ -308,7 +308,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
         {
             NSException *exception = [NSException exceptionWithName:@"Java exception"
                                                              reason:error.userInfo[NSLocalizedFailureReasonErrorKey]
-                                                           userInfo:nil];
+                                                           userInfo:error.userInfo];
             if (useHandler && self.exceptionHandler)
             {
                 self.exceptionHandler(exception);
