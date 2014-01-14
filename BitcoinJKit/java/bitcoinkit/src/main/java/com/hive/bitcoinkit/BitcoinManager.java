@@ -654,28 +654,30 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
     public void onCoinsReceived(Wallet w, Transaction tx, BigInteger prevBalance, BigInteger newBalance)
     {
         assert !newBalance.equals(BigInteger.ZERO);
-        if (!tx.isPending()) return;
 
         // update the UI
         onTransactionChanged(tx.getHashAsString());
 
         // get notified when transaction is confirmed
-        tx.getConfidence().addEventListener(this);
+        if (tx.isPending())
+        {
+            tx.getConfidence().addEventListener(this);
+        }
     }
 
 
     /* --- TransactionConfidence.Listener --- */
 
-    public void onConfidenceChanged(final Transaction tx2, TransactionConfidence.Listener.ChangeReason reason)
+    public void onConfidenceChanged(final Transaction tx, TransactionConfidence.Listener.ChangeReason reason)
     {
-        if (tx2.getConfidence().getConfidenceType() == TransactionConfidence.ConfidenceType.BUILDING)
+        if (!tx.isPending())
         {
             // coins were confirmed (appeared in a block) - we don't need to listen anymore
-            tx2.getConfidence().removeEventListener(this);
+            tx.getConfidence().removeEventListener(this);
         }
 
         // update the UI
-        onTransactionChanged(tx2.getHashAsString());
+        onTransactionChanged(tx.getHashAsString());
     }
 
 
