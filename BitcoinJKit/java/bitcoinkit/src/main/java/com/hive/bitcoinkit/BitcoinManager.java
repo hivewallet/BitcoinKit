@@ -220,9 +220,10 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
             }
         });
 
-        peerGroup.startAndWait();
-
         onBalanceChanged();
+        trackPendingTransactions(wallet);
+
+        peerGroup.startAndWait();
 
         // get notified about sync progress
         peerGroup.startBlockChainDownload(new AbstractPeerEventListener()
@@ -239,6 +240,17 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
                 BitcoinManager.this.onChainDownloadStarted(peer, blocksLeft);
             }
         });
+    }
+
+    private void trackPendingTransactions(Wallet wallet)
+    {
+        // we won't receive onCoinsReceived again for transactions that we already know about,
+        // so we need to listen to confidence changes again after a restart
+        for (Transaction tx : wallet.getPendingTransactions())
+        {
+            log.debug("Tracking pending transaction " + tx.getHashAsString());
+            tx.getConfidence().addEventListener(this);
+        }
     }
 
     public void stop()
