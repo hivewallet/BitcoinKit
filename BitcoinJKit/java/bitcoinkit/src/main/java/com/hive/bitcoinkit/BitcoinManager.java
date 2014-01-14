@@ -37,7 +37,8 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
-public class BitcoinManager implements PeerEventListener, Thread.UncaughtExceptionHandler
+public class BitcoinManager
+    implements PeerEventListener, Thread.UncaughtExceptionHandler, TransactionConfidence.Listener
 {
     private NetworkParameters networkParams;
     private Wallet wallet;
@@ -210,30 +211,13 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         peerGroup.addPeerDiscovery(new DnsDiscovery(networkParams));
         peerGroup.addWallet(wallet);
 
-        // We want to know when the balance changes.
+        // get notified when an incoming transaction is received
         wallet.addEventListener(new AbstractWalletEventListener()
         {
             @Override
             public void onCoinsReceived(Wallet w, Transaction tx, BigInteger prevBalance, BigInteger newBalance)
             {
-                assert !newBalance.equals(BigInteger.ZERO);
-                if (!tx.isPending()) return;
-                // It was broadcast, but we can't really verify it's valid until it appears in a block.
-                onTransactionChanged(tx.getHashAsString());
-                tx.getConfidence().addEventListener(new TransactionConfidence.Listener()
-                {
-                    public void onConfidenceChanged(final Transaction tx2,
-                        TransactionConfidence.Listener.ChangeReason reason)
-                    {
-                        if (tx2.getConfidence().getConfidenceType() == TransactionConfidence.ConfidenceType.BUILDING)
-                        {
-                            // Coins were confirmed (appeared in a block).
-                            tx2.getConfidence().removeEventListener(this);
-                        }
-
-                        onTransactionChanged(tx2.getHashAsString());
-                    }
-                });
+                BitcoinManager.this.onCoinsReceived(w, tx, prevBalance, newBalance);
             }
         });
 
@@ -649,6 +633,36 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
     {
         Date date = getLastWalletChange();
         return (date != null) ? date.getTime() : 0;
+    }
+
+
+    /* --- WalletEventListener --- */
+
+    public void onCoinsReceived(Wallet w, Transaction tx, BigInteger prevBalance, BigInteger newBalance)
+    {
+        assert !newBalance.equals(BigInteger.ZERO);
+        if (!tx.isPending()) return;
+
+        // update the UI
+        onTransactionChanged(tx.getHashAsString());
+
+        // get notified when transaction is confirmed
+        tx.getConfidence().addEventListener(this);
+    }
+
+
+    /* --- TransactionConfidence.Listener --- */
+
+    public void onConfidenceChanged(final Transaction tx2, TransactionConfidence.Listener.ChangeReason reason)
+    {
+        if (tx2.getConfidence().getConfidenceType() == TransactionConfidence.ConfidenceType.BUILDING)
+        {
+            // coins were confirmed (appeared in a block) - we don't need to listen anymore
+            tx2.getConfidence().removeEventListener(this);
+        }
+
+        // update the UI
+        onTransactionChanged(tx2.getHashAsString());
     }
 
 
