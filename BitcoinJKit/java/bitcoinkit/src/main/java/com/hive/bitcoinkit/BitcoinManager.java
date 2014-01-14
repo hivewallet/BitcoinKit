@@ -37,8 +37,7 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
-public class BitcoinManager
-    implements PeerEventListener, Thread.UncaughtExceptionHandler, TransactionConfidence.Listener
+public class BitcoinManager implements Thread.UncaughtExceptionHandler, TransactionConfidence.Listener
 {
     private NetworkParameters networkParams;
     private Wallet wallet;
@@ -225,7 +224,21 @@ public class BitcoinManager
 
         onBalanceChanged();
 
-        peerGroup.startBlockChainDownload(this);
+        // get notified about sync progress
+        peerGroup.startBlockChainDownload(new AbstractPeerEventListener()
+        {
+            @Override
+            public void onBlocksDownloaded(Peer peer, Block block, int blocksLeft)
+            {
+                BitcoinManager.this.onBlocksDownloaded(peer, block, blocksLeft);
+            }
+
+            @Override
+            public void onChainDownloadStarted(Peer peer, int blocksLeft)
+            {
+                BitcoinManager.this.onChainDownloadStarted(peer, blocksLeft);
+            }
+        });
     }
 
     public void stop()
@@ -676,11 +689,6 @@ public class BitcoinManager
 
 	/* PeerEventListener */
 
-    public void onPeerCountChange(int peersConnected)
-    {
-        //		System.out.println("Peers " + peersConnected);
-    }
-
     public void onBlocksDownloaded(Peer peer, Block block, int blocksLeft)
     {
         updateBlocksLeft(blocksLeft);
@@ -714,31 +722,6 @@ public class BitcoinManager
             int downloadedSoFar = blocksToDownload - blocksLeft;
             onSynchronizationUpdate(100.0f * downloadedSoFar / blocksToDownload);
         }
-    }
-
-    public void onPeerConnected(Peer peer, int peerCount)
-    {
-        onPeerCountChange(peerCount);
-    }
-
-    public void onPeerDisconnected(Peer peer, int peerCount)
-    {
-        onPeerCountChange(peerCount);
-    }
-
-    public Message onPreMessageReceived(Peer peer, Message m)
-    {
-        return m;
-    }
-
-    public void onTransaction(Peer peer, Transaction t)
-    {
-
-    }
-
-    public List<Message> getData(Peer peer, GetDataMessage m)
-    {
-        return null;
     }
 
 
