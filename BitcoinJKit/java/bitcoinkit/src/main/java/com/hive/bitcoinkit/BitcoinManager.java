@@ -50,6 +50,9 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
 
     private static final Logger log = LoggerFactory.getLogger(BitcoinManager.class);
 
+
+    /* --- Initialization & configuration --- */
+
     public BitcoinManager()
     {
         Threading.uncaughtExceptionHandler = this;
@@ -74,6 +77,211 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         dataDirectory = path;
     }
 
+
+    /* --- Wallet lifecycle --- */
+
+    public void start() throws NoWalletException, UnreadableWalletException, IOException, BlockStoreException
+    {
+        if (networkParams == null)
+        {
+            setTestingNetwork(false);
+        }
+
+        // Try to read the wallet from storage, create a new one if not possible.
+        wallet = null;
+        walletFile = new File(dataDirectory + "/bitcoinkit.wallet");
+
+        if (!walletFile.exists())
+        {
+            // Stop here, because the caller might want to create an encrypted wallet and needs to supply a password.
+            throw new NoWalletException("No wallet file found at: " + walletFile);
+        }
+
+        try
+        {
+            useWallet(loadWalletFromFile(walletFile));
+        }
+        catch (FileNotFoundException e)
+        {
+            throw new NoWalletException("No wallet file found at: " + walletFile);
+        }
+    }
+
+    public void addExtensionsToWallet(Wallet wallet)
+    {
+        wallet.addExtension(new LastWalletChangeExtension());
+    }
+
+    public Wallet loadWalletFromFile(File f) throws UnreadableWalletException
+    {
+        try
+        {
+            FileInputStream stream = null;
+
+            try
+            {
+                stream = new FileInputStream(f);
+
+                Wallet wallet = new Wallet(networkParams);
+                addExtensionsToWallet(wallet);
+
+                Protos.Wallet walletData = WalletProtobufSerializer.parseToProto(stream);
+                new WalletProtobufSerializer().readWallet(walletData, wallet);
+
+                if (!wallet.isConsistent())
+                {
+                    log.error("Loaded an inconsistent wallet");
+                }
+
+                return wallet;
+            }
+            finally
+            {
+                if (stream != null)
+                {
+                    stream.close();
+                }
+            }
+        }
+        catch (IOException e)
+        {
+            throw new UnreadableWalletException("Could not open file", e);
+        }
+    }
+
+    public void createWallet() throws IOException, BlockStoreException, ExistingWalletException
+    {
+        createWallet(null);
+    }
+
+    public void createWallet(char[] utf16Password) throws IOException, BlockStoreException, ExistingWalletException
+    {
+        if (walletFile == null)
+        {
+            throw new IllegalStateException("createWallet cannot be called before start");
+        }
+        else if (walletFile.exists())
+        {
+            throw new ExistingWalletException("Trying to create a wallet even though one exists: " + walletFile);
+        }
+
+        Wallet wallet = new Wallet(networkParams);
+        addExtensionsToWallet(wallet);
+        updateLastWalletChange(wallet);
+        wallet.addKey(new ECKey());
+
+        if (utf16Password != null)
+        {
+            encryptWallet(utf16Password, wallet);
+        }
+
+        wallet.saveToFile(walletFile);
+
+        useWallet(wallet);
+    }
+
+    private void useWallet(Wallet wallet) throws BlockStoreException, IOException
+    {
+        this.wallet = wallet;
+
+        //make wallet autosave
+        wallet.autosaveToFile(walletFile, 1, TimeUnit.SECONDS, null);
+
+        // Fetch the first key in the wallet (should be the only key).
+        ECKey key = wallet.getKeys().iterator().next();
+
+        // Load the block chain data file or generate a new one
+        File chainFile = new File(dataDirectory + "/bitcoinkit.spvchain");
+        boolean chainExistedAlready = chainFile.exists();
+        blockStore = new SPVBlockStore(networkParams, chainFile);
+
+        if (!chainExistedAlready)
+        {
+            // the blockchain will need to be replayed; if the wallet already contains transactions, this might
+            // cause ugly inconsistent wallet exceptions, so clear all old transaction data first
+            log.info("Chain file missing - wallet transactions list will be rebuilt now");
+            wallet.clearTransactions(0);
+        }
+
+        BlockChain chain = new BlockChain(networkParams, wallet, blockStore);
+
+        peerGroup = new PeerGroup(networkParams, chain);
+        peerGroup.setUserAgent("BitcoinJKit", "0.9");
+        peerGroup.addPeerDiscovery(new DnsDiscovery(networkParams));
+        peerGroup.addWallet(wallet);
+
+        // We want to know when the balance changes.
+        wallet.addEventListener(new AbstractWalletEventListener()
+        {
+            @Override
+            public void onCoinsReceived(Wallet w, Transaction tx, BigInteger prevBalance, BigInteger newBalance)
+            {
+                assert !newBalance.equals(BigInteger.ZERO);
+                if (!tx.isPending()) return;
+                // It was broadcast, but we can't really verify it's valid until it appears in a block.
+                onTransactionChanged(tx.getHashAsString());
+                tx.getConfidence().addEventListener(new TransactionConfidence.Listener()
+                {
+                    public void onConfidenceChanged(final Transaction tx2,
+                        TransactionConfidence.Listener.ChangeReason reason)
+                    {
+                        if (tx2.getConfidence().getConfidenceType() == TransactionConfidence.ConfidenceType.BUILDING)
+                        {
+                            // Coins were confirmed (appeared in a block).
+                            tx2.getConfidence().removeEventListener(this);
+                        }
+
+                        onTransactionChanged(tx2.getHashAsString());
+                    }
+                });
+            }
+        });
+
+        peerGroup.startAndWait();
+
+        onBalanceChanged();
+
+        peerGroup.startBlockChainDownload(this);
+    }
+
+    public void stop()
+    {
+        try
+        {
+            System.out.print("Shutting down ... ");
+
+            if (peerGroup != null)
+            {
+                peerGroup.stopAndWait();
+            }
+
+            if (wallet != null)
+            {
+                wallet.saveToFile(walletFile);
+            }
+
+            if (blockStore != null)
+            {
+                blockStore.close();
+            }
+
+            System.out.print("done ");
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void exportWallet(String path) throws java.io.IOException
+    {
+        File backupFile = new File(path);
+        wallet.saveToFile(backupFile);
+    }
+
+
+    /* --- Reading wallet data --- */
+
     public String getWalletAddress()
     {
         ECKey ecKey = wallet.getKeys().get(0);
@@ -94,6 +302,9 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
     {
         return (wallet != null) ? wallet.getBalance(Wallet.BalanceType.ESTIMATED).longValue() : 0;
     }
+
+
+    /* --- Reading transaction data --- */
 
     private String getJSONFromTransaction(Transaction tx) throws ScriptException
     {
@@ -247,9 +458,25 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         return txs.toString();
     }
 
+
+    /* --- Sending transactions --- */
+
     public String feeForSendingCoins(String amount) throws AddressFormatException
     {
         return Transaction.REFERENCE_DEFAULT_MIN_TX_FEE.toString();
+    }
+
+    public boolean isAddressValid(String address)
+    {
+        try
+        {
+            Address addr = new Address(networkParams, address);
+            return (addr != null);
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
     }
 
     public void sendCoins(String amount, final String sendToAddressString) throws WrongPasswordException
@@ -303,6 +530,9 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         }
     }
 
+
+    /* --- Encryption/decryption --- */
+
     private KeyParameter aesKeyForPassword(char[] utf16Password) throws WrongPasswordException
     {
         KeyCrypter keyCrypter = wallet.getKeyCrypter();
@@ -333,151 +563,9 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         }
     }
 
-    public String getExceptionStackTrace(Throwable exception)
+    public boolean isWalletEncrypted()
     {
-        StringBuilder buffer = new StringBuilder();
-
-        for (StackTraceElement line : exception.getStackTrace())
-        {
-            buffer.append("at " + line.toString() + "\n");
-        }
-
-        return buffer.toString();
-    }
-
-    public boolean isAddressValid(String address)
-    {
-        try
-        {
-            Address addr = new Address(networkParams, address);
-            return (addr != null);
-        }
-        catch (Exception e)
-        {
-            return false;
-        }
-    }
-
-    public void start() throws NoWalletException, UnreadableWalletException, IOException, BlockStoreException
-    {
-        if (networkParams == null)
-        {
-            setTestingNetwork(false);
-        }
-
-        // Try to read the wallet from storage, create a new one if not possible.
-        wallet = null;
-        walletFile = new File(dataDirectory + "/bitcoinkit.wallet");
-
-        if (!walletFile.exists())
-        {
-            // Stop here, because the caller might want to create an encrypted wallet and needs to supply a password.
-            throw new NoWalletException("No wallet file found at: " + walletFile);
-        }
-
-        try
-        {
-            useWallet(loadWalletFromFile(walletFile));
-        }
-        catch (FileNotFoundException e)
-        {
-            throw new NoWalletException("No wallet file found at: " + walletFile);
-        }
-    }
-
-    public void addExtensionsToWallet(Wallet wallet)
-    {
-        wallet.addExtension(new LastWalletChangeExtension());
-    }
-
-    public void updateLastWalletChange(Wallet wallet)
-    {
-        LastWalletChangeExtension ext =
-            (LastWalletChangeExtension) wallet.getExtensions().get(LastWalletChangeExtension.EXTENSION_ID);
-
-        ext.setLastWalletChangeDate(new Date());
-    }
-
-    public Date getLastWalletChange()
-    {
-        LastWalletChangeExtension ext =
-            (LastWalletChangeExtension) wallet.getExtensions().get(LastWalletChangeExtension.EXTENSION_ID);
-
-        return ext.getLastWalletChangeDate();
-    }
-
-    public long getLastWalletChangeTimestamp()
-    {
-        Date date = getLastWalletChange();
-        return (date != null) ? date.getTime() : 0;
-    }
-
-    public Wallet loadWalletFromFile(File f) throws UnreadableWalletException
-    {
-        try
-        {
-            FileInputStream stream = null;
-
-            try
-            {
-                stream = new FileInputStream(f);
-
-                Wallet wallet = new Wallet(networkParams);
-                addExtensionsToWallet(wallet);
-
-                Protos.Wallet walletData = WalletProtobufSerializer.parseToProto(stream);
-                new WalletProtobufSerializer().readWallet(walletData, wallet);
-
-                if (!wallet.isConsistent())
-                {
-                    log.error("Loaded an inconsistent wallet");
-                }
-
-                return wallet;
-            }
-            finally
-            {
-                if (stream != null)
-                {
-                    stream.close();
-                }
-            }
-        }
-        catch (IOException e)
-        {
-            throw new UnreadableWalletException("Could not open file", e);
-        }
-    }
-
-    public void createWallet() throws IOException, BlockStoreException, ExistingWalletException
-    {
-        createWallet(null);
-    }
-
-    public void createWallet(char[] utf16Password) throws IOException, BlockStoreException, ExistingWalletException
-    {
-        if (walletFile == null)
-        {
-            throw new IllegalStateException("createWallet cannot be called before start");
-        }
-        else if (walletFile.exists())
-        {
-            throw new ExistingWalletException("Trying to create a wallet even though one exists: " + walletFile);
-        }
-
-        Wallet wallet = new Wallet(networkParams);
-        addExtensionsToWallet(wallet);
-        updateLastWalletChange(wallet);
-        wallet.addKey(new ECKey());
-
-        if (utf16Password != null)
-        {
-            encryptWallet(utf16Password, wallet);
-        }
-
-        wallet.saveToFile(walletFile);
-
-        useWallet(wallet);
+        return wallet.getKeys().get(0).isEncrypted();
     }
 
     public void changeWalletPassword(char[] oldUtf16Password, char[] newUtf16Password) throws WrongPasswordException
@@ -523,133 +611,56 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         }
     }
 
-    private void useWallet(Wallet wallet) throws BlockStoreException, IOException
+
+    /* --- Handling exceptions --- */
+
+    public String getExceptionStackTrace(Throwable exception)
     {
-        this.wallet = wallet;
+        StringBuilder buffer = new StringBuilder();
 
-        //make wallet autosave
-        wallet.autosaveToFile(walletFile, 1, TimeUnit.SECONDS, null);
-
-        // Fetch the first key in the wallet (should be the only key).
-        ECKey key = wallet.getKeys().iterator().next();
-
-        // Load the block chain data file or generate a new one
-        File chainFile = new File(dataDirectory + "/bitcoinkit.spvchain");
-        boolean chainExistedAlready = chainFile.exists();
-        blockStore = new SPVBlockStore(networkParams, chainFile);
-
-        if (!chainExistedAlready)
+        for (StackTraceElement line : exception.getStackTrace())
         {
-            // the blockchain will need to be replayed; if the wallet already contains transactions, this might
-            // cause ugly inconsistent wallet exceptions, so clear all old transaction data first
-            log.info("Chain file missing - wallet transactions list will be rebuilt now");
-            wallet.clearTransactions(0);
+            buffer.append("at " + line.toString() + "\n");
         }
 
-        BlockChain chain = new BlockChain(networkParams, wallet, blockStore);
-
-        peerGroup = new PeerGroup(networkParams, chain);
-        peerGroup.setUserAgent("BitcoinJKit", "0.9");
-        peerGroup.addPeerDiscovery(new DnsDiscovery(networkParams));
-        peerGroup.addWallet(wallet);
-
-        // We want to know when the balance changes.
-        wallet.addEventListener(new AbstractWalletEventListener()
-        {
-            @Override
-            public void onCoinsReceived(Wallet w, Transaction tx, BigInteger prevBalance, BigInteger newBalance)
-            {
-                assert !newBalance.equals(BigInteger.ZERO);
-                if (!tx.isPending()) return;
-                // It was broadcast, but we can't really verify it's valid until it appears in a block.
-                BigInteger value = tx.getValueSentToMe(w);
-                onTransactionChanged(tx.getHashAsString());
-                tx.getConfidence().addEventListener(new TransactionConfidence.Listener()
-                {
-                    public void onConfidenceChanged(final Transaction tx2,
-                        TransactionConfidence.Listener.ChangeReason reason)
-                    {
-                        if (tx2.getConfidence().getConfidenceType() == TransactionConfidence.ConfidenceType.BUILDING)
-                        {
-                            // Coins were confirmed (appeared in a block).
-                            tx2.getConfidence().removeEventListener(this);
-                        }
-
-                        onTransactionChanged(tx2.getHashAsString());
-                    }
-                });
-            }
-        });
-
-        peerGroup.startAndWait();
-
-        onBalanceChanged();
-
-        peerGroup.startBlockChainDownload(this);
+        return buffer.toString();
     }
 
-    public boolean isWalletEncrypted()
+
+    /* --- Keeping last wallet change date --- */
+
+    public void updateLastWalletChange(Wallet wallet)
     {
-        return wallet.getKeys().get(0).isEncrypted();
+        LastWalletChangeExtension ext =
+            (LastWalletChangeExtension) wallet.getExtensions().get(LastWalletChangeExtension.EXTENSION_ID);
+
+        ext.setLastWalletChangeDate(new Date());
     }
+
+    public Date getLastWalletChange()
+    {
+        LastWalletChangeExtension ext =
+            (LastWalletChangeExtension) wallet.getExtensions().get(LastWalletChangeExtension.EXTENSION_ID);
+
+        return ext.getLastWalletChangeDate();
+    }
+
+    public long getLastWalletChangeTimestamp()
+    {
+        Date date = getLastWalletChange();
+        return (date != null) ? date.getTime() : 0;
+    }
+
+
+    /* --- Thread.UncaughtExceptionHandler --- */
 
     public void uncaughtException(Thread thread, Throwable exception)
     {
         onException(exception);
     }
 
-    public void stop()
-    {
-        try
-        {
-            System.out.print("Shutting down ... ");
 
-            if (peerGroup != null)
-            {
-                peerGroup.stopAndWait();
-            }
-
-            if (wallet != null)
-            {
-                wallet.saveToFile(walletFile);
-            }
-
-            if (blockStore != null)
-            {
-                blockStore.close();
-            }
-
-            System.out.print("done ");
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void exportWallet(String path) throws java.io.IOException
-    {
-        File backupFile = new File(path);
-        wallet.saveToFile(backupFile);
-    }
-
-
-	/* Implementing native callbacks here */
-
-    public native void onTransactionChanged(String txid);
-
-    public native void onTransactionFailed();
-
-    public native void onTransactionSuccess(String txid);
-
-    public native void onSynchronizationUpdate(float percent);
-
-    public native void onBalanceChanged();
-
-    public native void onException(Throwable exception);
-
-
-	/* Implementing peer listener */
+	/* PeerEventListener */
 
     public void onPeerCountChange(int peersConnected)
     {
@@ -696,7 +707,6 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         onPeerCountChange(peerCount);
     }
 
-
     public void onPeerDisconnected(Peer peer, int peerCount)
     {
         onPeerCountChange(peerCount);
@@ -716,4 +726,19 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
     {
         return null;
     }
+
+
+	/* Native callbacks to pass data to the Cocoa side when something happens */
+
+    public native void onTransactionChanged(String txid);
+
+    public native void onTransactionFailed();
+
+    public native void onTransactionSuccess(String txid);
+
+    public native void onSynchronizationUpdate(float percent);
+
+    public native void onBalanceChanged();
+
+    public native void onException(Throwable exception);
 }
