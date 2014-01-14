@@ -533,23 +533,17 @@ public class BitcoinManager implements PeerEventListener, Thread.UncaughtExcepti
         // Fetch the first key in the wallet (should be the only key).
         ECKey key = wallet.getKeys().iterator().next();
 
-        // Load the block chain, if there is one stored locally. If it's going to be freshly created, checkpoint it.
+        // Load the block chain data file or generate a new one
         File chainFile = new File(dataDirectory + "/bitcoinkit.spvchain");
         boolean chainExistedAlready = chainFile.exists();
         blockStore = new SPVBlockStore(networkParams, chainFile);
+
         if (!chainExistedAlready)
         {
             // the blockchain will need to be replayed; if the wallet already contains transactions, this might
             // cause ugly inconsistent wallet exceptions, so clear all old transaction data first
             log.info("Chain file missing - wallet transactions list will be rebuilt now");
             wallet.clearTransactions(0);
-
-            File checkpointsFile = new File(dataDirectory + "/bitcoinkit.checkpoints");
-            if (checkpointsFile.exists())
-            {
-                FileInputStream stream = new FileInputStream(checkpointsFile);
-                CheckpointManager.checkpoint(networkParams, stream, blockStore, key.getCreationTimeSeconds());
-            }
         }
 
         BlockChain chain = new BlockChain(networkParams, wallet, blockStore);
