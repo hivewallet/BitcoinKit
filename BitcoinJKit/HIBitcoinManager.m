@@ -31,7 +31,7 @@
 - (void)onEstimatedBalanceChanged;
 - (void)onSynchronizationChanged:(float)percent;
 - (void)onTransactionChanged:(NSString *)txid;
-- (void)onTransactionSucceeded:(NSString *)txid;
+- (void)onTransactionSuccess:(NSString *)txid;
 - (void)onTransactionFailed;
 - (void)handleJavaException:(jthrowable)exception useExceptionHandler:(BOOL)useHandler error:(NSError **)returnedError;
 
@@ -91,13 +91,13 @@ JNIEXPORT void JNICALL onTransactionChanged(JNIEnv *env, jobject thisobject, jst
     [pool release];
 }
 
-JNIEXPORT void JNICALL onTransactionSucceeded(JNIEnv *env, jobject thisobject, jstring txid)
+JNIEXPORT void JNICALL onTransactionSuccess(JNIEnv *env, jobject thisobject, jstring txid)
 {
     NSAutoreleasePool *pool = [NSAutoreleasePool new];
 
     if (txid)
     {
-        [[HIBitcoinManager defaultManager] onTransactionSucceeded:NSStringFromJString(env, txid)];
+        [[HIBitcoinManager defaultManager] onTransactionSuccess:NSStringFromJString(env, txid)];
     }
     
     [pool release];
@@ -135,7 +135,7 @@ JNIEXPORT void JNICALL receiveLogFromJVM(JNIEnv *env, jobject thisobject, jstrin
 static JNINativeMethod methods[] = {
     {"onBalanceChanged",        "()V",                                     (void *)&onBalanceChanged},
     {"onTransactionChanged",    "(Ljava/lang/String;)V",                   (void *)&onTransactionChanged},
-    {"onTransactionSuccess",    "(Ljava/lang/String;)V",                   (void *)&onTransactionSucceeded},
+    {"onTransactionSuccess",    "(Ljava/lang/String;)V",                   (void *)&onTransactionSuccess},
     {"onTransactionFailed",     "()V",                                     (void *)&onTransactionFailed},
     {"onSynchronizationUpdate", "(F)V",                                    (void *)&onSynchronizationUpdate},
     {"onException",             "(Ljava/lang/Throwable;)V",                (void *)&onException}
@@ -931,7 +931,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     });
 }
 
-- (void)onTransactionSucceeded:(NSString *)txid
+- (void)onTransactionSuccess:(NSString *)txid
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (sendCompletionBlock)
