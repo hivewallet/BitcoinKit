@@ -33,7 +33,9 @@ import java.nio.CharBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
@@ -47,6 +49,7 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
     private BlockStore blockStore;
     private File walletFile;
     private int blocksToDownload;
+    private Set<Transaction> trackedTransactions;
 
     private static final Logger log = LoggerFactory.getLogger(BitcoinManager.class);
 
@@ -56,6 +59,8 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
     public BitcoinManager()
     {
         Threading.uncaughtExceptionHandler = this;
+
+        trackedTransactions = new HashSet<Transaction>();
 
         ((CocoaLogger) log).setLevel(CocoaLogger.HILoggerLevelDebug);
     }
@@ -210,13 +215,20 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         peerGroup.addPeerDiscovery(new DnsDiscovery(networkParams));
         peerGroup.addWallet(wallet);
 
-        // get notified when an incoming transaction is received
         wallet.addEventListener(new AbstractWalletEventListener()
         {
+            // get notified when an incoming transaction is received
             @Override
             public void onCoinsReceived(Wallet w, Transaction tx, BigInteger prevBalance, BigInteger newBalance)
             {
                 BitcoinManager.this.onCoinsReceived(w, tx, prevBalance, newBalance);
+            }
+
+            // get notified when we send a transaction, or when we restore an outgoing transaction from the blockchain
+            @Override
+            public void onCoinsSent(Wallet w, Transaction tx, BigInteger prevBalance, BigInteger newBalance)
+            {
+                BitcoinManager.this.onCoinsSent(w, tx, prevBalance, newBalance);
             }
         });
 
@@ -248,8 +260,29 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         // so we need to listen to confidence changes again after a restart
         for (Transaction tx : wallet.getPendingTransactions())
         {
-            log.debug("Tracking pending transaction " + tx.getHashAsString());
+            trackTransaction(tx);
+        }
+    }
+
+    private void trackTransaction(Transaction tx)
+    {
+        if (!trackedTransactions.contains(tx))
+        {
+            log.debug("Tracking transaction " + tx.getHashAsString());
+
             tx.getConfidence().addEventListener(this);
+            trackedTransactions.add(tx);
+        }
+    }
+
+    private void stopTrackingTransaction(Transaction tx)
+    {
+        if (trackedTransactions.contains(tx))
+        {
+            log.debug("Stopped tracking transaction " + tx.getHashAsString());
+
+            tx.getConfidence().removeEventListener(this);
+            trackedTransactions.remove(tx);
         }
     }
 
@@ -516,7 +549,6 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
                 {
                     wipeAesKey(request.aesKey);
                     onTransactionSuccess(sendResult.tx.getHashAsString());
-                    onTransactionChanged(sendResult.tx.getHashAsString());
                 }
 
                 public void onFailure(Throwable throwable)
@@ -665,15 +697,27 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
 
     public void onCoinsReceived(Wallet w, Transaction tx, BigInteger prevBalance, BigInteger newBalance)
     {
-        assert !newBalance.equals(BigInteger.ZERO);
+        onNewTransaction(tx);
+    }
 
-        // update the UI
-        onTransactionChanged(tx.getHashAsString());
+    public void onCoinsSent(Wallet w, Transaction tx, BigInteger prevBalance, BigInteger newBalance)
+    {
+        onNewTransaction(tx);
+    }
 
-        // get notified when transaction is confirmed
-        if (tx.isPending())
+    private void onNewTransaction(Transaction tx)
+    {
+        // avoid double updates if we get both sent + received
+        if (!trackedTransactions.contains(tx))
         {
-            tx.getConfidence().addEventListener(this);
+            // update the UI
+            onTransactionChanged(tx.getHashAsString());
+
+            // get notified when transaction is confirmed
+            if (tx.isPending())
+            {
+                trackTransaction(tx);
+            }
         }
     }
 
@@ -685,7 +729,7 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         if (!tx.isPending())
         {
             // coins were confirmed (appeared in a block) - we don't need to listen anymore
-            tx.getConfidence().removeEventListener(this);
+            stopTrackingTransaction(tx);
         }
 
         // update the UI
