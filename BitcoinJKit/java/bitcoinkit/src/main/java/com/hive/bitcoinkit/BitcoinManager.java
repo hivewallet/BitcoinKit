@@ -35,7 +35,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
@@ -49,7 +48,7 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
     private BlockStore blockStore;
     private File walletFile;
     private int blocksToDownload;
-    private Set<Transaction> trackedTransactions;
+    private HashSet<Transaction> trackedTransactions;
 
     private static final Logger log = LoggerFactory.getLogger(BitcoinManager.class);
 
@@ -192,11 +191,35 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         //make wallet autosave
         wallet.autosaveToFile(walletFile, 1, TimeUnit.SECONDS, null);
 
-        // Fetch the first key in the wallet (should be the only key).
-        ECKey key = wallet.getKeys().iterator().next();
+        wallet.addEventListener(new AbstractWalletEventListener()
+        {
+            // get notified when an incoming transaction is received
+            @Override
+            public void onCoinsReceived(Wallet w, Transaction tx, BigInteger prevBalance, BigInteger newBalance)
+            {
+                BitcoinManager.this.onCoinsReceived(w, tx, prevBalance, newBalance);
+            }
 
+            // get notified when we send a transaction, or when we restore an outgoing transaction from the blockchain
+            @Override
+            public void onCoinsSent(Wallet w, Transaction tx, BigInteger prevBalance, BigInteger newBalance)
+            {
+                BitcoinManager.this.onCoinsSent(w, tx, prevBalance, newBalance);
+            }
+        });
+
+        startBlockchain();
+    }
+
+    private File getBlockchainFile()
+    {
+        return new File(dataDirectory + "/bitcoinkit.spvchain");
+    }
+
+    private void startBlockchain() throws BlockStoreException
+    {
         // Load the block chain data file or generate a new one
-        File chainFile = new File(dataDirectory + "/bitcoinkit.spvchain");
+        File chainFile = getBlockchainFile();
         boolean chainExistedAlready = chainFile.exists();
         blockStore = new SPVBlockStore(networkParams, chainFile);
 
@@ -214,23 +237,6 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         peerGroup.setUserAgent("BitcoinJKit", "0.9");
         peerGroup.addPeerDiscovery(new DnsDiscovery(networkParams));
         peerGroup.addWallet(wallet);
-
-        wallet.addEventListener(new AbstractWalletEventListener()
-        {
-            // get notified when an incoming transaction is received
-            @Override
-            public void onCoinsReceived(Wallet w, Transaction tx, BigInteger prevBalance, BigInteger newBalance)
-            {
-                BitcoinManager.this.onCoinsReceived(w, tx, prevBalance, newBalance);
-            }
-
-            // get notified when we send a transaction, or when we restore an outgoing transaction from the blockchain
-            @Override
-            public void onCoinsSent(Wallet w, Transaction tx, BigInteger prevBalance, BigInteger newBalance)
-            {
-                BitcoinManager.this.onCoinsSent(w, tx, prevBalance, newBalance);
-            }
-        });
 
         onBalanceChanged();
         trackPendingTransactions(wallet);
@@ -286,32 +292,69 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         }
     }
 
+    public void resetBlockchain()
+    {
+        try
+        {
+            shutdownBlockchain();
+
+            log.info("Deleting blockchain data file...");
+            File chainFile = getBlockchainFile();
+            chainFile.delete();
+
+            blocksToDownload = 0;
+
+            for (Transaction tx : (HashSet<Transaction>) trackedTransactions.clone())
+            {
+                stopTrackingTransaction(tx);
+            }
+
+            startBlockchain();
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void stop()
     {
         try
         {
-            System.out.print("Shutting down ... ");
+            log.info("Shutting down BitcoinManager...");
 
-            if (peerGroup != null)
-            {
-                peerGroup.stopAndWait();
-            }
+            shutdownBlockchain();
 
             if (wallet != null)
             {
                 wallet.saveToFile(walletFile);
             }
 
-            if (blockStore != null)
-            {
-                blockStore.close();
-            }
-
-            System.out.print("done ");
+            log.info("Shutdown done.");
         }
         catch (Exception e)
         {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void shutdownBlockchain() throws BlockStoreException
+    {
+        log.info("Shutting down PeerGroup...");
+
+        if (peerGroup != null)
+        {
+            peerGroup.stopAndWait();
+            peerGroup.removeWallet(wallet);
+            peerGroup = null;
+        }
+
+        log.info("Shutting down BlockStore...");
+
+        if (blockStore != null)
+        {
+            blockStore.close();
+            blockStore = null;
         }
     }
 
