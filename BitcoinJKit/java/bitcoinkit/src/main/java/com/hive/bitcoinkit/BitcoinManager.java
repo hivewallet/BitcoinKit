@@ -489,11 +489,40 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
 
         return "{ \"amount\": " + tx.getValue(wallet) +
+                ", \"fee\": " + getTransactionFee(tx) +
                 ", \"txid\": \"" + tx.getHashAsString() + "\"" +
                 ", \"time\": \"" + dateFormat.format(tx.getUpdateTime()) + "\"" +
                 ", \"confidence\": \"" + confidence + "\"" +
                 ", \"details\": " + conns.toString() +
                 "}";
+    }
+
+    public BigInteger getTransactionFee(Transaction tx)
+    {
+        // TODO: this will break once we do more complex transactions with multiple sources/targets (e.g. coinjoin)
+
+        BigInteger v = BigInteger.ZERO;
+
+        for (TransactionInput input : tx.getInputs())
+        {
+            TransactionOutput connected = input.getConnectedOutput();
+            if (connected != null)
+            {
+                v = v.add(connected.getValue());
+            }
+            else
+            {
+                // we can't calculate the fee amount without having all data
+                return BigInteger.ZERO;
+            }
+        }
+
+        for (TransactionOutput output : tx.getOutputs())
+        {
+            v = v.subtract(output.getValue());
+        }
+
+        return v;
     }
 
     public int getTransactionCount()
