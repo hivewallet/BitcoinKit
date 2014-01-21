@@ -830,12 +830,12 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         {
             // remember the total amount
             blocksToDownload = blocksLeft;
-            log.debug("onChainDownloadStarted: blocksToDownload := " + blocksLeft);
+            log.debug("Starting blockchain sync: blocksToDownload := " + blocksLeft);
         }
         else
         {
             // we've already set that once and we're only downloading the remaining part
-            log.debug("onChainDownloadStarted: blocksToDownload = " + blocksToDownload + ", left = " + blocksLeft);
+            log.debug("Restarting blockchain sync: blocksToDownload = " + blocksToDownload + ", left = " + blocksLeft);
         }
 
         updateBlocksLeft(blocksLeft);
@@ -845,6 +845,7 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
     {
         if (blocksToDownload == 0)
         {
+            log.debug("Blockchain sync finished.");
             onSynchronizationUpdate(100.0f);
         }
         else
