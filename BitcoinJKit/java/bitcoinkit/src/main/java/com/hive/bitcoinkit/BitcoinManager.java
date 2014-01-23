@@ -752,6 +752,11 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
 
     public Date getLastWalletChange()
     {
+        if (wallet == null)
+        {
+            return null;
+        }
+
         LastWalletChangeExtension ext =
             (LastWalletChangeExtension) wallet.getExtensions().get(LastWalletChangeExtension.EXTENSION_ID);
 
