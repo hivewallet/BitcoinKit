@@ -51,13 +51,19 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;
 // Balance calculated assuming all pending transactions are included into the best chain by miners
 @property (nonatomic, readonly) uint64_t estimatedBalance;
 
-// Float value indicating the progress of network sync. Values are from 0 to 100.
+// Double value indicating the progress of network sync. Values are from 0.0 to 1.0.
 @property (nonatomic, readonly) float syncProgress;
+
+// Number of blocks in local spv chain file.
+@property (nonatomic, readonly) long currentBlockCount;
+
+// Number of blocks expected from the network
+@property (nonatomic, readonly) long totalBlockCount;
 
 // Various details about the wallet dumped into a single string, useful for debugging
 @property (nonatomic, readonly) NSString *walletDebuggingInfo;
 
-// Returns wallets main address. Creates one if none exists yet
+// Returns wallets main address.
 @property (nonatomic, readonly, getter = walletAddress) NSString *walletAddress;
 
 // Returns YES if wallet is encrypted. NO - otherwise

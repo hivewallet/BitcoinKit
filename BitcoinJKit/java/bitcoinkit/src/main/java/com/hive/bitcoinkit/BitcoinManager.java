@@ -48,6 +48,7 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
     private BlockStore blockStore;
     private File walletFile;
     private int blocksToDownload;
+    private int storedChainHeight;
     private HashSet<Transaction> trackedTransactions;
 
     private static final Logger log = LoggerFactory.getLogger(BitcoinManager.class);
@@ -218,6 +219,9 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
 
     private void startBlockchain() throws BlockStoreException
     {
+        //progress reset
+        storedChainHeight = 0;
+        
         // Load the block chain data file or generate a new one
         File chainFile = getBlockchainFile();
         boolean chainExistedAlready = chainFile.exists();
@@ -229,6 +233,32 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
             // cause ugly inconsistent wallet exceptions, so clear all old transaction data first
             log.info("Chain file missing - wallet transactions list will be rebuilt now");
             wallet.clearTransactions(0);
+            
+            File checkpointsFile = new File(dataDirectory + "/bitcoinkit.checkpoints");
+            if (checkpointsFile.exists())
+            {
+                
+                // get the oldest key
+                long oldestKeyCreationTime = 0;
+                for(ECKey key: wallet.getKeys())
+                {
+                    long keyAge = key.getCreationTimeSeconds();
+                    if(oldestKeyCreationTime == 0 || keyAge < oldestKeyCreationTime)
+                    {
+                        oldestKeyCreationTime = keyAge;
+                    }
+                }
+                
+                try {
+                    FileInputStream stream = new FileInputStream(checkpointsFile);
+                    CheckpointManager.checkpoint(networkParams, stream, blockStore, oldestKeyCreationTime);
+                }
+                catch (IOException e)
+                {
+                    throw new BlockStoreException("Could not initialize checkpoints");
+                }
+                
+            }
         }
 
         BlockChain chain = new BlockChain(networkParams, wallet, blockStore);
@@ -241,6 +271,17 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         onBalanceChanged();
         trackPendingTransactions(wallet);
 
+        // inform the app over the current chains height; if there is a chain and already loaded blocks
+        if(chain != null)
+        {
+            StoredBlock chainHead = chain.getChainHead();
+            if(chainHead != null)
+            {
+                storedChainHeight = chainHead.getHeight();
+                onSynchronizationUpdate(0.0, storedChainHeight, -1);
+            }
+        }
+        
         peerGroup.startAndWait();
 
         // get notified about sync progress
@@ -826,38 +867,29 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
 
     public void onBlocksDownloaded(Peer peer, Block block, int blocksLeft)
     {
-        updateBlocksLeft(blocksLeft);
+        int downloadedSoFar = blocksToDownload - blocksLeft;
+        if (blocksToDownload == 0)
+        {
+            onSynchronizationUpdate(1.0, storedChainHeight+downloadedSoFar, -1);
+        }
+        else
+        {
+            // report after every 100 block
+            if(blocksLeft % 100 == 0)
+            {
+                double progress = (double)downloadedSoFar / (double)blocksToDownload;
+                onSynchronizationUpdate(progress, storedChainHeight+downloadedSoFar, -1);
+            }
+        }
     }
-
+    
     public void onChainDownloadStarted(Peer peer, int blocksLeft)
     {
+        blocksToDownload = blocksLeft;
         if (blocksToDownload == 0)
-        {
-            // remember the total amount
-            blocksToDownload = blocksLeft;
-            log.debug("Starting blockchain sync: blocksToDownload := " + blocksLeft);
-        }
+            onSynchronizationUpdate(1.0, storedChainHeight+blocksToDownload, -1);
         else
-        {
-            // we've already set that once and we're only downloading the remaining part
-            log.debug("Restarting blockchain sync: blocksToDownload = " + blocksToDownload + ", left = " + blocksLeft);
-        }
-
-        updateBlocksLeft(blocksLeft);
-    }
-
-    private void updateBlocksLeft(int blocksLeft)
-    {
-        if (blocksToDownload == 0)
-        {
-            log.debug("Blockchain sync finished.");
-            onSynchronizationUpdate(100.0f);
-        }
-        else
-        {
-            int downloadedSoFar = blocksToDownload - blocksLeft;
-            onSynchronizationUpdate(100.0f * downloadedSoFar / blocksToDownload);
-        }
+            onSynchronizationUpdate(0.0, -1, -1);
     }
 
 
@@ -869,7 +901,7 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
 
     public native void onTransactionSuccess(String txid);
 
-    public native void onSynchronizationUpdate(float percent);
+    public native void onSynchronizationUpdate(double progress, long blockCount, long blockHeight);
 
     public native void onBalanceChanged();
 
