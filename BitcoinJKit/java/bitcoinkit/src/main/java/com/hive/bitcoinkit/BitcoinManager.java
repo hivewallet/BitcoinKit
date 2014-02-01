@@ -6,7 +6,6 @@ import com.google.bitcoin.crypto.KeyCrypterException;
 import com.google.bitcoin.crypto.KeyCrypterScrypt;
 import com.google.bitcoin.net.discovery.DnsDiscovery;
 import com.google.bitcoin.params.MainNetParams;
-import com.google.bitcoin.params.RegTestParams;
 import com.google.bitcoin.params.TestNet3Params;
 import com.google.bitcoin.script.Script;
 import com.google.bitcoin.store.BlockStore;
@@ -28,7 +27,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.net.InetAddress;
 import java.nio.CharBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -198,6 +196,7 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
             public void onCoinsReceived(Wallet w, Transaction tx, BigInteger prevBalance, BigInteger newBalance)
             {
                 BitcoinManager.this.onCoinsReceived(w, tx, prevBalance, newBalance);
+                BitcoinManager.this.onBalanceChanged();
             }
 
             // get notified when we send a transaction, or when we restore an outgoing transaction from the blockchain
@@ -205,6 +204,20 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
             public void onCoinsSent(Wallet w, Transaction tx, BigInteger prevBalance, BigInteger newBalance)
             {
                 BitcoinManager.this.onCoinsSent(w, tx, prevBalance, newBalance);
+                BitcoinManager.this.onBalanceChanged();
+            }
+
+            @Override
+            public void onReorganize(Wallet wallet)
+            {
+                BitcoinManager.this.onBalanceChanged();
+            }
+
+            @Override
+            public void onTransactionConfidenceChanged(Wallet wallet, Transaction tx)
+            {
+                super.onTransactionConfidenceChanged(wallet, tx);
+                BitcoinManager.this.onBalanceChanged();
             }
         });
 
@@ -745,7 +758,7 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
     public void updateLastWalletChange(Wallet wallet)
     {
         LastWalletChangeExtension ext =
-            (LastWalletChangeExtension) wallet.getExtensions().get(LastWalletChangeExtension.EXTENSION_ID);
+                (LastWalletChangeExtension) wallet.getExtensions().get(LastWalletChangeExtension.EXTENSION_ID);
 
         ext.setLastWalletChangeDate(new Date());
     }
@@ -758,7 +771,7 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         }
 
         LastWalletChangeExtension ext =
-            (LastWalletChangeExtension) wallet.getExtensions().get(LastWalletChangeExtension.EXTENSION_ID);
+                (LastWalletChangeExtension) wallet.getExtensions().get(LastWalletChangeExtension.EXTENSION_ID);
 
         return ext.getLastWalletChangeDate();
     }

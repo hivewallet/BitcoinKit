@@ -530,7 +530,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
         _balanceChecker = [NSTimer scheduledTimerWithTimeInterval:1.0
                                                            target:self
-                                                         selector:@selector(checkBalance:)
+                                                         selector:@selector(verifyBalance:)
                                                          userInfo:nil
                                                           repeats:YES];
 
@@ -857,15 +857,18 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     return [self callLongMethodWithName:"getEstimatedBalance" signature:"()J"];
 }
 
-- (void)checkBalance:(NSTimer *)timer
+- (void)verifyBalance:(NSTimer *)timer
 {
+    // This shouldn't be necessary, but let's check if we missed anything.
     if (self.availableBalance != _lastAvailableBalance)
     {
+        HILogError(@"BitcoinKit missed a change notification. This is a bug.");
         [self onAvailableBalanceChanged];
     }
 
     if (self.estimatedBalance != _lastEstimatedBalance)
     {
+        HILogError(@"BitcoinKit missed a change notification. This is a bug.");
         [self onEstimatedBalanceChanged];
     }
 }
