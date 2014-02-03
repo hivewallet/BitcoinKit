@@ -29,7 +29,7 @@
 
 - (void)onAvailableBalanceChanged;
 - (void)onEstimatedBalanceChanged;
-- (void)onSynchronizationChanged:(float)percent;
+- (void)onSynchronizationChanged:(double)progress blockCount:(long)blockCount totalBlocks:(long)totalBlocks;
 - (void)onTransactionChanged:(NSString *)txid;
 - (void)onTransactionSuccess:(NSString *)txid;
 - (void)onTransactionFailed;
@@ -72,10 +72,10 @@ JNIEXPORT void JNICALL onBalanceChanged(JNIEnv *env, jobject thisobject)
     [pool release];
 }
 
-JNIEXPORT void JNICALL onSynchronizationUpdate(JNIEnv *env, jobject thisobject, jfloat percent)
+JNIEXPORT void JNICALL onSynchronizationUpdate(JNIEnv *env, jobject thisobject, jdouble progress, jlong blockCount, jlong totalBlocks)
 {
     NSAutoreleasePool *pool = [NSAutoreleasePool new];
-    [[HIBitcoinManager defaultManager] onSynchronizationChanged:(float)percent];
+    [[HIBitcoinManager defaultManager] onSynchronizationChanged:(double)progress blockCount:blockCount totalBlocks:totalBlocks];
     [pool release];
 }
 
@@ -137,7 +137,7 @@ static JNINativeMethod methods[] = {
     {"onTransactionChanged",    "(Ljava/lang/String;)V",                   (void *)&onTransactionChanged},
     {"onTransactionSuccess",    "(Ljava/lang/String;)V",                   (void *)&onTransactionSuccess},
     {"onTransactionFailed",     "()V",                                     (void *)&onTransactionFailed},
-    {"onSynchronizationUpdate", "(F)V",                                    (void *)&onSynchronizationUpdate},
+    {"onSynchronizationUpdate", "(DJJ)V",                                    (void *)&onSynchronizationUpdate},
     {"onException",             "(Ljava/lang/Throwable;)V",                (void *)&onException}
 };
 
@@ -463,6 +463,8 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
         _connections = 0;
         _sending = NO;
         _syncProgress = 0;
+        _totalBlockCount = 0;
+        _currentBlockCount = 0;
         _testingNetwork = NO;
         _enableMining = NO;
         _isRunning = NO;
@@ -922,11 +924,23 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     });
 }
 
-- (void)onSynchronizationChanged:(float)percent
+- (void)onSynchronizationChanged:(double)progress blockCount:(long)blockCount totalBlocks:(long)totalBlocks
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self willChangeValueForKey:@"syncProgress"];
-        _syncProgress = percent;
+        if(progress >= 0)
+        {
+            _syncProgress = (double)progress;
+        }
+        
+        if(blockCount > 0)
+        {
+            _currentBlockCount = blockCount;
+        }
+        if(totalBlocks > 0)
+        {
+            _totalBlockCount = totalBlocks;
+        }
         [self didChangeValueForKey:@"syncProgress"];
     });
 }
