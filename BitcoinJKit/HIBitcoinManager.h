@@ -60,6 +60,9 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;
 // Returns wallets main address. Creates one if none exists yet
 @property (nonatomic, readonly, getter = walletAddress) NSString *walletAddress;
 
+// Returns all wallet addresses.
+@property (nonatomic, readonly, getter = allWalletAddresses) NSArray *allWalletAddresses;
+
 // Returns YES if wallet is encrypted. NO - otherwise
 @property (nonatomic, readonly, getter = isWalletEncrypted) BOOL isWalletEncrypted;
 
@@ -138,6 +141,14 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;
 - (void)changeWalletPassword:(NSData *)fromPassword
                   toPassword:(NSData *)toPassword
                        error:(NSError **)error;
+
+/** Add a address to the wallet.
+ *
+ * @param error A pointer to an error object (or NULL to throw an exception on errors)
+ *
+ * @returns string of the pubkey of the new address
+ */
+- (NSString *)addAddress:(NSError **)error;
 
 /** Stops the manager and stores all up-to-date information in data folder
  *
