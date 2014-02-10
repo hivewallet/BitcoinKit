@@ -196,7 +196,6 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
             public void onCoinsReceived(Wallet w, Transaction tx, BigInteger prevBalance, BigInteger newBalance)
             {
                 BitcoinManager.this.onCoinsReceived(w, tx, prevBalance, newBalance);
-                BitcoinManager.this.onBalanceChanged();
             }
 
             // get notified when we send a transaction, or when we restore an outgoing transaction from the blockchain
@@ -204,19 +203,11 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
             public void onCoinsSent(Wallet w, Transaction tx, BigInteger prevBalance, BigInteger newBalance)
             {
                 BitcoinManager.this.onCoinsSent(w, tx, prevBalance, newBalance);
-                BitcoinManager.this.onBalanceChanged();
             }
 
             @Override
             public void onReorganize(Wallet wallet)
             {
-                BitcoinManager.this.onBalanceChanged();
-            }
-
-            @Override
-            public void onTransactionConfidenceChanged(Wallet wallet, Transaction tx)
-            {
-                super.onTransactionConfidenceChanged(wallet, tx);
                 BitcoinManager.this.onBalanceChanged();
             }
         });
@@ -801,6 +792,7 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         if (!trackedTransactions.contains(tx))
         {
             // update the UI
+            onBalanceChanged();
             onTransactionChanged(tx.getHashAsString());
 
             // get notified when transaction is confirmed
@@ -823,6 +815,7 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         }
 
         // update the UI
+        onBalanceChanged();
         onTransactionChanged(tx.getHashAsString());
     }
 
