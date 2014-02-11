@@ -146,6 +146,9 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;
  */
 - (void)stop;
 
+/** Deletes the blockchain data file. */
+- (void)deleteBlockchainDataFile:(NSError **)error;
+
 /** Deletes the blockchain data file, restarts the network layer and starts rebuilding the wallet from the blockchain.
  *
  * @param error A pointer to an error object (or NULL to throw an exception on errors)

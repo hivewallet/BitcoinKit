@@ -296,15 +296,19 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         }
     }
 
+    public void deleteBlockchainDataFile()
+    {
+        log.info("Deleting blockchain data file...");
+        File chainFile = getBlockchainFile();
+        chainFile.delete();
+    }
+
     public void resetBlockchain()
     {
         try
         {
             shutdownBlockchain();
-
-            log.info("Deleting blockchain data file...");
-            File chainFile = getBlockchainFile();
-            chainFile.delete();
+            deleteBlockchainDataFile();
 
             blocksToDownload = 0;
 

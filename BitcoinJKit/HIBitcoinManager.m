@@ -680,6 +680,11 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     [[NSNotificationCenter defaultCenter] postNotificationName:kHIBitcoinManagerStoppedNotification object:self];
 }
 
+- (void)deleteBlockchainDataFile:(NSError **)error
+{
+    [self callVoidMethodWithName:"deleteBlockchainDataFile" error:error signature:"()V"];
+}
+
 - (void)resetBlockchain:(NSError **)error
 {
     [self callVoidMethodWithName:"resetBlockchain" error:error signature:"()V"];
