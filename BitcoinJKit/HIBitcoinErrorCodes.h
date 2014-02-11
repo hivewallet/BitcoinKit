@@ -9,8 +9,8 @@
 /* The wallet file exists but could not be read. */
 extern NSInteger const kHIBitcoinManagerUnreadableWallet;
 
-/* Storing a block failed (e.g. because the file is locked or the volume is full). */
-extern NSInteger const kHIBitcoinManagerBlockStoreError;
+/* Acessing a block store file failed because it's locked by another process. */
+extern NSInteger const kHIBitcoinManagerBlockStoreLockError;
 
 /* There is no wallet and it needs to be created. */
 extern NSInteger const kHIBitcoinManagerNoWallet;
@@ -20,3 +20,6 @@ extern NSInteger const kHIBitcoinManagerWalletExists;
 
 /* An operation could not be completed because a wrong password was specified. */
 extern NSInteger const kHIBitcoinManagerWrongPassword;
+
+/* Accessing block store file failed (e.g. file is corrupted). */
+extern NSInteger const kHIBitcoinManagerBlockStoreReadError;

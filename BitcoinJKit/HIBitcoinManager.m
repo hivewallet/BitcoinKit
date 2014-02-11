@@ -336,13 +336,22 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 - (NSInteger)errorCodeForJavaException:(jthrowable)exception
 {
     NSString *exceptionClass = [self getJavaExceptionClassName:exception];
+    NSString *exceptionMessage = [self getJavaExceptionMessage:exception];
+
     if ([exceptionClass isEqual:@"com.google.bitcoin.store.UnreadableWalletException"])
     {
         return kHIBitcoinManagerUnreadableWallet;
     }
     else if ([exceptionClass isEqual:@"com.google.bitcoin.store.BlockStoreException"])
     {
-        return kHIBitcoinManagerBlockStoreError;
+        if ([exceptionMessage rangeOfString:@"Store file is already locked"].location != NSNotFound)
+        {
+            return kHIBitcoinManagerBlockStoreLockError;
+        }
+        else
+        {
+            return kHIBitcoinManagerBlockStoreReadError;
+        }
     }
     else if ([exceptionClass isEqual:@"java.lang.IllegalArgumentException"])
     {
