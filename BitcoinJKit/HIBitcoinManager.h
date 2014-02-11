@@ -42,8 +42,11 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;
 // Currently active connections to bitcoin network
 @property (nonatomic, readonly) NSUInteger connections;
 
-// Flag indicating if NPBitcoinManager is currently running and connecting with the network
+// Flag indicating if HIBitcoinManager is currently running and connecting with the network
 @property (nonatomic, readonly) BOOL isRunning;
+
+// Flag indicating if HIBitcoinManager is currently syncing with the Bitcoin network
+@property (nonatomic, readonly) BOOL isSyncing;
 
 // Actual balance of the wallet
 @property (nonatomic, readonly) uint64_t availableBalance;

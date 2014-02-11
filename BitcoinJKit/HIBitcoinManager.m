@@ -35,6 +35,8 @@
 - (void)onTransactionFailed;
 - (void)handleJavaException:(jthrowable)exception useExceptionHandler:(BOOL)useHandler error:(NSError **)returnedError;
 
+@property (nonatomic, assign) BOOL isSyncing;
+
 @end
 
 
@@ -915,6 +917,16 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     [self handleJavaExceptions:NULL];
 }
 
+- (void)setIsSyncing:(BOOL)isSyncing
+{
+    if (_isSyncing != isSyncing)
+    {
+        [self willChangeValueForKey:@"isSyncing"];
+        _isSyncing = isSyncing;
+        [self didChangeValueForKey:@"isSyncing"];
+    }
+}
+
 
 #pragma mark - Callbacks
 
@@ -942,6 +954,8 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
         [self willChangeValueForKey:@"syncProgress"];
         _syncProgress = percent;
         [self didChangeValueForKey:@"syncProgress"];
+
+        self.isSyncing = (percent < 100.0);
     });
 }
 
