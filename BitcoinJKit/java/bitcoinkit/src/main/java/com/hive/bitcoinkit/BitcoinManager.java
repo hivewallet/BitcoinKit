@@ -179,6 +179,9 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
 
         wallet.saveToFile(walletFile);
 
+        // just in case an old file exists there for some reason
+        deleteBlockchainDataFile();
+
         useWallet(wallet);
     }
 
