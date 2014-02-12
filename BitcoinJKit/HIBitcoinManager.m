@@ -390,7 +390,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
 - (NSDictionary *)createUserInfoForJavaException:(jthrowable)exception
 {
-    NSMutableDictionary *userInfo = [NSMutableDictionary new];
+    NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
     userInfo[NSLocalizedFailureReasonErrorKey] = [self getJavaExceptionMessage:exception] ?: @"Java VM raised an exception";
 
     NSString *stackTrace = [self getJavaExceptionStackTrace:exception];
