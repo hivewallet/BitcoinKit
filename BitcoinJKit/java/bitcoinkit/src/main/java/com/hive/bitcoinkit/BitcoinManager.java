@@ -605,13 +605,13 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
     }
 
     public void sendCoins(String amount, final String sendToAddressString)
-            throws WrongPasswordException, SendingDustException
+            throws WrongPasswordException, SendingDustException, AddressFormatException, InsufficientMoneyException
     {
         sendCoins(amount, sendToAddressString, null);
     }
 
     public void sendCoins(String amount, final String sendToAddressString, char[] utf16Password)
-            throws WrongPasswordException, SendingDustException
+            throws WrongPasswordException, SendingDustException, AddressFormatException, InsufficientMoneyException
     {
         KeyParameter aesKey = null;
         try
@@ -651,14 +651,6 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         catch (KeyCrypterException e)
         {
             throw new WrongPasswordException(e);
-        }
-        catch (SendingDustException e)
-        {
-            throw e;
-        }
-        catch (Exception e)
-        {
-            onTransactionFailed();
         }
         finally
         {
