@@ -604,13 +604,14 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         }
     }
 
-    public void sendCoins(String amount, final String sendToAddressString) throws WrongPasswordException
+    public void sendCoins(String amount, final String sendToAddressString)
+            throws WrongPasswordException, SendingDustException
     {
         sendCoins(amount, sendToAddressString, null);
     }
 
     public void sendCoins(String amount, final String sendToAddressString, char[] utf16Password)
-            throws WrongPasswordException
+            throws WrongPasswordException, SendingDustException
     {
         KeyParameter aesKey = null;
         try
@@ -618,6 +619,11 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
             BigInteger aToSend = new BigInteger(amount);
             Address sendToAddress = new Address(networkParams, sendToAddressString);
             final Wallet.SendRequest request = Wallet.SendRequest.to(sendToAddress, aToSend);
+
+            if (isDust(request))
+            {
+                throw new SendingDustException("Can't send dust amount: " + amount);
+            }
 
             if (utf16Password != null)
             {
@@ -644,14 +650,32 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         }
         catch (KeyCrypterException e)
         {
-            wipeAesKey(aesKey);
             throw new WrongPasswordException(e);
+        }
+        catch (SendingDustException e)
+        {
+            throw e;
         }
         catch (Exception e)
         {
-            wipeAesKey(aesKey);
             onTransactionFailed();
         }
+        finally
+        {
+            wipeAesKey(aesKey);
+        }
+    }
+
+    private boolean isDust(Wallet.SendRequest req)
+    {
+        for (TransactionOutput output : req.tx.getOutputs())
+        {
+            if (output.getValue().compareTo(Utils.CENT) < 0)
+            {
+                return output.getValue().compareTo(output.getMinNonDustValue()) < 0;
+            }
+        }
+        return false;
     }
 
 

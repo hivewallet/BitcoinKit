@@ -371,6 +371,10 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     {
         return kHIBitcoinManagerWrongPassword;
     }
+    else if ([exceptionClass isEqual:@"com.hive.bitcoinkit.SendingDustException"])
+    {
+        return kHIBitcoinManagerSendingDustError;
+    }
     else
     {
         return kHIBitcoinManagerUnexpectedError;

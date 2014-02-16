@@ -23,3 +23,6 @@ extern NSInteger const kHIBitcoinManagerWrongPassword;
 
 /* Accessing block store file failed (e.g. file is corrupted). */
 extern NSInteger const kHIBitcoinManagerBlockStoreReadError;
+
+/* The user tried to send dust. */
+extern NSInteger const kHIBitcoinManagerSendingDustError;
