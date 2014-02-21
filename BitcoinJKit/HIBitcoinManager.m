@@ -29,6 +29,7 @@
 
 - (void)onAvailableBalanceChanged;
 - (void)onEstimatedBalanceChanged;
+- (void)onPeerCountChanged:(NSUInteger)peerCount;
 - (void)onSynchronizationChanged:(float)percent;
 - (void)onTransactionChanged:(NSString *)txid;
 - (void)onTransactionSuccess:(NSString *)txid;
@@ -71,6 +72,13 @@ JNIEXPORT void JNICALL onBalanceChanged(JNIEnv *env, jobject thisobject)
     NSAutoreleasePool *pool = [NSAutoreleasePool new];
     [[HIBitcoinManager defaultManager] onAvailableBalanceChanged];
     [[HIBitcoinManager defaultManager] onEstimatedBalanceChanged];
+    [pool release];
+}
+
+JNIEXPORT void JNICALL onPeerCountChanged(JNIEnv *env, jobject thisobject, jint peerCount)
+{
+    NSAutoreleasePool *pool = [NSAutoreleasePool new];
+    [[HIBitcoinManager defaultManager] onPeerCountChanged:peerCount];
     [pool release];
 }
 
@@ -136,6 +144,7 @@ JNIEXPORT void JNICALL receiveLogFromJVM(JNIEnv *env, jobject thisobject, jstrin
 
 static JNINativeMethod methods[] = {
     {"onBalanceChanged",        "()V",                                     (void *)&onBalanceChanged},
+    {"onPeerCountChanged",      "(I)V",                                    (void *)&onPeerCountChanged},
     {"onTransactionChanged",    "(Ljava/lang/String;)V",                   (void *)&onTransactionChanged},
     {"onTransactionSuccess",    "(Ljava/lang/String;)V",                   (void *)&onTransactionSuccess},
     {"onTransactionFailed",     "()V",                                     (void *)&onTransactionFailed},
@@ -931,6 +940,11 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     }
 }
 
+- (BOOL)isConnected
+{
+    return (_peerCount > 0);
+}
+
 
 #pragma mark - Callbacks
 
@@ -949,6 +963,26 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
         [self willChangeValueForKey:@"estimatedBalance"];
         _lastEstimatedBalance = self.estimatedBalance;
         [self didChangeValueForKey:@"estimatedBalance"];
+    });
+}
+
+- (void)onPeerCountChanged:(NSUInteger)peerCount {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        BOOL statusChange = (_peerCount > 0 && peerCount == 0) || (_peerCount == 0 && peerCount > 0);
+
+        [self willChangeValueForKey:@"peerCount"];
+        if (statusChange)
+        {
+            [self willChangeValueForKey:@"isConnected"];
+        }
+
+        _peerCount = peerCount;
+
+        [self didChangeValueForKey:@"peerCount"];
+        if (statusChange)
+        {
+            [self didChangeValueForKey:@"isConnected"];
+        }
     });
 }
 

@@ -248,6 +248,18 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         onBalanceChanged();
         trackPendingTransactions(wallet);
 
+        peerGroup.addEventListener(new AbstractPeerEventListener() {
+            @Override
+            public void onPeerConnected(Peer peer, int peerCount) {
+                BitcoinManager.this.onPeerConnected(peer, peerCount);
+            }
+
+            @Override
+            public void onPeerDisconnected(Peer peer, int peerCount) {
+                BitcoinManager.this.onPeerDisconnected(peer, peerCount);
+            }
+        });
+
         peerGroup.startAndWait();
 
         // get notified about sync progress
@@ -851,7 +863,15 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
     }
 
 
-	/* PeerEventListener */
+    /* PeerEventListener */
+
+    public void onPeerConnected(Peer peer, int peerCount) {
+        onPeerCountChanged(peerCount);
+    }
+
+    public void onPeerDisconnected(Peer peer, int peerCount) {
+        onPeerCountChanged(peerCount);
+    }
 
     public void onBlocksDownloaded(Peer peer, Block block, int blocksLeft)
     {
@@ -901,6 +921,8 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
     public native void onSynchronizationUpdate(float percent);
 
     public native void onBalanceChanged();
+
+    public native void onPeerCountChanged(int peerCount);
 
     public native void onException(Throwable exception);
 }

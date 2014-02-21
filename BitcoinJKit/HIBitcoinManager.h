@@ -72,6 +72,12 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;
 // Returns global transaction cound for current wallet
 @property (nonatomic, readonly, getter = transactionCount) NSUInteger transactionCount;
 
+// Returns number of connected peers
+@property (nonatomic, readonly) NSUInteger peerCount;
+
+// Tells if the manager is connected to at least one peer
+@property (nonatomic, readonly) BOOL isConnected;
+
 // Returns date when the wallet password was last changed, or when the wallet was created (might be null for old files)
 @property (nonatomic, readonly) NSDate *lastWalletChangeDate;
 
