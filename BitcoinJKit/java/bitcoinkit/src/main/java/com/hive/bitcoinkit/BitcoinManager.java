@@ -720,6 +720,26 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         return wallet.getKeys().get(0).isEncrypted();
     }
 
+    public boolean isPasswordCorrect(char[] password)
+    {
+        KeyParameter aesKey = null;
+
+        try
+        {
+            aesKey = aesKeyForPassword(password);
+            return wallet.checkAESKey(aesKey);
+        }
+        catch (WrongPasswordException e)
+        {
+            return false;
+        }
+        finally
+        {
+            wipeAesKey(aesKey);
+        }
+    }
+
+
     public void changeWalletPassword(char[] oldUtf16Password, char[] newUtf16Password) throws WrongPasswordException
     {
         updateLastWalletChange(wallet);

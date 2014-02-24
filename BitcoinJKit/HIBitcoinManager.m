@@ -654,6 +654,17 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     [self zeroCharArray:toCharArray size:(jsize)(toPassword.length / sizeof(jchar))];
 }
 
+- (BOOL)isPasswordCorrect:(NSData *)password
+{
+    jarray charArray = JCharArrayFromNSData(_jniEnv, password);
+
+    BOOL result = [self callBooleanMethodWithName:"isPasswordCorrect" signature:"([C)Z", charArray];
+
+    [self zeroCharArray:charArray size:(jsize)(password.length / sizeof(jchar))];
+
+    return result;
+}
+
 - (void)zeroCharArray:(jarray)charArray size:(jsize)size {
     jchar zero[size];
     memset(zero, 0, size * sizeof(jchar));

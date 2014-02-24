@@ -148,6 +148,13 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;
                   toPassword:(NSData *)toPassword
                        error:(NSError **)error;
 
+/** Checks if the given password is correct.
+ *
+ * @param password The password to be checked.
+ * @returns BOOL true if the password matches the one in the wallet
+ */
+- (BOOL)isPasswordCorrect:(NSData *)password;
+
 /** Stops the manager and stores all up-to-date information in data folder
  *
  * One should stop the manager only once. At the shutdown procedure.
