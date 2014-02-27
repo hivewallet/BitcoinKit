@@ -236,6 +236,32 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
             // cause ugly inconsistent wallet exceptions, so clear all old transaction data first
             log.info("Chain file missing - wallet transactions list will be rebuilt now");
             wallet.clearTransactions(0);
+
+            File checkpointsFile = new File(dataDirectory + "/bitcoinkit.checkpoints");
+            if (checkpointsFile.exists())
+            {
+                // get the oldest key
+                long oldestKeyCreationTime = 0;
+                for (ECKey key : wallet.getKeys())
+                {
+                    long keyAge = key.getCreationTimeSeconds();
+
+                    if (oldestKeyCreationTime == 0 || keyAge < oldestKeyCreationTime)
+                    {
+                        oldestKeyCreationTime = keyAge;
+                    }
+                }
+
+                try
+                {
+                    FileInputStream stream = new FileInputStream(checkpointsFile);
+                    CheckpointManager.checkpoint(networkParams, stream, blockStore, oldestKeyCreationTime);
+                }
+                catch (IOException e)
+                {
+                    throw new BlockStoreException("Could not load checkpoints file");
+                }
+            }
         }
 
         BlockChain chain = new BlockChain(networkParams, wallet, blockStore);
