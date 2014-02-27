@@ -45,11 +45,15 @@
 
 NSString * NSStringFromJString(JNIEnv *env, jstring javaString)
 {
-    const char *chars = (*env)->GetStringUTFChars(env, javaString, NULL);
-    NSString *objcString = [NSString stringWithUTF8String:chars];
-    (*env)->ReleaseStringUTFChars(env, javaString, chars);
+    if (javaString) {
+        const char *chars = (*env)->GetStringUTFChars(env, javaString, NULL);
+        NSString *objcString = [NSString stringWithUTF8String:chars];
+        (*env)->ReleaseStringUTFChars(env, javaString, chars);
 
-    return objcString;
+        return objcString;
+    } else {
+        return nil;
+    }
 }
 
 jstring JStringFromNSString(JNIEnv *env, NSString *string)
@@ -771,6 +775,20 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 {
     jstring address = [self callObjectMethodWithName:"getWalletAddress" error:NULL signature:"()Ljava/lang/String;"];
     return NSStringFromJString(_jniEnv, address);
+}
+
+- (NSString *)checkpointsFilePath
+{
+    jstring path = [self callObjectMethodWithName:"getCheckpointsFilePath" error:NULL signature:"()Ljava/lang/String;"];
+    return NSStringFromJString(_jniEnv, path);
+}
+
+- (void)setCheckpointsFilePath:(NSString *)checkpointsFilePath
+{
+    [self callVoidMethodWithName:"setCheckpointsFilePath"
+                           error:NULL
+                       signature:"(Ljava/lang/String;)V",
+     JStringFromNSString(_jniEnv, checkpointsFilePath)];
 }
 
 - (void)stop

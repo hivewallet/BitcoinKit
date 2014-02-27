@@ -28,15 +28,19 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;
 @interface HIBitcoinManager : NSObject
 
 // Specifies an URL path to a directory where HIBitcoinManager should store its data.
-// Warning! All changes to it has to be performed BEFORE start.
+// Warning! All changes to this property have to be made BEFORE start.
 @property (nonatomic, copy) NSURL *dataURL;
 
+// Specifies a path to a checkpoints file used to speed up blockchain sync (optional)
+// Warning! All changes to this property have to be made BEFORE start.
+@property (nonatomic, copy) NSString *checkpointsFilePath;
+
 // Specifies if a manager is running on the testing network.
-// Warning! All changes to it has to be performed BEFORE start.
+// Warning! All changes to this property have to be made BEFORE start.
 @property (nonatomic, assign) BOOL testingNetwork;
 
 // Specifies if a manager should try to mine bticoins.
-// Warning! All changes to it has to be performed BEFORE start.
+// Warning! All changes to this property have to be made BEFORE start.
 @property (nonatomic, assign) BOOL enableMining;
 
 // Currently active connections to bitcoin network

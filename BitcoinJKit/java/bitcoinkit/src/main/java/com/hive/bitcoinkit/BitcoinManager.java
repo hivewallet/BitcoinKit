@@ -41,6 +41,7 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
     private NetworkParameters networkParams;
     private Wallet wallet;
     private String dataDirectory;
+    private String checkpointsFilePath;
 
     private PeerGroup peerGroup;
     private BlockStore blockStore;
@@ -77,6 +78,16 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
     public void setDataDirectory(String path)
     {
         dataDirectory = path;
+    }
+
+    public String getCheckpointsFilePath()
+    {
+        return checkpointsFilePath;
+    }
+
+    public void setCheckpointsFilePath(String path)
+    {
+        checkpointsFilePath = path;
     }
 
 
@@ -237,7 +248,13 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
             log.info("Chain file missing - wallet transactions list will be rebuilt now");
             wallet.clearTransactions(0);
 
-            File checkpointsFile = new File(dataDirectory + "/bitcoinkit.checkpoints");
+            String checkpointsFilePath = this.checkpointsFilePath;
+            if (checkpointsFilePath == null)
+            {
+                checkpointsFilePath = dataDirectory + "/bitcoinkit.checkpoints";
+            }
+
+            File checkpointsFile = new File(checkpointsFilePath);
             if (checkpointsFile.exists())
             {
                 // get the oldest key
