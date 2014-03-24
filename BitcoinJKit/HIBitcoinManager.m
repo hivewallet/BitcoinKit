@@ -495,7 +495,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
                                                                              inDomains:NSUserDomainMask];
         self.dataURL = [[applicationSupport lastObject] URLByAppendingPathComponent:BitcoinJKitBundleIdentifier];
 
-        int numOptions = 1;
+        int numOptions = 2;
 #ifdef DEBUG
         const char *debugPort = getenv("HIVE_JAVA_DEBUG_PORT");
         BOOL doDebug = debugPort && debugPort[0];
@@ -507,6 +507,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
         NSBundle *myBundle = [NSBundle bundleWithIdentifier:BitcoinJKitBundleIdentifier];
         NSString *bootJarPath = [myBundle pathForResource:@"boot" ofType:@"jar"];
         options[0].optionString = (char *) [[NSString stringWithFormat:@"-Djava.class.path=%@", bootJarPath] UTF8String];
+        options[1].optionString = "-Djava.ext.dirs=";
 
 #ifdef DEBUG
         NSString *debugOptionString =
