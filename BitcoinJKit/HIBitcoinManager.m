@@ -65,6 +65,11 @@ jarray JCharArrayFromNSData(JNIEnv *env, NSData *data)
     return charArray;
 }
 
+char * CharsFromString(NSString *string) {
+    return (char *) [string UTF8String];
+}
+
+
 #pragma mark - JNI callback functions
 
 JNIEXPORT void JNICALL onBalanceChanged(JNIEnv *env, jobject thisobject)
@@ -495,7 +500,8 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
                                                                              inDomains:NSUserDomainMask];
         self.dataURL = [[applicationSupport lastObject] URLByAppendingPathComponent:BitcoinJKitBundleIdentifier];
 
-        int numOptions = 2;
+        int numOptions = 1;
+
 #ifdef DEBUG
         const char *debugPort = getenv("HIVE_JAVA_DEBUG_PORT");
         BOOL doDebug = debugPort && debugPort[0];
@@ -503,17 +509,29 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
             numOptions++;
         }
 #endif
+
+        NSString *extensionPaths = [self javaExtensionPaths];
+        if (extensionPaths) {
+            numOptions++;
+        }
+
         JavaVMOption options[numOptions];
-        NSBundle *myBundle = [NSBundle bundleWithIdentifier:BitcoinJKitBundleIdentifier];
-        NSString *bootJarPath = [myBundle pathForResource:@"boot" ofType:@"jar"];
-        options[0].optionString = (char *) [[NSString stringWithFormat:@"-Djava.class.path=%@", bootJarPath] UTF8String];
-        options[1].optionString = "-Djava.ext.dirs=";
+
+        options[0].optionString = CharsFromString([NSString stringWithFormat:@"-Djava.class.path=%@",
+                                                     [self bootJarPath]]);
+
+        if (extensionPaths) {
+            options[1].optionString = CharsFromString([NSString stringWithFormat:@"-Djava.ext.dirs=%@",
+                                                         extensionPaths]);
+        }
 
 #ifdef DEBUG
-        NSString *debugOptionString =
-            [NSString stringWithFormat:@"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=%s", debugPort];
         if (doDebug) {
-            options[numOptions - 1].optionString = (char *)[debugOptionString UTF8String];
+            NSString *debugOptionString = [NSString stringWithFormat:
+                                           @"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=%s",
+                                           debugPort];
+
+            options[numOptions - 1].optionString = CharsFromString(debugOptionString);
         }
 #endif
 
@@ -564,6 +582,47 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     }
 
     return self;
+}
+
+- (NSString *)bootJarPath {
+    NSBundle *myBundle = [NSBundle bundleWithIdentifier:BitcoinJKitBundleIdentifier];
+    return [myBundle pathForResource:@"boot" ofType:@"jar"];
+}
+
+- (NSString *)javaExtensionPaths {
+    /*
+        We want to remove /Library/Java/Extensions from java.ext.dirs, because otherwise some random libs from there
+        will be loaded and might conflict with our classes.
+        But we don't want to remove any system directories from there, because those might contain required JRE
+        modules like crypto algorithm implementations, and e.g. password hashing with SHA256 might break...
+        So to get a list of all system dirs from java.ext.dirs but without the user-accessible dirs, we need to run
+        ExtensionPathsReader class first which will print the filtered paths.
+    */
+
+    NSTask *task = [[NSTask alloc] init];
+    task.launchPath = @"/usr/bin/java";
+    task.arguments = @[@"-cp", [self bootJarPath], @"ExtensionPathsReader"];
+    task.standardOutput = [NSPipe pipe];
+    task.standardError = [NSPipe pipe];
+
+    [task launch];
+    [task waitUntilExit];
+
+    NSData *outputData = [[task.standardOutput fileHandleForReading] readDataToEndOfFile];
+    NSString *output = [[NSString alloc] initWithData:outputData encoding:NSUTF8StringEncoding];
+    output = [output stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+
+    if (task.terminationStatus == 0) {
+        return output;
+    } else {
+        NSData *errorData = [[task.standardError fileHandleForReading] readDataToEndOfFile];
+        NSString *errorText = [[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding];
+
+        HILogWarn(@"Can't read Java extension directory list: output = '%@', error = '%@', return code = %d",
+                  output, errorText, task.terminationStatus);
+
+        return nil;
+    }
 }
 
 - (void)dealloc
