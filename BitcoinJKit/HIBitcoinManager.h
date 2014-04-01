@@ -155,6 +155,17 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;
  */
 - (BOOL)isPasswordCorrect:(NSData *)password;
 
+/** Signs a given text message with the user's private key and returns the signature.
+ *
+ * @param message Message to be signed.
+ * @param password The wallet password (if any).
+ * @param error A pointer to an error object (or NULL to throw an exception on errors)
+ */
+
+- (NSString *)signMessage:(NSString *)message
+             withPassword:(NSData *)password
+                    error:(NSError **)error;
+
 /** Stops the manager and stores all up-to-date information in data folder
  *
  * One should stop the manager only once. At the shutdown procedure.

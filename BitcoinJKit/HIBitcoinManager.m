@@ -714,6 +714,30 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     [self zeroCharArray:toCharArray size:(jsize)(toPassword.length / sizeof(jchar))];
 }
 
+- (NSString *)signMessage:(NSString *)message
+             withPassword:(NSData *)password
+                    error:(NSError **)error
+{
+    jarray passwordCharArray = password ? JCharArrayFromNSData(_jniEnv, password) : NULL;
+    jstring messageJString = JStringFromNSString(_jniEnv, message);
+
+    jstring signature = [self callObjectMethodWithName:"signMessage"
+                                                 error:error
+                                             signature:"(Ljava/lang/String;[C)Ljava/lang/String;",
+                         messageJString, passwordCharArray];
+
+    if (passwordCharArray)
+    {
+        [self zeroCharArray:passwordCharArray size:(jsize)(password.length / sizeof(jchar))];
+    }
+
+    if (signature) {
+        return NSStringFromJString(_jniEnv, signature);
+    } else {
+        return NULL;
+    }
+}
+
 - (BOOL)isPasswordCorrect:(NSData *)password
 {
     jarray charArray = JCharArrayFromNSData(_jniEnv, password);

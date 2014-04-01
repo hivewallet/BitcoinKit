@@ -739,7 +739,6 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         }
     }
 
-
     public void changeWalletPassword(char[] oldUtf16Password, char[] newUtf16Password) throws WrongPasswordException
     {
         updateLastWalletChange(wallet);
@@ -780,6 +779,41 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         finally
         {
             wipeAesKey(aesKey);
+        }
+    }
+
+    public String signMessage(String message, char[] utf16Password) throws WrongPasswordException
+    {
+        KeyParameter aesKey = null;
+        ECKey decryptedKey = null;
+
+        try
+        {
+            ECKey ecKey = wallet.getKeys().get(0);
+
+            if (utf16Password != null)
+            {
+                aesKey = aesKeyForPassword(utf16Password);
+                decryptedKey = ecKey.decrypt(wallet.getKeyCrypter(), aesKey);
+                return decryptedKey.signMessage(message);
+            }
+            else
+            {
+                return ecKey.signMessage(message);
+            }
+        }
+        catch (KeyCrypterException e)
+        {
+            throw new WrongPasswordException(e);
+        }
+        finally
+        {
+            wipeAesKey(aesKey);
+
+            if (decryptedKey != null)
+            {
+                decryptedKey.clearPrivateKey();
+            }
         }
     }
 
