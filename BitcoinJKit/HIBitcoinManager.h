@@ -33,6 +33,10 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;
 
 // Specifies a path to a checkpoints file used to speed up blockchain sync (optional)
 // Warning! All changes to this property have to be made BEFORE start.
+//
+// To create a checkpoints file, use the BuildCheckpoints class from bitcoinj, e.g.:
+//   java -cp target/bitcoinj-tools-0.11-SNAPSHOT.jar com.google.bitcoin.tools.BuildCheckpoints
+// Note: BuildCheckpoints only generates checkpoints for the main network (i.e. not for the testnet).
 @property (nonatomic, copy) NSString *checkpointsFilePath;
 
 // Specifies if a manager is running on the testing network.
