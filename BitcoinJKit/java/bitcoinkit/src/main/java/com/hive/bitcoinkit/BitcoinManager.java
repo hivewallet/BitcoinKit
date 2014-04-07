@@ -257,22 +257,12 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
             File checkpointsFile = new File(checkpointsFilePath);
             if (checkpointsFile.exists())
             {
-                // get the oldest key
-                long oldestKeyCreationTime = 0;
-                for (ECKey key : wallet.getKeys())
-                {
-                    long keyAge = key.getCreationTimeSeconds();
-
-                    if (oldestKeyCreationTime == 0 || keyAge < oldestKeyCreationTime)
-                    {
-                        oldestKeyCreationTime = keyAge;
-                    }
-                }
+                long earliestKeyCreationTime = wallet.getEarliestKeyCreationTime();
 
                 try
                 {
                     FileInputStream stream = new FileInputStream(checkpointsFile);
-                    CheckpointManager.checkpoint(networkParams, stream, blockStore, oldestKeyCreationTime);
+                    CheckpointManager.checkpoint(networkParams, stream, blockStore, earliestKeyCreationTime);
                 }
                 catch (IOException e)
                 {
