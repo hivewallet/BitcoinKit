@@ -259,6 +259,13 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
             {
                 long earliestKeyCreationTime = wallet.getEarliestKeyCreationTime();
 
+                if (earliestKeyCreationTime == 0)
+                {
+                    // there was a bug in bitcoinj until recently that caused encrypted keys to lose their creation time
+                    // so if we have no data from the wallet, use the time of the first Hive commit (15.05.2013) instead
+                    earliestKeyCreationTime = 1368620845;
+                }
+
                 try
                 {
                     FileInputStream stream = new FileInputStream(checkpointsFile);
