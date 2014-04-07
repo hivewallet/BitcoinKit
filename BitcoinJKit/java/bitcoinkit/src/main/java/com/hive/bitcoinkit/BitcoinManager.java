@@ -181,11 +181,18 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         Wallet wallet = new Wallet(networkParams);
         addExtensionsToWallet(wallet);
         updateLastWalletChange(wallet);
-        wallet.addKey(new ECKey());
+
+        ECKey privateKey = new ECKey();
+        wallet.addKey(privateKey);
+        long creationTime = privateKey.getCreationTimeSeconds();
 
         if (utf16Password != null)
         {
             encryptWallet(utf16Password, wallet);
+
+            // temporary fix for bitcoinj creation time clearing bug
+            ECKey encryptedKey = wallet.getKeys().get(0);
+            encryptedKey.setCreationTimeSeconds(creationTime);
         }
 
         wallet.saveToFile(walletFile);
