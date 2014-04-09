@@ -253,6 +253,33 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;
             error:(NSError **)error
        completion:(void(^)(NSString *hash))completion;
 
+/** Loads a Payment Protocol compatible payment request from a local file.
+ *
+ * @param filename Path to the .bitcoinpaymentrequest file
+ * @param callback Block that will be called when the request is loaded or an error occurs;
+ *                 returns: error (if any), session id (to be returned later), request data dictionary
+ */
+- (void)openPaymentRequestFromFile:(NSString *)filename callback:(void(^)(NSError*, int, NSDictionary*))callback;
+
+/** Loads a Payment Protocol compatible payment request from a remote URL.
+ *
+ * @param URL Location of the payment request resource
+ * @param callback Block that will be called when the request is loaded or an error occurs;
+ *                 returns: error (if any), session id (to be returned later), request data dictionary
+ */
+- (void)openPaymentRequestFromURL:(NSString *)URL callback:(void(^)(NSError*, int, NSDictionary*))callback;
+
+/** Submits a payment using Payment Protocol.
+ *
+ * @param sessionId session id returned from one of the openPaymentRequest* methods
+ * @param password wallet password, if any
+ * @param callback Block that will be called when the payment is accepted or an error occurs;
+ *                 returns: error (if any), ack response data dictionary
+ */
+- (void)sendPaymentRequest:(int)sessionId
+                  password:(NSData *)password
+                  callback:(void(^)(NSError*, NSDictionary*))callback;
+
 /** Exports (backs up) the wallet to given file URL.
  *
  * @param exportURL NSURL to local file where the wallet file should be copied to

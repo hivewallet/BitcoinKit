@@ -7,6 +7,8 @@ import com.google.bitcoin.crypto.KeyCrypterScrypt;
 import com.google.bitcoin.net.discovery.DnsDiscovery;
 import com.google.bitcoin.params.MainNetParams;
 import com.google.bitcoin.params.TestNet3Params;
+import com.google.bitcoin.protocols.payments.PaymentRequestException;
+import com.google.bitcoin.protocols.payments.PaymentSession;
 import com.google.bitcoin.script.Script;
 import com.google.bitcoin.store.BlockStore;
 import com.google.bitcoin.store.BlockStoreException;
@@ -14,8 +16,10 @@ import com.google.bitcoin.store.SPVBlockStore;
 import com.google.bitcoin.store.UnreadableWalletException;
 import com.google.bitcoin.store.WalletProtobufSerializer;
 import com.google.bitcoin.utils.Threading;
+import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import org.bitcoinj.wallet.Protos;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +36,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
@@ -48,6 +53,8 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
     private File walletFile;
     private int blocksToDownload;
     private HashSet<Transaction> trackedTransactions;
+    private HashMap<Integer, PaymentSession> paymentSessions;
+    private int paymentSessionsSequenceId = 0;
 
     private static final Logger log = LoggerFactory.getLogger(BitcoinManager.class);
 
@@ -59,6 +66,7 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         Threading.uncaughtExceptionHandler = this;
 
         trackedTransactions = new HashSet<Transaction>();
+        paymentSessions = new HashMap<Integer, PaymentSession>();
 
         ((CocoaLogger) log).setLevel(CocoaLogger.HILoggerLevelDebug);
     }
@@ -730,6 +738,107 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
     }
 
 
+    /* --- Handling payment requests --- */
+
+    public void openPaymentRequestFromFile(String path, int callbackId) throws IOException, PaymentRequestException
+    {
+        File requestFile = new File(path);
+        FileInputStream stream = new FileInputStream(requestFile);
+        org.bitcoin.protocols.payments.Protos.PaymentRequest paymentRequest =
+            org.bitcoin.protocols.payments.Protos.PaymentRequest.parseFrom(stream);
+
+        PaymentSession session = new PaymentSession(paymentRequest, false);
+        int sessionId = ++paymentSessionsSequenceId;
+        paymentSessions.put(sessionId, session);
+
+        onPaymentRequestLoaded(callbackId, sessionId, getPaymentRequestDetails(session));
+    }
+
+    public void openPaymentRequestFromURL(String url, final int callbackId) throws PaymentRequestException
+    {
+        ListenableFuture<PaymentSession> future = PaymentSession.createFromUrl(url, false);
+
+        Futures.addCallback(future, new FutureCallback<PaymentSession>()
+        {
+            public void onSuccess(PaymentSession session)
+            {
+                int sessionId = ++paymentSessionsSequenceId;
+                paymentSessions.put(sessionId, session);
+                onPaymentRequestLoaded(callbackId, sessionId, getPaymentRequestDetails(session));
+            }
+
+            public void onFailure(Throwable throwable)
+            {
+                onPaymentRequestLoadFailed(callbackId, throwable);
+            }
+        });
+    }
+
+    private String getPaymentRequestDetails(PaymentSession session)
+    {
+        BigInteger amount = session.getValue();
+        String memo = session.getMemo();
+        String paymentURL = session.getPaymentUrl();
+
+        return "{ " +
+            "\"amount\": " + amount + ", " +
+            "\"memo\": \"" + memo.replace("\"", "\\\"") + "\", " +
+            "\"paymentURL\": \"" + paymentURL + "\" " +
+            "}";
+    }
+
+    public void sendPaymentRequest(final int sessionId, char[] utf16Password, final int callbackId)
+        throws WrongPasswordException, InsufficientMoneyException, PaymentRequestException, IOException
+    {
+        KeyParameter aesKey = null;
+
+        try
+        {
+            PaymentSession session = paymentSessions.get(sessionId);
+            final Wallet.SendRequest request = session.getSendRequest();
+
+            if (utf16Password != null)
+            {
+                aesKey = aesKeyForPassword(utf16Password);
+                request.aesKey = aesKey;
+            }
+
+            wallet.completeTx(request);
+
+            ListenableFuture<PaymentSession.Ack> ack = session.sendPayment(ImmutableList.of(request.tx), null, null);
+            Futures.addCallback(ack, new FutureCallback<PaymentSession.Ack>()
+            {
+                public void onSuccess(PaymentSession.Ack ack)
+                {
+                    wallet.commitTx(request.tx);
+                    paymentSessions.remove(sessionId);
+                    onPaymentRequestProcessed(callbackId, getPaymentRequestAckDetails(ack));
+                }
+
+                public void onFailure(Throwable throwable)
+                {
+                    onPaymentRequestProcessingFailed(callbackId, throwable);
+                }
+            });
+        }
+        catch (KeyCrypterException e)
+        {
+            throw new WrongPasswordException(e);
+        }
+        finally
+        {
+            wipeAesKey(aesKey);
+        }
+    }
+
+    private String getPaymentRequestAckDetails(PaymentSession.Ack ack)
+    {
+        String memo = ack.getMemo();
+
+        return "{ \"memo\": \"" + memo.replace("\"", "\\\"") + "\" }";
+    }
+
+
     /* --- Encryption/decryption --- */
 
     private KeyParameter aesKeyForPassword(char[] utf16Password) throws WrongPasswordException
@@ -1026,4 +1135,10 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
     public native void onPeerCountChanged(int peerCount);
 
     public native void onException(Throwable exception);
+
+    public native void onPaymentRequestLoaded(int callbackId, int sessionId, String requestDetails);
+    public native void onPaymentRequestLoadFailed(int callbackId, Throwable error);
+
+    public native void onPaymentRequestProcessed(int callbackId, String ackDetails);
+    public native void onPaymentRequestProcessingFailed(int callbackId, Throwable error);
 }

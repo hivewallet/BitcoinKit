@@ -25,6 +25,8 @@
     uint64_t _lastAvailableBalance;
     uint64_t _lastEstimatedBalance;
     NSTimer *_balanceChecker;
+    NSMutableDictionary *_callbacks;
+    NSUInteger _callbackId;
 }
 
 - (void)onAvailableBalanceChanged;
@@ -34,6 +36,10 @@
 - (void)onTransactionChanged:(NSString *)txid;
 - (void)onTransactionSuccess:(NSString *)txid;
 - (void)onTransactionFailed;
+- (void)onPaymentRequestLoaded:(jint)sessionId details:(jstring)details callback:(NSUInteger)callbackId;
+- (void)onPaymentRequestLoadFailedWithError:(jthrowable)error callback:(NSUInteger)callbackId;
+- (void)onPaymentRequestProcessed:(jstring)details callback:(NSUInteger)callbackId;
+- (void)onPaymentRequestProcessingFailedWithError:(jthrowable)error callback:(NSUInteger)callbackId;
 - (void)handleJavaException:(jthrowable)exception useExceptionHandler:(BOOL)useHandler error:(NSError **)returnedError;
 
 @property (nonatomic, assign) BOOL isSyncing;
@@ -136,6 +142,39 @@ JNIEXPORT void JNICALL onException(JNIEnv *env, jobject thisobject, jthrowable j
     [pool release];
 }
 
+JNIEXPORT void JNICALL onPaymentRequestLoaded(JNIEnv *env, jobject thisobject,
+                                              jint callbackId, jint sessionId, jstring requestDetails)
+{
+    NSAutoreleasePool *pool = [NSAutoreleasePool new];
+    [[HIBitcoinManager defaultManager] onPaymentRequestLoaded:sessionId
+                                                      details:requestDetails
+                                                     callback:callbackId];
+    [pool release];
+}
+
+JNIEXPORT void JNICALL onPaymentRequestLoadFailed(JNIEnv *env, jobject thisobject, jint callbackId, jthrowable error)
+{
+    NSAutoreleasePool *pool = [NSAutoreleasePool new];
+    [[HIBitcoinManager defaultManager] onPaymentRequestLoadFailedWithError:error
+                                                                  callback:callbackId];
+    [pool release];
+}
+
+JNIEXPORT void JNICALL onPaymentRequestProcessed(JNIEnv *env, jobject thisobject, jint callbackId, jstring details)
+{
+    NSAutoreleasePool *pool = [NSAutoreleasePool new];
+    [[HIBitcoinManager defaultManager] onPaymentRequestProcessed:details callback:callbackId];
+    [pool release];
+}
+
+JNIEXPORT void JNICALL onPaymentRequestProcessingFailed(JNIEnv *env, jobject thisobject,
+                                                        jint callbackId, jthrowable error)
+{
+    NSAutoreleasePool *pool = [NSAutoreleasePool new];
+    [[HIBitcoinManager defaultManager] onPaymentRequestProcessingFailedWithError:error callback:callbackId];
+    [pool release];
+}
+
 JNIEXPORT void JNICALL receiveLogFromJVM(JNIEnv *env, jobject thisobject, jstring fileName, jstring methodName,
                                          int lineNumber, jint level, jstring msg)
 {
@@ -157,6 +196,10 @@ static JNINativeMethod methods[] = {
     {"onTransactionChanged",    "(Ljava/lang/String;)V",                   (void *)&onTransactionChanged},
     {"onTransactionSuccess",    "(Ljava/lang/String;)V",                   (void *)&onTransactionSuccess},
     {"onTransactionFailed",     "()V",                                     (void *)&onTransactionFailed},
+    {"onPaymentRequestLoaded",  "(IILjava/lang/String;)V",                 (void *)&onPaymentRequestLoaded},
+    {"onPaymentRequestLoadFailed", "(ILjava/lang/Throwable;)V",            (void *)&onPaymentRequestLoadFailed},
+    {"onPaymentRequestProcessed", "(ILjava/lang/String;)V",                (void *)&onPaymentRequestProcessed},
+    {"onPaymentRequestProcessingFailed", "(ILjava/lang/Throwable;)V",      (void *)&onPaymentRequestProcessingFailed},
     {"onSynchronizationUpdate", "(F)V",                                    (void *)&onSynchronizationUpdate},
     {"onException",             "(Ljava/lang/Throwable;)V",                (void *)&onException}
 };
@@ -306,9 +349,14 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     (*_jniEnv)->ExceptionClear(_jniEnv);
 
     // try to get exception details from Java
+    //
     // note: we need to do this on the main thread - if this is called from a background thread,
     // the toString() call returns nil and throws a new exception (java.lang.StackOverflowException)
-    dispatch_block_t processException = ^{
+    //
+    // and it needs to be run synchronously,
+    // otherwise Java GC can clean up the exception object and we get a memory access error
+
+    [self runSynchronouslyOnMainThread:^{
         NSError *error = [NSError errorWithDomain:@"BitcoinKit"
                                              code:[self errorCodeForJavaException:exception]
                                          userInfo:[self createUserInfoForJavaException:exception]];
@@ -338,18 +386,18 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
                 @throw exception;
             }
         }
-    };
+    }];
+}
 
+- (void)runSynchronouslyOnMainThread:(void (^)())block {
     if (dispatch_get_current_queue() != dispatch_get_main_queue())
     {
-        // run the above code synchronously on the main thread,
-        // otherwise Java GC can clean up the exception object and we get a memory access error
-        dispatch_sync(dispatch_get_main_queue(), processException);
+        dispatch_sync(dispatch_get_main_queue(), block);
     }
     else
     {
         // if this is the main thread, we can't use dispatch_sync or the whole thing will lock up
-        processException();
+        block();
     }
 }
 
@@ -499,6 +547,8 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
         _testingNetwork = NO;
         _enableMining = NO;
         _isRunning = NO;
+        _callbacks = [[NSMutableDictionary alloc] init];
+        _callbackId = 0;
 
         NSArray *applicationSupport = [[NSFileManager defaultManager] URLsForDirectory:NSApplicationSupportDirectory
                                                                              inDomains:NSUserDomainMask];
@@ -962,9 +1012,12 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     if (password)
     {
         jarray jPassword = JCharArrayFromNSData(_jniEnv, password);
+
         [self callVoidMethodWithName:"sendCoins"
                                error:error
                            signature:"(Ljava/lang/String;Ljava/lang/String;[C)V", jAmount, jRecipient, jPassword];
+
+        [self zeroCharArray:jPassword size:(jsize)(password.length / sizeof(jchar))];
     }
     else
     {
@@ -976,6 +1029,79 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     if (*error)
     {
         [self endSending];
+    }
+}
+
+- (void)sendPaymentRequest:(int)sessionId
+                  password:(NSData *)password
+                  callback:(void(^)(NSError*, NSDictionary*))callback
+{
+    jarray jPassword = nil;
+    NSError *error = nil;
+    NSUInteger callbackId = [self storeCallback:callback];
+
+    if (password)
+    {
+        jPassword = JCharArrayFromNSData(_jniEnv, password);
+    }
+
+    [self callVoidMethodWithName:"sendPaymentRequest"
+                           error:&error
+                       signature:"(I[CI)V", sessionId, jPassword, callbackId];
+
+    if (jPassword)
+    {
+        [self zeroCharArray:jPassword size:(jsize)(password.length / sizeof(jchar))];
+    }
+
+    if (error) {
+        [self retrieveCallback:callbackId];
+
+        callback(error, nil);
+    }
+}
+
+- (NSUInteger)storeCallback:(id)callback {
+    NSUInteger callbackId = ++_callbackId;
+    _callbacks[@(callbackId)] = [callback copy];
+    return callbackId;
+}
+
+- (id)retrieveCallback:(NSUInteger)callbackId {
+    id callback = _callbacks[@(callbackId)];
+    [_callbacks removeObjectForKey:@(callbackId)];
+    return [callback autorelease];
+}
+
+- (void)openPaymentRequestFromFile:(NSString *)filename callback:(void(^)(NSError*, int, NSDictionary*))callback {
+    jstring requestFilename = JStringFromNSString(_jniEnv, filename);
+    NSUInteger callbackId = [self storeCallback:callback];
+    NSError *error = nil;
+
+    [self callVoidMethodWithName:"openPaymentRequestFromFile"
+                           error:&error
+                       signature:"(Ljava/lang/String;I)V", requestFilename, callbackId];
+
+    if (error) {
+        [self retrieveCallback:callbackId];
+
+        callback(error, 0, nil);
+    }
+}
+
+- (void)openPaymentRequestFromURL:(NSString *)URL callback:(void(^)(NSError*, int, NSDictionary*))callback {
+    jstring requestURL = JStringFromNSString(_jniEnv, URL);
+    NSUInteger callbackId = [self storeCallback:callback];
+    NSError *error = nil;
+
+    [self callVoidMethodWithName:"openPaymentRequestFromURL"
+                           error:NULL
+                       signature:"(Ljava/lang/String;I)V", requestURL, callbackId];
+
+    if (error) {
+        [self retrieveCallback:callbackId];
+
+        callback(error, 0, nil);
     }
 }
 
@@ -1140,6 +1266,56 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
         [self endSending];
     });
+}
+
+- (void)onPaymentRequestLoaded:(jint)sessionId details:(jstring)details callback:(NSUInteger)callbackId {
+    [self runSynchronouslyOnMainThread:^{
+        void (^callback)(NSError*, int, NSDictionary*) = [self retrieveCallback:callbackId];
+
+        if (callback) {
+            NSDictionary *data = [self objectFromJSONString:NSStringFromJString(_jniEnv, details)];
+            callback(nil, sessionId, data);
+        }
+    }];
+}
+
+- (void)onPaymentRequestLoadFailedWithError:(jthrowable)exception callback:(NSUInteger)callbackId {
+    [self runSynchronouslyOnMainThread:^{
+        void (^callback)(NSError*, int, NSDictionary*) = [self retrieveCallback:callbackId];
+
+        if (callback) {
+            NSError *error = [NSError errorWithDomain:@"BitcoinKit"
+                                                 code:[self errorCodeForJavaException:exception]
+                                             userInfo:[self createUserInfoForJavaException:exception]];
+
+            callback(error, 0, nil);
+        }
+    }];
+}
+
+- (void)onPaymentRequestProcessed:(jstring)details callback:(NSUInteger)callbackId {
+    [self runSynchronouslyOnMainThread:^{
+        void (^callback)(NSError*, NSDictionary*) = [self retrieveCallback:callbackId];
+
+        if (callback) {
+            NSDictionary *data = [self objectFromJSONString:NSStringFromJString(_jniEnv, details)];
+            callback(nil, data);
+        }
+    }];
+}
+
+- (void)onPaymentRequestProcessingFailedWithError:(jthrowable)exception callback:(NSUInteger)callbackId {
+    [self runSynchronouslyOnMainThread:^{
+        void (^callback)(NSError*, NSDictionary*) = [self retrieveCallback:callbackId];
+
+        if (callback) {
+            NSError *error = [NSError errorWithDomain:@"BitcoinKit"
+                                                 code:[self errorCodeForJavaException:exception]
+                                             userInfo:[self createUserInfoForJavaException:exception]];
+
+            callback(error, nil);
+        }
+    }];
 }
 
 - (void)endSending {
