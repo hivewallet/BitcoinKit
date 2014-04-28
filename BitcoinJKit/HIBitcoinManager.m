@@ -481,8 +481,16 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
 - (id)objectFromJSONString:(NSString *)JSONString
 {
+    NSError *error = nil;
     NSData *data = [JSONString dataUsingEncoding:NSUTF8StringEncoding];
-    return [NSJSONSerialization JSONObjectWithData:data options:0 error:NULL];
+    id result = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+
+    if (!error) {
+        return result;
+    } else {
+        HILogWarn(@"Couldn't parse JSON string '%@' (%@)", JSONString, error);
+        return nil;
+    }
 }
 
 
@@ -824,6 +832,10 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 
 - (NSDictionary *)modifiedTransactionForTransaction:(NSDictionary *)transaction
 {
+    if (!transaction) {
+        return nil;
+    }
+
     NSMutableDictionary *d = [NSMutableDictionary dictionaryWithDictionary:transaction];
     NSDate *date = [_dateFormatter dateFromString:transaction[@"time"]];
 
@@ -880,6 +892,10 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     if (transactionsJString)
     {
         NSArray *transactionJSONs = [self objectFromJSONString:NSStringFromJString(_jniEnv, transactionsJString)];
+        if (!transactionJSONs) {
+            return nil;
+        }
+
         NSMutableArray *transactions = [NSMutableArray arrayWithCapacity:transactionJSONs.count];
 
         for (NSDictionary *JSON in transactionJSONs)
@@ -903,6 +919,10 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     if (transactionsJString)
     {
         NSArray *transactionJSONs = [self objectFromJSONString:NSStringFromJString(_jniEnv, transactionsJString)];
+        if (!transactionJSONs) {
+            return nil;
+        }
+
         NSMutableArray *transactions = [NSMutableArray arrayWithCapacity:transactionJSONs.count];
 
         for (NSDictionary *JSON in transactionJSONs)
