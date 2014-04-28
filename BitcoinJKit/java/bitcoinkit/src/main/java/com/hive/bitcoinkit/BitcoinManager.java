@@ -645,9 +645,41 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
 
     /* --- Sending transactions --- */
 
-    public String feeForSendingCoins(String amount) throws AddressFormatException
+    public String feeForSendingCoins(String amount, String sendToAddressString)
     {
-        return Transaction.REFERENCE_DEFAULT_MIN_TX_FEE.toString();
+        try
+        {
+            BigInteger amountToSend = new BigInteger(amount);
+            if (amountToSend.intValue() == 0 || sendToAddressString.equals(""))
+            {
+                // assume default value for now
+                return Transaction.REFERENCE_DEFAULT_MIN_TX_FEE.toString();
+            }
+
+            Address sendToAddress = new Address(networkParams, sendToAddressString);
+            Wallet.SendRequest request = Wallet.SendRequest.to(sendToAddress, amountToSend);
+
+            try
+            {
+                wallet.completeTx(request);
+            }
+            catch (KeyCrypterException e)
+            {
+                // that's ok, we aren't sending this yet
+            }
+
+            return getTransactionFee(request.tx).toString();
+        }
+        catch (InsufficientMoneyException e)
+        {
+            // no way to calculate this
+            return "0";
+        }
+        catch (AddressFormatException e)
+        {
+            // assume default value for now
+            return Transaction.REFERENCE_DEFAULT_MIN_TX_FEE.toString();
+        }
     }
 
     public boolean isAddressValid(String address)
