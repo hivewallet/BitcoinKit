@@ -165,7 +165,7 @@ NSString * const kHIBitcoinManagerTransactionChangedNotification = @"kJHIBitcoin
 NSString * const kHIBitcoinManagerStartedNotification = @"kJHIBitcoinManagerStartedNotification";
 NSString * const kHIBitcoinManagerStoppedNotification = @"kJHIBitcoinManagerStoppedNotification";
 
-static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
+static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJKit";
 
 @implementation HIBitcoinManager
 
@@ -381,19 +381,19 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     {
         return kHIIllegalArgumentException;
     }
-    else if ([exceptionClass isEqual:@"com.hive.bitcoinkit.NoWalletException"])
+    else if ([exceptionClass isEqual:@"com.hivewallet.bitcoinkit.NoWalletException"])
     {
         return kHIBitcoinManagerNoWallet;
     }
-    else if ([exceptionClass isEqual:@"com.hive.bitcoinkit.ExistingWalletException"])
+    else if ([exceptionClass isEqual:@"com.hivewallet.bitcoinkit.ExistingWalletException"])
     {
         return kHIBitcoinManagerWalletExists;
     }
-    else if ([exceptionClass isEqual:@"com.hive.bitcoinkit.WrongPasswordException"])
+    else if ([exceptionClass isEqual:@"com.hivewallet.bitcoinkit.WrongPasswordException"])
     {
         return kHIBitcoinManagerWrongPassword;
     }
-    else if ([exceptionClass isEqual:@"com.hive.bitcoinkit.SendingDustException"])
+    else if ([exceptionClass isEqual:@"com.hivewallet.bitcoinkit.SendingDustException"])
     {
         return kHIBitcoinManagerSendingDustError;
     }
@@ -573,7 +573,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
 #endif
 
         // We need to create the manager object
-        _managerClass = [self jClassForClass:@"com/hive/bitcoinkit/BitcoinManager"];
+        _managerClass = [self jClassForClass:@"com/hivewallet/bitcoinkit/BitcoinManager"];
         (*_jniEnv)->RegisterNatives(_jniEnv, _managerClass, methods, sizeof(methods)/sizeof(methods[0]));
 
         JNINativeMethod loggerMethod;

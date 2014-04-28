@@ -1,4 +1,4 @@
-package com.hive.bitcoinkit;
+package com.hivewallet.bitcoinkit;
 
 import com.google.bitcoin.core.*;
 import com.google.bitcoin.crypto.KeyCrypter;
