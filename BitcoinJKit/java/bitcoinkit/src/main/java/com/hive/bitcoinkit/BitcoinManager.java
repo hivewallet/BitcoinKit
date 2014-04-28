@@ -538,9 +538,14 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
 
                 Script scriptPubKey = out.getScriptPubKey();
 
-                if (scriptPubKey.isSentToAddress())
+                try
                 {
-                    conns.append("\"address\": \"" + scriptPubKey.getToAddress(networkParams).toString() + "\", ");
+                    Address toAddress = scriptPubKey.getToAddress(networkParams);
+                    conns.append("\"address\": \"" + toAddress + "\", ");
+                }
+                catch (ScriptException e)
+                {
+                    // non-standard target, there's no address or we can't figure it out
                 }
 
                 conns.append("\"category\": \"sent\" }");
