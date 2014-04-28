@@ -502,18 +502,18 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
                 conns.append(", ");
             }
 
-            conns.append("{ ");
-
             try
             {
+                conns.append("{ ");
+
                 Script scriptSig = in.getScriptSig();
 
                 if (scriptSig.getChunks().size() == 2)
                 {
-                    conns.append("\"address\": \"" + scriptSig.getFromAddress(networkParams).toString() + "\"");
+                    conns.append("\"address\": \"" + scriptSig.getFromAddress(networkParams).toString() + "\", ");
                 }
 
-                conns.append(" ,\"category\": \"received\" }");
+                conns.append("\"category\": \"received\" }");
 
                 connCount++;
             }
@@ -532,18 +532,18 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
                 conns.append(", ");
             }
 
-            conns.append("{ ");
-
             try
             {
+                conns.append("{ ");
+
                 Script scriptPubKey = out.getScriptPubKey();
 
                 if (scriptPubKey.isSentToAddress())
                 {
-                    conns.append(" \"address\": \"" + scriptPubKey.getToAddress(networkParams).toString() + "\"");
+                    conns.append("\"address\": \"" + scriptPubKey.getToAddress(networkParams).toString() + "\", ");
                 }
 
-                conns.append(" ,\"category\": \"sent\" }");
+                conns.append("\"category\": \"sent\" }");
 
                 connCount++;
             }
