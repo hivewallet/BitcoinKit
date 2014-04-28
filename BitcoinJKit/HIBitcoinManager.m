@@ -375,7 +375,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hive.BitcoinJKit";
     }
     else if ([exceptionClass isEqual:@"com.google.bitcoin.core.InsufficientMoneyException"])
     {
-        return kHIInsufficientMoneyException;
+        return kHIBitcoinManagerInsufficientMoneyError;
     }
     else if ([exceptionClass isEqual:@"java.lang.IllegalArgumentException"])
     {

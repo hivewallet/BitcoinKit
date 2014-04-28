@@ -26,3 +26,6 @@ extern NSInteger const kHIBitcoinManagerBlockStoreReadError;
 
 /* The user tried to send dust. */
 extern NSInteger const kHIBitcoinManagerSendingDustError;
+
+/* The user tried to send more than the wallet balance. */
+extern NSInteger const kHIBitcoinManagerInsufficientMoneyError;

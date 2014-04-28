@@ -10,4 +10,3 @@
 extern NSInteger const kHIBitcoinManagerUnexpectedError;
 
 extern NSInteger const kHIIllegalArgumentException;
-extern NSInteger const kHIInsufficientMoneyException;
