@@ -17,6 +17,9 @@ import com.google.bitcoin.utils.Threading;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import org.bitcoinj.wallet.Protos;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.impl.CocoaLogger;
@@ -464,14 +467,15 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
 
     /* --- Reading transaction data --- */
 
-    private String getJSONFromTransaction(Transaction tx) throws ScriptException
+    private String getJSONFromTransaction(Transaction tx) throws ScriptException, JSONException
     {
         if (tx == null)
         {
             return null;
         }
 
-        StringBuffer conns = new StringBuffer();
+        JSONArray conns = new JSONArray();
+
         int connCount = 0;
 
         TransactionConfidence.ConfidenceType confidenceType = tx.getConfidence().getConfidenceType();
@@ -494,18 +498,14 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
             confidence = "unknown";
         }
 
-        conns.append("[");
-
         if (tx.getInputs().size() > 0 && tx.getValue(wallet).compareTo(BigInteger.ZERO) > 0)
         {
             TransactionInput in = tx.getInput(0);
 
-            if (connCount > 0)
-            {
-                conns.append(", ");
-            }
+            JSONObject transaction = new JSONObject();
+            transaction.put("category", "received");
 
-            conns.append("{ \"category\": \"received\" }");
+            conns.put(transaction);
             connCount++;
         }
 
@@ -513,29 +513,25 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         {
             TransactionOutput out = tx.getOutput(0);
 
-            if (connCount > 0)
-            {
-                conns.append(", ");
-            }
-
             try
             {
-                conns.append("{ ");
+                JSONObject transaction = new JSONObject();
 
                 Script scriptPubKey = out.getScriptPubKey();
 
                 try
                 {
                     Address toAddress = scriptPubKey.getToAddress(networkParams);
-                    conns.append("\"address\": \"" + toAddress + "\", ");
+                    transaction.put("address", toAddress);
                 }
                 catch (ScriptException e)
                 {
                     // non-standard target, there's no address or we can't figure it out
                 }
 
-                conns.append("\"category\": \"sent\" }");
+                transaction.put("category", "sent");
 
+                conns.put(transaction);
                 connCount++;
             }
             catch (Exception e)
@@ -544,18 +540,18 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
             }
         }
 
-        conns.append("]");
-
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
 
-        return "{ \"amount\": " + tx.getValue(wallet) +
-                ", \"fee\": " + getTransactionFee(tx) +
-                ", \"txid\": \"" + tx.getHashAsString() + "\"" +
-                ", \"time\": \"" + dateFormat.format(tx.getUpdateTime()) + "\"" +
-                ", \"confidence\": \"" + confidence + "\"" +
-                ", \"details\": " + conns.toString() +
-                "}";
+        JSONObject result = new JSONObject();
+        result.put("amount", tx.getValue(wallet));
+        result.put("fee", getTransactionFee(tx));
+        result.put("txid", tx.getHashAsString());
+        result.put("time", dateFormat.format(tx.getUpdateTime()));
+        result.put("confidence", confidence);
+        result.put("details", conns);
+
+        return result.toString();
     }
 
     public BigInteger getTransactionFee(Transaction tx)
@@ -591,23 +587,23 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         return wallet.getTransactionsByTime().size();
     }
 
-    public String getAllTransactions() throws ScriptException
+    public String getAllTransactions() throws ScriptException, JSONException
     {
         return getTransactions(0, getTransactionCount());
     }
 
-    public String getTransaction(String tx) throws ScriptException
+    public String getTransaction(String tx) throws ScriptException, JSONException
     {
         Sha256Hash hash = new Sha256Hash(tx);
         return getJSONFromTransaction(wallet.getTransaction(hash));
     }
 
-    public String getTransaction(int idx) throws ScriptException
+    public String getTransaction(int idx) throws ScriptException, JSONException
     {
         return getJSONFromTransaction(wallet.getTransactionsByTime().get(idx));
     }
 
-    public String getTransactions(int from, int count) throws ScriptException
+    public String getTransactions(int from, int count) throws ScriptException, JSONException
     {
         List<Transaction> transactions = wallet.getTransactionsByTime();
 
