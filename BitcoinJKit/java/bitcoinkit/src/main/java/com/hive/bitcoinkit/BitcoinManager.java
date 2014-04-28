@@ -502,25 +502,8 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
                 conns.append(", ");
             }
 
-            try
-            {
-                conns.append("{ ");
-
-                Script scriptSig = in.getScriptSig();
-
-                if (scriptSig.getChunks().size() == 2)
-                {
-                    conns.append("\"address\": \"" + scriptSig.getFromAddress(networkParams).toString() + "\", ");
-                }
-
-                conns.append("\"category\": \"received\" }");
-
-                connCount++;
-            }
-            catch (Exception e)
-            {
-
-            }
+            conns.append("{ \"category\": \"received\" }");
+            connCount++;
         }
 
         if (tx.getOutputs().size() > 0 && tx.getValue(wallet).compareTo(BigInteger.ZERO) < 0)
