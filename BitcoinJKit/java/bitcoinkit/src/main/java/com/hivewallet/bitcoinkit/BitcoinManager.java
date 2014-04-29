@@ -237,6 +237,8 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         });
 
         startBlockchain();
+
+        wallet.cleanup();
     }
 
     private File getBlockchainFile()
