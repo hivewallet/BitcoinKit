@@ -312,12 +312,7 @@
 				GCC_VERSION = "";
 				INFOPLIST_FILE = "BitcoinJKit/BitcoinJKit-Info.plist";
 				INSTALL_PATH = "@executable_path/../Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/avian/build/darwin-x86_64\"",
-					"\"$(SRCROOT)/avian/build/darwin-x86_64-debug-heapdump-openjdk-src\"",
-					"\"$(SRCROOT)/avian/build/darwin-x86_64-continuations-openjdk-src\"",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -337,12 +332,7 @@
 				GCC_VERSION = "";
 				INFOPLIST_FILE = "BitcoinJKit/BitcoinJKit-Info.plist";
 				INSTALL_PATH = "@executable_path/../Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/avian/build/darwin-x86_64\"",
-					"\"$(SRCROOT)/avian/build/darwin-x86_64-debug-heapdump-openjdk-src\"",
-					"\"$(SRCROOT)/avian/build/darwin-x86_64-continuations-openjdk-src\"",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
