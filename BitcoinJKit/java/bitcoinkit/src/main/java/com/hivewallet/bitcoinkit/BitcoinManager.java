@@ -834,6 +834,11 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         {
             throw new WrongNetworkException("This payment request is meant for a different Bitcoin network");
         }
+
+        if (session.isExpired())
+        {
+            throw new PaymentRequestException.Expired("PaymentRequest is expired");
+        }
     }
 
     private String getPaymentRequestDetails(PaymentSession session) throws JSONException
