@@ -770,10 +770,19 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
             org.bitcoin.protocols.payments.Protos.PaymentRequest.parseFrom(stream);
 
         PaymentSession session = new PaymentSession(paymentRequest, false);
-        int sessionId = ++paymentSessionsSequenceId;
-        paymentSessions.put(sessionId, session);
 
-        onPaymentRequestLoaded(callbackId, sessionId, getPaymentRequestDetails(session));
+        try
+        {
+            validatePaymentRequest(session);
+
+            int sessionId = ++paymentSessionsSequenceId;
+            paymentSessions.put(sessionId, session);
+            onPaymentRequestLoaded(callbackId, sessionId, getPaymentRequestDetails(session));
+        }
+        catch (PaymentRequestException e)
+        {
+            onPaymentRequestLoadFailed(callbackId, e);
+        }
     }
 
     public void openPaymentRequestFromURL(String url, final int callbackId) throws PaymentRequestException
@@ -786,11 +795,13 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
             {
                 try
                 {
+                    validatePaymentRequest(session);
+
                     int sessionId = ++paymentSessionsSequenceId;
                     paymentSessions.put(sessionId, session);
                     onPaymentRequestLoaded(callbackId, sessionId, getPaymentRequestDetails(session));
                 }
-                catch (JSONException e)
+                catch (Exception e)
                 {
                     onPaymentRequestLoadFailed(callbackId, e);
                 }
@@ -801,6 +812,28 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
                 onPaymentRequestLoadFailed(callbackId, throwable);
             }
         });
+    }
+
+    private void validatePaymentRequest(PaymentSession session) throws PaymentRequestException
+    {
+        org.bitcoin.protocols.payments.Protos.PaymentDetails paymentDetails = session.getPaymentDetails();
+
+        // this should really be done in bitcoinj (see https://code.google.com/p/bitcoinj/issues/detail?id=551)
+        NetworkParameters params;
+
+        if (paymentDetails.hasNetwork())
+        {
+            params = NetworkParameters.fromPmtProtocolID(paymentDetails.getNetwork());
+        }
+        else
+        {
+            params = MainNetParams.get();
+        }
+
+        if (params != networkParams)
+        {
+            throw new WrongNetworkException("This payment request is meant for a different Bitcoin network");
+        }
     }
 
     private String getPaymentRequestDetails(PaymentSession session) throws JSONException
