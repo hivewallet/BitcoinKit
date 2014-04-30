@@ -7,3 +7,4 @@ NSInteger const kHIBitcoinManagerWalletExists = 1003;
 NSInteger const kHIBitcoinManagerWrongPassword = 1004;
 NSInteger const kHIBitcoinManagerBlockStoreReadError = 1005;
 NSInteger const kHIBitcoinManagerSendingDustError = 1006;
+NSInteger const kHIBitcoinManagerInsufficientMoneyError = 1007;

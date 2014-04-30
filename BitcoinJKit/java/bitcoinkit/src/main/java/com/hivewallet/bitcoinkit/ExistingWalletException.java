@@ -1,4 +1,4 @@
-package com.hive.bitcoinkit;
+package com.hivewallet.bitcoinkit;
 
 public class ExistingWalletException extends Exception
 {

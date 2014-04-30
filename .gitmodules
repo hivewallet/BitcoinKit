@@ -1,6 +1,3 @@
 [submodule "avian"]
 	path = avian
 	url = https://github.com/ReadyTalk/avian.git
-[submodule "bitcoinj"]
-	path = bitcoinj
-	url = https://code.google.com/p/bitcoinj/

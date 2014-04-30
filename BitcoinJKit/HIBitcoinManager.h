@@ -43,13 +43,6 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;
 // Warning! All changes to this property have to be made BEFORE start.
 @property (nonatomic, assign) BOOL testingNetwork;
 
-// Specifies if a manager should try to mine bticoins.
-// Warning! All changes to this property have to be made BEFORE start.
-@property (nonatomic, assign) BOOL enableMining;
-
-// Currently active connections to bitcoin network
-@property (nonatomic, readonly) NSUInteger connections;
-
 // Flag indicating if HIBitcoinManager is currently running and connecting with the network
 @property (nonatomic, readonly) BOOL isRunning;
 
@@ -88,13 +81,6 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;
 
 // Returns date when the wallet password was last changed, or when the wallet was created (might be null for old files)
 @property (nonatomic, readonly) NSDate *lastWalletChangeDate;
-
-// Proxy server in address:port format. Default is nil (no proxy). Warning! All changes to it has to be performed BEFORE start.
-@property (nonatomic, copy) NSString *proxyAddress;
-
-// Flag disabling listening on public IP address. To be used i.e. with tor proxy not to reveal real IP address.
-// Warning! All changes to it has to be performed BEFORE start.
-@property (nonatomic, assign) BOOL disableListening;
 
 // Block that will be called when an exception is thrown on a background thread in JVM (e.g. while processing an
 // incoming transaction or other blockchain update). If not set, the exception will just be thrown and will crash your
@@ -235,8 +221,9 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;
 /** Calculates the transaction fee when sending coins.
  *
  * @param coins Amount of coins for the recipient to receive in satoshis
+ * @param recipient Target address
  */
-- (uint64_t)calculateTransactionFeeForSendingCoins:(uint64_t)coins;
+- (uint64_t)calculateTransactionFeeForSendingCoins:(uint64_t)coins toRecipient:(NSString *)recipient;
 
 /** Sends amount of coins to recipient
  *
