@@ -839,6 +839,16 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         {
             throw new PaymentRequestException.Expired("PaymentRequest is expired");
         }
+
+        try
+        {
+            session.verifyPki();
+        }
+        catch (PaymentRequestException e)
+        {
+            // apparently we're supposed to just ignore these errors (?)
+            log.warn("PKI Verification error: " + e);
+        }
     }
 
     private String getPaymentRequestDetails(PaymentSession session) throws JSONException
@@ -848,6 +858,11 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         request.put("amount", session.getValue());
         request.put("memo", session.getMemo());
         request.put("paymentURL", session.getPaymentUrl());
+
+        if (session.pkiVerificationData != null)
+        {
+            request.put("pkiName", session.pkiVerificationData.name);
+        }
 
         return request.toString();
     }
