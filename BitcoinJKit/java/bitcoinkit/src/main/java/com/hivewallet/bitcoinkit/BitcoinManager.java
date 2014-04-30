@@ -761,7 +761,8 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
 
     /* --- Handling payment requests --- */
 
-    public void openPaymentRequestFromFile(String path, int callbackId) throws IOException, PaymentRequestException
+    public void openPaymentRequestFromFile(String path, int callbackId)
+        throws IOException, PaymentRequestException, JSONException
     {
         File requestFile = new File(path);
         FileInputStream stream = new FileInputStream(requestFile);
@@ -783,9 +784,16 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         {
             public void onSuccess(PaymentSession session)
             {
-                int sessionId = ++paymentSessionsSequenceId;
-                paymentSessions.put(sessionId, session);
-                onPaymentRequestLoaded(callbackId, sessionId, getPaymentRequestDetails(session));
+                try
+                {
+                    int sessionId = ++paymentSessionsSequenceId;
+                    paymentSessions.put(sessionId, session);
+                    onPaymentRequestLoaded(callbackId, sessionId, getPaymentRequestDetails(session));
+                }
+                catch (JSONException e)
+                {
+                    onPaymentRequestLoadFailed(callbackId, e);
+                }
             }
 
             public void onFailure(Throwable throwable)
@@ -795,17 +803,15 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         });
     }
 
-    private String getPaymentRequestDetails(PaymentSession session)
+    private String getPaymentRequestDetails(PaymentSession session) throws JSONException
     {
-        BigInteger amount = session.getValue();
-        String memo = session.getMemo();
-        String paymentURL = session.getPaymentUrl();
+        JSONObject request = new JSONObject();
 
-        return "{ " +
-            "\"amount\": " + amount + ", " +
-            "\"memo\": \"" + memo.replace("\"", "\\\"") + "\", " +
-            "\"paymentURL\": \"" + paymentURL + "\" " +
-            "}";
+        request.put("amount", session.getValue());
+        request.put("memo", session.getMemo());
+        request.put("paymentURL", session.getPaymentUrl());
+
+        return request.toString();
     }
 
     public void sendPaymentRequest(final int sessionId, char[] utf16Password, final int callbackId)
@@ -831,9 +837,16 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
             {
                 public void onSuccess(PaymentSession.Ack ack)
                 {
-                    wallet.commitTx(request.tx);
-                    paymentSessions.remove(sessionId);
-                    onPaymentRequestProcessed(callbackId, getPaymentRequestAckDetails(ack));
+                    try
+                    {
+                        wallet.commitTx(request.tx);
+                        paymentSessions.remove(sessionId);
+                        onPaymentRequestProcessed(callbackId, getPaymentRequestAckDetails(ack));
+                    }
+                    catch (JSONException e)
+                    {
+                        onPaymentRequestProcessingFailed(callbackId, e);
+                    }
                 }
 
                 public void onFailure(Throwable throwable)
@@ -852,11 +865,11 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         }
     }
 
-    private String getPaymentRequestAckDetails(PaymentSession.Ack ack)
+    private String getPaymentRequestAckDetails(PaymentSession.Ack ack) throws JSONException
     {
-        String memo = ack.getMemo();
-
-        return "{ \"memo\": \"" + memo.replace("\"", "\\\"") + "\" }";
+        JSONObject json = new JSONObject();
+        json.put("memo", ack.getMemo());
+        return json.toString();
     }
 
 
