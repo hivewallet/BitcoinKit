@@ -243,18 +243,26 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;
 /** Loads a Payment Protocol compatible payment request from a local file.
  *
  * @param filename Path to the .bitcoinpaymentrequest file
+ * @param outError Returned error if the payment request file can't be opened
  * @param callback Block that will be called when the request is loaded or an error occurs;
  *                 returns: error (if any), session id (to be returned later), request data dictionary
+ * @return true if the request file was opened
  */
-- (void)openPaymentRequestFromFile:(NSString *)filename callback:(void(^)(NSError*, int, NSDictionary*))callback;
+- (BOOL)openPaymentRequestFromFile:(NSString *)filename
+                             error:(NSError **)outError
+                          callback:(void(^)(NSError*, int, NSDictionary*))callback;
 
 /** Loads a Payment Protocol compatible payment request from a remote URL.
  *
  * @param URL Location of the payment request resource
+ * @param outError Returned error if the URL is empty or invalid
  * @param callback Block that will be called when the request is loaded or an error occurs;
  *                 returns: error (if any), session id (to be returned later), request data dictionary
+ * @return true if the URL was valid and the request is being loaded
  */
-- (void)openPaymentRequestFromURL:(NSString *)URL callback:(void(^)(NSError*, int, NSDictionary*))callback;
+- (BOOL)openPaymentRequestFromURL:(NSString *)URL
+                            error:(NSError **)outError
+                         callback:(void(^)(NSError*, int, NSDictionary*))callback;
 
 /** Submits a payment using Payment Protocol.
  *

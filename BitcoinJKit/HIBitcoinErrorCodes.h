@@ -29,3 +29,16 @@ extern NSInteger const kHIBitcoinManagerSendingDustError;
 
 /* The user tried to send more than the wallet balance. */
 extern NSInteger const kHIBitcoinManagerInsufficientMoneyError;
+
+/* The payment request has already expired. */
+extern NSInteger const kHIBitcoinManagerPaymentRequestExpiredError;
+
+/* The payment request is meant for a different Bitcoin network. */
+extern NSInteger const kHIBitcoinManagerPaymentRequestWrongNetworkError;
+
+/* The file could not be parsed as a protocol buffer data file. */
+extern NSInteger const kHIBitcoinManagerInvalidProtocolBufferError;
+
+
+/* java.io.FileNotFoundException - invalid file name or file is missing. */
+extern NSInteger const kHIFileNotFoundException;

@@ -761,23 +761,32 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
 
     /* --- Handling payment requests --- */
 
-    public void openPaymentRequestFromFile(String path, int callbackId)
-        throws IOException, PaymentRequestException, JSONException
+    public void openPaymentRequestFromFile(String path, int callbackId) throws IOException
     {
         File requestFile = new File(path);
         FileInputStream stream = new FileInputStream(requestFile);
-        org.bitcoin.protocols.payments.Protos.PaymentRequest paymentRequest =
-            org.bitcoin.protocols.payments.Protos.PaymentRequest.parseFrom(stream);
-
-        PaymentSession session = new PaymentSession(paymentRequest, false);
 
         try
         {
+            org.bitcoin.protocols.payments.Protos.PaymentRequest paymentRequest =
+                org.bitcoin.protocols.payments.Protos.PaymentRequest.parseFrom(stream);
+
+            PaymentSession session = new PaymentSession(paymentRequest, false);
+
             validatePaymentRequest(session);
 
             int sessionId = ++paymentSessionsSequenceId;
             paymentSessions.put(sessionId, session);
             onPaymentRequestLoaded(callbackId, sessionId, getPaymentRequestDetails(session));
+        }
+        catch (com.google.protobuf.InvalidProtocolBufferException e)
+        {
+            onPaymentRequestLoadFailed(callbackId, e);
+        }
+        catch (JSONException e)
+        {
+            // this should never happen
+            onPaymentRequestLoadFailed(callbackId, e);
         }
         catch (PaymentRequestException e)
         {

@@ -421,9 +421,21 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
             return kHIBitcoinManagerBlockStoreReadError;
         }
     }
+    else if ([exceptionClass isEqual:@"com.google.bitcoin.protocols.payments.PaymentRequestException$Expired"])
+    {
+        return kHIBitcoinManagerPaymentRequestExpiredError;
+    }
     else if ([exceptionClass isEqual:@"com.google.bitcoin.core.InsufficientMoneyException"])
     {
         return kHIBitcoinManagerInsufficientMoneyError;
+    }
+    else if ([exceptionClass isEqual:@"com.google.protobuf.InvalidProtocolBufferException"])
+    {
+        return kHIBitcoinManagerInvalidProtocolBufferError;
+    }
+    else if ([exceptionClass isEqual:@"java.io.FileNotFoundException"])
+    {
+        return kHIFileNotFoundException;
     }
     else if ([exceptionClass isEqual:@"java.lang.IllegalArgumentException"])
     {
@@ -440,6 +452,10 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     else if ([exceptionClass isEqual:@"com.hivewallet.bitcoinkit.WrongPasswordException"])
     {
         return kHIBitcoinManagerWrongPassword;
+    }
+    else if ([exceptionClass isEqual:@"com.hivewallet.bitcoinkit.WrongNetworkException"])
+    {
+        return kHIBitcoinManagerPaymentRequestWrongNetworkError;
     }
     else if ([exceptionClass isEqual:@"com.hivewallet.bitcoinkit.SendingDustException"])
     {
@@ -1097,7 +1113,10 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     return [callback autorelease];
 }
 
-- (void)openPaymentRequestFromFile:(NSString *)filename callback:(void(^)(NSError*, int, NSDictionary*))callback {
+- (BOOL)openPaymentRequestFromFile:(NSString *)filename
+                             error:(NSError **)outError
+                          callback:(void(^)(NSError*, int, NSDictionary*))callback {
+
     jstring requestFilename = JStringFromNSString(_jniEnv, filename);
     NSUInteger callbackId = [self storeCallback:callback];
     NSError *error = nil;
@@ -1106,26 +1125,35 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
                            error:&error
                        signature:"(Ljava/lang/String;I)V", requestFilename, callbackId];
 
-    if (error) {
+    if (!error) {
+        return YES;
+    } else {
         [self retrieveCallback:callbackId];
 
-        callback(error, 0, nil);
+        *outError = error;
+        return NO;
     }
 }
 
-- (void)openPaymentRequestFromURL:(NSString *)URL callback:(void(^)(NSError*, int, NSDictionary*))callback {
+- (BOOL)openPaymentRequestFromURL:(NSString *)URL
+                            error:(NSError **)outError
+                         callback:(void(^)(NSError*, int, NSDictionary*))callback {
+
     jstring requestURL = JStringFromNSString(_jniEnv, URL);
     NSUInteger callbackId = [self storeCallback:callback];
     NSError *error = nil;
 
     [self callVoidMethodWithName:"openPaymentRequestFromURL"
-                           error:NULL
+                           error:&error
                        signature:"(Ljava/lang/String;I)V", requestURL, callbackId];
 
-    if (error) {
+    if (!error) {
+        return YES;
+    } else {
         [self retrieveCallback:callbackId];
 
-        callback(error, 0, nil);
+        *outError = error;
+        return NO;
     }
 }
 
@@ -1293,14 +1321,19 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
 }
 
 - (void)onPaymentRequestLoaded:(jint)sessionId details:(jstring)details callback:(NSUInteger)callbackId {
-    [self runSynchronouslyOnMainThread:^{
-        void (^callback)(NSError*, int, NSDictionary*) = [self retrieveCallback:callbackId];
+    void (^callback)(NSError*, int, NSDictionary*) = [self retrieveCallback:callbackId];
 
-        if (callback) {
-            NSDictionary *data = [self objectFromJSONString:NSStringFromJString(_jniEnv, details)];
+    if (callback) {
+        __block NSDictionary *data = nil;
+
+        [self runSynchronouslyOnMainThread:^{
+            data = [self objectFromJSONString:NSStringFromJString(_jniEnv, details)];
+        }];
+
+        dispatch_async(dispatch_get_main_queue(), ^{
             callback(nil, sessionId, data);
-        }
-    }];
+        });
+    }
 }
 
 - (void)onPaymentRequestLoadFailedWithError:(jthrowable)exception callback:(NSUInteger)callbackId {
