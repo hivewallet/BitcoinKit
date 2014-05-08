@@ -11,7 +11,6 @@
 #import "HIBitcoinErrorCodes.h"
 #import "HIBitcoinInternalErrorCodes.h"
 #import "HILogger.h"
-#import <JavaVM/jni.h>
 
 @interface HIBitcoinManager ()
 {

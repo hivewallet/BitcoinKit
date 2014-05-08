@@ -6,8 +6,6 @@
 //  Copyright (c) 2013 Hive Developers. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-
 // Transaction list update notification. Sent object is a NSString representation of the updated hash
 extern NSString * const kHIBitcoinManagerTransactionChangedNotification;
 
