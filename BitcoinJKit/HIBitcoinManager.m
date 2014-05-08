@@ -495,7 +495,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
 
 #pragma mark - Initialization
 
-- (id)init
+- (instancetype)init
 {
     self = [super init];
 
