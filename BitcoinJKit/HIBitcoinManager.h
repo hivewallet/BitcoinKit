@@ -266,11 +266,15 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;
  *
  * @param sessionId session id returned from one of the openPaymentRequest* methods
  * @param password wallet password, if any
+ * @param outError Returned error if the transaction can't be completed
  * @param callback Block that will be called when the payment is accepted or an error occurs;
  *                 returns: error (if any), ack response data dictionary
+ * @return true if the transaction was prepared successfully and the payment was submitted
+                (though not necessarily confirmed)
  */
-- (void)sendPaymentRequest:(int)sessionId
+- (BOOL)sendPaymentRequest:(int)sessionId
                   password:(NSData *)password
+                     error:(NSError **)outError
                   callback:(void(^)(NSError*, NSDictionary*))callback;
 
 /** Exports (backs up) the wallet to given file URL.

@@ -877,7 +877,8 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
     }
 
     public void sendPaymentRequest(final int sessionId, char[] utf16Password, final int callbackId)
-        throws WrongPasswordException, InsufficientMoneyException, PaymentRequestException, IOException
+        throws WrongPasswordException, InsufficientMoneyException, PaymentRequestException, IOException,
+               SendingDustException
     {
         KeyParameter aesKey = null;
 
@@ -885,6 +886,11 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         {
             PaymentSession session = paymentSessions.get(sessionId);
             final Wallet.SendRequest request = session.getSendRequest();
+
+            if (isDust(request))
+            {
+                throw new SendingDustException("Can't send dust amount");
+            }
 
             if (utf16Password != null)
             {
