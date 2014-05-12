@@ -21,7 +21,6 @@
 		D958B0B017A29CE200B0EDD5 /* jni.h in Headers */ = {isa = PBXBuildFile; fileRef = D958B0AE17A29CE200B0EDD5 /* jni.h */; };
 		D958B0BC17A2A40600B0EDD5 /* HIBitcoinManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D958B0BA17A2A40600B0EDD5 /* HIBitcoinManager.m */; };
 		D958B0BE17A2A41A00B0EDD5 /* BitcoinJKit.h in Headers */ = {isa = PBXBuildFile; fileRef = D958B0A617A29B0500B0EDD5 /* BitcoinJKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		D958B0C117A2A50A00B0EDD5 /* HIJavaBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = D958B0BF17A2A50A00B0EDD5 /* HIJavaBridge.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -47,8 +46,6 @@
 		D958B0AD17A29CE200B0EDD5 /* jni_md.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jni_md.h; sourceTree = "<group>"; };
 		D958B0AE17A29CE200B0EDD5 /* jni.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jni.h; sourceTree = "<group>"; };
 		D958B0BA17A2A40600B0EDD5 /* HIBitcoinManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HIBitcoinManager.m; sourceTree = "<group>"; };
-		D958B0BF17A2A50A00B0EDD5 /* HIJavaBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HIJavaBridge.h; sourceTree = "<group>"; };
-		D958B0C017A2A50A00B0EDD5 /* HIJavaBridge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HIJavaBridge.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -114,8 +111,6 @@
 				24D21A62184D550A00FF296A /* HIBitcoinInternalErrorCodes.m */,
 				58BE670C185B3DB3001AAB50 /* HIBitcoinManager.h */,
 				D958B0BA17A2A40600B0EDD5 /* HIBitcoinManager.m */,
-				D958B0BF17A2A50A00B0EDD5 /* HIJavaBridge.h */,
-				D958B0C017A2A50A00B0EDD5 /* HIJavaBridge.m */,
 				583B1DC51860AA5A00817EF8 /* HILogger.h */,
 				583B1DC61860AA5A00817EF8 /* HILogger.m */,
 				D958B0AE17A29CE200B0EDD5 /* jni.h */,
@@ -148,7 +143,6 @@
 				D958B0AF17A29CE200B0EDD5 /* jni_md.h in Headers */,
 				24D21A63184D550A00FF296A /* HIBitcoinInternalErrorCodes.h in Headers */,
 				D958B0B017A29CE200B0EDD5 /* jni.h in Headers */,
-				D958B0C117A2A50A00B0EDD5 /* HIJavaBridge.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

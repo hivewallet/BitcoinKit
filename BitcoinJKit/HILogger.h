@@ -6,8 +6,6 @@
 //  Copyright (c) 2013 Hive Developers. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-
 typedef NS_ENUM(int, HILoggerLevel) {
     HILoggerLevelDebug = 1,
     HILoggerLevelInfo = 2,

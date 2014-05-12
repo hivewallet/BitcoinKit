@@ -11,7 +11,6 @@
 #import "HIBitcoinErrorCodes.h"
 #import "HIBitcoinInternalErrorCodes.h"
 #import "HILogger.h"
-#import <JavaVM/jni.h>
 
 @interface HIBitcoinManager ()
 {
@@ -560,7 +559,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
 
 #pragma mark - Initialization
 
-- (id)init
+- (instancetype)init
 {
     self = [super init];
 
