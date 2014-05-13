@@ -871,6 +871,7 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         if (session.pkiVerificationData != null)
         {
             request.put("pkiName", session.pkiVerificationData.name);
+            request.put("pkiRootAuthorityName", session.pkiVerificationData.rootAuthorityName);
         }
 
         return request.toString();
