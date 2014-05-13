@@ -724,13 +724,11 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
             {
                 public void onSuccess(Transaction transaction)
                 {
-                    wipeAesKey(request.aesKey);
                     onTransactionSuccess(sendResult.tx.getHashAsString());
                 }
 
                 public void onFailure(Throwable throwable)
                 {
-                    wipeAesKey(request.aesKey);
                     onTransactionFailed();
                     throwable.printStackTrace();
                 }
