@@ -899,28 +899,53 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
 
             wallet.completeTx(request);
 
-            ListenableFuture<PaymentSession.Ack> ack = session.sendPayment(ImmutableList.of(request.tx), null, null);
-            Futures.addCallback(ack, new FutureCallback<PaymentSession.Ack>()
-            {
-                public void onSuccess(PaymentSession.Ack ack)
-                {
-                    try
-                    {
-                        wallet.commitTx(request.tx);
-                        paymentSessions.remove(sessionId);
-                        onPaymentRequestProcessed(callbackId, getPaymentRequestAckDetails(ack));
-                    }
-                    catch (JSONException e)
-                    {
-                        onPaymentRequestProcessingFailed(callbackId, e);
-                    }
-                }
+            ListenableFuture<PaymentSession.Ack> fack = session.sendPayment(ImmutableList.of(request.tx), null, null);
 
-                public void onFailure(Throwable throwable)
+            if (fack != null)
+            {
+                Futures.addCallback(fack, new FutureCallback<PaymentSession.Ack>()
                 {
-                    onPaymentRequestProcessingFailed(callbackId, throwable);
-                }
-            });
+                    public void onSuccess(PaymentSession.Ack ack)
+                    {
+                        try
+                        {
+                            wallet.commitTx(request.tx);
+                            paymentSessions.remove(sessionId);
+                            onPaymentRequestProcessed(callbackId, getPaymentRequestAckDetails(ack));
+                        }
+                        catch (JSONException e)
+                        {
+                            onPaymentRequestProcessingFailed(callbackId, e);
+                        }
+                    }
+
+                    public void onFailure(Throwable throwable)
+                    {
+                        onPaymentRequestProcessingFailed(callbackId, throwable);
+                    }
+                });
+            }
+            else
+            {
+                // no payment_url - we just need to broadcast the transaction as with a normal send
+
+                wallet.commitTx(request.tx);
+                ListenableFuture<Transaction> broadcastComplete = peerGroup.broadcastTransaction(request.tx);
+
+                Futures.addCallback(broadcastComplete, new FutureCallback<Transaction>()
+                {
+                    public void onSuccess(Transaction transaction)
+                    {
+                        paymentSessions.remove(sessionId);
+                        onPaymentRequestProcessed(callbackId, "{}");
+                    }
+
+                    public void onFailure(Throwable throwable)
+                    {
+                        onPaymentRequestProcessingFailed(callbackId, throwable);
+                    }
+                });
+            }
         }
         catch (KeyCrypterException e)
         {
