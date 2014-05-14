@@ -7,32 +7,27 @@ import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LastWalletChangeExtension implements WalletExtension
-{
+public class LastWalletChangeExtension implements WalletExtension {
     static final String EXTENSION_ID = LastWalletChangeExtension.class.getName();
     private static final Logger log = LoggerFactory.getLogger(LastWalletChangeExtension.class);
 
     private Date lastWalletChangeDate;
 
-    public LastWalletChangeExtension()
-    {
+    public LastWalletChangeExtension() {
     }
 
-    public Date getLastWalletChangeDate()
-    {
+    public Date getLastWalletChangeDate() {
         return lastWalletChangeDate;
     }
 
-    public void setLastWalletChangeDate(Date date)
-    {
+    public void setLastWalletChangeDate(Date date) {
         lastWalletChangeDate = date;
     }
 
 
     /** Returns a Java package/class style name used to disambiguate this extension from others. */
     @Override
-    public String getWalletExtensionID()
-    {
+    public String getWalletExtensionID() {
         return EXTENSION_ID;
     }
 
@@ -42,23 +37,20 @@ public class LastWalletChangeExtension implements WalletExtension
      * the objects lifetime.
      */
     @Override
-    public boolean isWalletExtensionMandatory()
-    {
+    public boolean isWalletExtensionMandatory() {
         return false;
     }
 
     /** Returns bytes that will be saved in the wallet. */
     @Override
-    public byte[] serializeWalletExtension()
-    {
+    public byte[] serializeWalletExtension() {
         long timestamp = (lastWalletChangeDate != null) ? lastWalletChangeDate.getTime() : 0;
         return ByteBuffer.allocate(8).putLong(timestamp).array();
     }
 
     /** Loads the contents of this object from the wallet. */
     @Override
-    public void deserializeWalletExtension(Wallet containingWallet, byte[] data) throws Exception
-    {
+    public void deserializeWalletExtension(Wallet containingWallet, byte[] data) throws Exception {
         ByteBuffer buffer = ByteBuffer.allocate(8);
         buffer.put(data).flip();
         long timestamp = buffer.getLong();

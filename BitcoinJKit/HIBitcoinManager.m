@@ -12,8 +12,7 @@
 #import "HIBitcoinInternalErrorCodes.h"
 #import "HILogger.h"
 
-@interface HIBitcoinManager ()
-{
+@interface HIBitcoinManager () {
     JNIEnv *_jniEnv;
     JavaVMInitArgs _vmArgs;
     jobject _managerObject;
@@ -48,8 +47,7 @@
 
 #pragma mark - Helper functions for conversion
 
-NSString * NSStringFromJString(JNIEnv *env, jstring javaString)
-{
+NSString * NSStringFromJString(JNIEnv *env, jstring javaString) {
     if (javaString) {
         const char *chars = (*env)->GetStringUTFChars(env, javaString, NULL);
         NSString *objcString = [NSString stringWithUTF8String:chars];
@@ -61,13 +59,11 @@ NSString * NSStringFromJString(JNIEnv *env, jstring javaString)
     }
 }
 
-jstring JStringFromNSString(JNIEnv *env, NSString *string)
-{
+jstring JStringFromNSString(JNIEnv *env, NSString *string) {
     return (*env)->NewStringUTF(env, [string UTF8String]);
 }
 
-jarray JCharArrayFromNSData(JNIEnv *env, NSData *data)
-{
+jarray JCharArrayFromNSData(JNIEnv *env, NSData *data) {
     jsize length = (jsize)(data.length / sizeof(jchar));
     jcharArray charArray = (*env)->NewCharArray(env, length);
     (*env)->SetCharArrayRegion(env, charArray, 0, length, data.bytes);
@@ -81,69 +77,59 @@ char * CharsFromString(NSString *string) {
 
 #pragma mark - JNI callback functions
 
-JNIEXPORT void JNICALL onBalanceChanged(JNIEnv *env, jobject thisobject)
-{
+JNIEXPORT void JNICALL onBalanceChanged(JNIEnv *env, jobject thisobject) {
     NSAutoreleasePool *pool = [NSAutoreleasePool new];
     [[HIBitcoinManager defaultManager] onAvailableBalanceChanged];
     [[HIBitcoinManager defaultManager] onEstimatedBalanceChanged];
     [pool release];
 }
 
-JNIEXPORT void JNICALL onPeerCountChanged(JNIEnv *env, jobject thisobject, jint peerCount)
-{
+JNIEXPORT void JNICALL onPeerCountChanged(JNIEnv *env, jobject thisobject, jint peerCount) {
     NSAutoreleasePool *pool = [NSAutoreleasePool new];
     [[HIBitcoinManager defaultManager] onPeerCountChanged:peerCount];
     [pool release];
 }
 
-JNIEXPORT void JNICALL onSynchronizationUpdate(JNIEnv *env, jobject thisobject, jfloat percent)
-{
+JNIEXPORT void JNICALL onSynchronizationUpdate(JNIEnv *env, jobject thisobject, jfloat percent) {
     NSAutoreleasePool *pool = [NSAutoreleasePool new];
     [[HIBitcoinManager defaultManager] onSynchronizationChanged:(float)percent];
     [pool release];
 }
 
-JNIEXPORT void JNICALL onTransactionChanged(JNIEnv *env, jobject thisobject, jstring txid)
-{
+JNIEXPORT void JNICALL onTransactionChanged(JNIEnv *env, jobject thisobject, jstring txid) {
     NSAutoreleasePool *pool = [NSAutoreleasePool new];
 
-    if (txid)
-    {
+    if (txid) {
         [[HIBitcoinManager defaultManager] onTransactionChanged:NSStringFromJString(env, txid)];
     }
     
     [pool release];
 }
 
-JNIEXPORT void JNICALL onTransactionSuccess(JNIEnv *env, jobject thisobject, jstring txid)
-{
+JNIEXPORT void JNICALL onTransactionSuccess(JNIEnv *env, jobject thisobject, jstring txid) {
     NSAutoreleasePool *pool = [NSAutoreleasePool new];
 
-    if (txid)
-    {
+    if (txid) {
         [[HIBitcoinManager defaultManager] onTransactionSuccess:NSStringFromJString(env, txid)];
     }
     
     [pool release];
 }
 
-JNIEXPORT void JNICALL onTransactionFailed(JNIEnv *env, jobject thisobject)
-{
+JNIEXPORT void JNICALL onTransactionFailed(JNIEnv *env, jobject thisobject) {
     NSAutoreleasePool *pool = [NSAutoreleasePool new];
     [[HIBitcoinManager defaultManager] onTransactionFailed];
     [pool release];
 }
 
-JNIEXPORT void JNICALL onException(JNIEnv *env, jobject thisobject, jthrowable jexception)
-{
+JNIEXPORT void JNICALL onException(JNIEnv *env, jobject thisobject, jthrowable jexception) {
     NSAutoreleasePool *pool = [NSAutoreleasePool new];
     [[HIBitcoinManager defaultManager] handleJavaException:jexception useExceptionHandler:YES error:NULL];
     [pool release];
 }
 
 JNIEXPORT void JNICALL onPaymentRequestLoaded(JNIEnv *env, jobject thisobject,
-                                              jint callbackId, jint sessionId, jstring requestDetails)
-{
+                                              jint callbackId, jint sessionId, jstring requestDetails) {
     NSAutoreleasePool *pool = [NSAutoreleasePool new];
     [[HIBitcoinManager defaultManager] onPaymentRequestLoaded:sessionId
                                                       details:requestDetails
@@ -151,32 +137,28 @@ JNIEXPORT void JNICALL onPaymentRequestLoaded(JNIEnv *env, jobject thisobject,
     [pool release];
 }
 
-JNIEXPORT void JNICALL onPaymentRequestLoadFailed(JNIEnv *env, jobject thisobject, jint callbackId, jthrowable error)
-{
+JNIEXPORT void JNICALL onPaymentRequestLoadFailed(JNIEnv *env, jobject thisobject, jint callbackId, jthrowable error) {
     NSAutoreleasePool *pool = [NSAutoreleasePool new];
     [[HIBitcoinManager defaultManager] onPaymentRequestLoadFailedWithError:error
                                                                   callback:callbackId];
     [pool release];
 }
 
-JNIEXPORT void JNICALL onPaymentRequestProcessed(JNIEnv *env, jobject thisobject, jint callbackId, jstring details)
-{
+JNIEXPORT void JNICALL onPaymentRequestProcessed(JNIEnv *env, jobject thisobject, jint callbackId, jstring details) {
     NSAutoreleasePool *pool = [NSAutoreleasePool new];
     [[HIBitcoinManager defaultManager] onPaymentRequestProcessed:details callback:callbackId];
     [pool release];
 }
 
 JNIEXPORT void JNICALL onPaymentRequestProcessingFailed(JNIEnv *env, jobject thisobject,
-                                                        jint callbackId, jthrowable error)
-{
+                                                        jint callbackId, jthrowable error) {
     NSAutoreleasePool *pool = [NSAutoreleasePool new];
     [[HIBitcoinManager defaultManager] onPaymentRequestProcessingFailedWithError:error callback:callbackId];
     [pool release];
 }
 
 JNIEXPORT void JNICALL receiveLogFromJVM(JNIEnv *env, jobject thisobject, jstring fileName, jstring methodName,
-                                         int lineNumber, jint level, jstring msg)
-{
+                                         int lineNumber, jint level, jstring msg) {
     NSAutoreleasePool *pool = [NSAutoreleasePool new];
     const char *fileNameString = (*env)->GetStringUTFChars(env, fileName, NULL);
     const char *methodNameString = (*env)->GetStringUTFChars(env, methodName, NULL);
@@ -211,13 +193,11 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
 
 @implementation HIBitcoinManager
 
-+ (HIBitcoinManager *)defaultManager
-{
++ (HIBitcoinManager *)defaultManager {
     static HIBitcoinManager *defaultManager = nil;
     static dispatch_once_t oncePredicate;
 
-    if (!defaultManager)
-    {
+    if (!defaultManager) {
         dispatch_once(&oncePredicate, ^{
             defaultManager = [[self alloc] init];
         });
@@ -229,8 +209,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
 
 #pragma mark - helper methods for JNI calls and conversion
 
-- (jclass)jClassForClass:(NSString *)class
-{
+- (jclass)jClassForClass:(NSString *)class {
     jclass cls = (*_jniEnv)->FindClass(_jniEnv, [class UTF8String]);
 
     [self handleJavaExceptions:NULL];
@@ -238,12 +217,10 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     return cls;
 }
 
-- (jmethodID)jMethodWithName:(char *)name signature:(char *)signature
-{
+- (jmethodID)jMethodWithName:(char *)name signature:(char *)signature {
     jmethodID method = (*_jniEnv)->GetMethodID(_jniEnv, _managerClass, name, signature);
 
-    if (method == NULL)
-    {
+    if (method == NULL) {
         @throw [NSException exceptionWithName:@"Java exception"
                                        reason:[NSString stringWithFormat:@"Method not found: %s (%s)", name, signature]
                                      userInfo:nil];
@@ -252,8 +229,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     return method;
 }
 
-- (BOOL)callBooleanMethodWithName:(char *)name signature:(char *)signature, ...
-{
+- (BOOL)callBooleanMethodWithName:(char *)name signature:(char *)signature, ... {
     jmethodID method = [self jMethodWithName:name signature:signature];
 
     va_list args;
@@ -266,8 +242,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     return result;
 }
 
-- (int)callIntegerMethodWithName:(char *)name signature:(char *)signature, ...
-{
+- (int)callIntegerMethodWithName:(char *)name signature:(char *)signature, ... {
     jmethodID method = [self jMethodWithName:name signature:signature];
 
     va_list args;
@@ -280,8 +255,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     return result;
 }
 
-- (long)callLongMethodWithName:(char *)name signature:(char *)signature, ...
-{
+- (long)callLongMethodWithName:(char *)name signature:(char *)signature, ... {
     jmethodID method = [self jMethodWithName:name signature:signature];
 
     va_list args;
@@ -294,8 +268,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     return result;
 }
 
-- (jobject)callObjectMethodWithName:(char *)name error:(NSError **)error signature:(char *)signature, ...
-{
+- (jobject)callObjectMethodWithName:(char *)name error:(NSError **)error signature:(char *)signature, ... {
     jmethodID method = [self jMethodWithName:name signature:signature];
 
     va_list args;
@@ -308,8 +281,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     return result;
 }
 
-- (void)callVoidMethodWithName:(char *)name error:(NSError **)error signature:(char *)signature, ...
-{
+- (void)callVoidMethodWithName:(char *)name error:(NSError **)error signature:(char *)signature, ... {
     jmethodID method = [self jMethodWithName:name signature:signature];
 
     va_list args;
@@ -320,27 +292,21 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     [self handleJavaExceptions:error];
 }
 
-- (void)handleJavaExceptions:(NSError **)error
-{
-    if ((*_jniEnv)->ExceptionCheck(_jniEnv))
-    {
+- (void)handleJavaExceptions:(NSError **)error {
+    if ((*_jniEnv)->ExceptionCheck(_jniEnv)) {
         // get the exception object
         jthrowable exception = (*_jniEnv)->ExceptionOccurred(_jniEnv);
 
         [self handleJavaException:exception useExceptionHandler:NO error:error];
-    }
-    else if (error)
-    {
+    } else if (error) {
         *error = nil;
     }
 }
 
-- (void)handleJavaException:(jthrowable)exception useExceptionHandler:(BOOL)useHandler error:(NSError **)returnedError
-{
+- (void)handleJavaException:(jthrowable)exception useExceptionHandler:(BOOL)useHandler error:(NSError **)returnedError {
     BOOL callerWantsToHandleErrors = returnedError != nil;
 
-    if (callerWantsToHandleErrors)
-    {
+    if (callerWantsToHandleErrors) {
         *returnedError = nil;
     }
 
@@ -367,21 +333,15 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
                   error.userInfo[NSLocalizedFailureReasonErrorKey],
                   error.userInfo[@"stackTrace"] ?: @"");
 
-        if (callerWantsToHandleErrors && error.code != kHIBitcoinManagerUnexpectedError)
-        {
+        if (callerWantsToHandleErrors && error.code != kHIBitcoinManagerUnexpectedError) {
             *returnedError = error;
-        }
-        else
-        {
+        } else {
             NSException *exception = [NSException exceptionWithName:@"Java exception"
                                                              reason:error.userInfo[NSLocalizedFailureReasonErrorKey]
                                                            userInfo:error.userInfo];
-            if (useHandler && self.exceptionHandler)
-            {
+            if (useHandler && self.exceptionHandler) {
                 self.exceptionHandler(exception);
-            }
-            else
-            {
+            } else {
                 @throw exception;
             }
         }
@@ -389,85 +349,52 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
 }
 
 - (void)runSynchronouslyOnMainThread:(void (^)())block {
-    if (dispatch_get_current_queue() != dispatch_get_main_queue())
-    {
+    if (dispatch_get_current_queue() != dispatch_get_main_queue()) {
         dispatch_sync(dispatch_get_main_queue(), block);
-    }
-    else
-    {
+    } else {
         // if this is the main thread, we can't use dispatch_sync or the whole thing will lock up
         block();
     }
 }
 
-- (NSInteger)errorCodeForJavaException:(jthrowable)exception
-{
+- (NSInteger)errorCodeForJavaException:(jthrowable)exception {
     NSString *exceptionClass = [self getJavaExceptionClassName:exception];
     NSString *exceptionMessage = [self getJavaExceptionMessage:exception];
 
-    if ([exceptionClass isEqual:@"com.google.bitcoin.store.UnreadableWalletException"])
-    {
+    if ([exceptionClass isEqual:@"com.google.bitcoin.store.UnreadableWalletException"]) {
         return kHIBitcoinManagerUnreadableWallet;
-    }
-    else if ([exceptionClass isEqual:@"com.google.bitcoin.store.BlockStoreException"])
-    {
-        if ([exceptionMessage rangeOfString:@"Store file is already locked"].location != NSNotFound)
-        {
+    } else if ([exceptionClass isEqual:@"com.google.bitcoin.store.BlockStoreException"]) {
+        if ([exceptionMessage rangeOfString:@"Store file is already locked"].location != NSNotFound) {
             return kHIBitcoinManagerBlockStoreLockError;
-        }
-        else
-        {
+        } else {
             return kHIBitcoinManagerBlockStoreReadError;
         }
-    }
-    else if ([exceptionClass isEqual:@"com.google.bitcoin.protocols.payments.PaymentRequestException$Expired"])
-    {
+    } else if ([exceptionClass isEqual:@"com.google.bitcoin.protocols.payments.PaymentRequestException$Expired"]) {
         return kHIBitcoinManagerPaymentRequestExpiredError;
-    }
-    else if ([exceptionClass isEqual:@"com.google.bitcoin.core.InsufficientMoneyException"])
-    {
+    } else if ([exceptionClass isEqual:@"com.google.bitcoin.core.InsufficientMoneyException"]) {
         return kHIBitcoinManagerInsufficientMoneyError;
-    }
-    else if ([exceptionClass isEqual:@"com.google.protobuf.InvalidProtocolBufferException"])
-    {
+    } else if ([exceptionClass isEqual:@"com.google.protobuf.InvalidProtocolBufferException"]) {
         return kHIBitcoinManagerInvalidProtocolBufferError;
-    }
-    else if ([exceptionClass isEqual:@"java.io.FileNotFoundException"])
-    {
+    } else if ([exceptionClass isEqual:@"java.io.FileNotFoundException"]) {
         return kHIFileNotFoundException;
-    }
-    else if ([exceptionClass isEqual:@"java.lang.IllegalArgumentException"])
-    {
+    } else if ([exceptionClass isEqual:@"java.lang.IllegalArgumentException"]) {
         return kHIIllegalArgumentException;
-    }
-    else if ([exceptionClass isEqual:@"com.hivewallet.bitcoinkit.NoWalletException"])
-    {
+    } else if ([exceptionClass isEqual:@"com.hivewallet.bitcoinkit.NoWalletException"]) {
         return kHIBitcoinManagerNoWallet;
-    }
-    else if ([exceptionClass isEqual:@"com.hivewallet.bitcoinkit.ExistingWalletException"])
-    {
+    } else if ([exceptionClass isEqual:@"com.hivewallet.bitcoinkit.ExistingWalletException"]) {
         return kHIBitcoinManagerWalletExists;
-    }
-    else if ([exceptionClass isEqual:@"com.hivewallet.bitcoinkit.WrongPasswordException"])
-    {
+    } else if ([exceptionClass isEqual:@"com.hivewallet.bitcoinkit.WrongPasswordException"]) {
         return kHIBitcoinManagerWrongPassword;
-    }
-    else if ([exceptionClass isEqual:@"com.hivewallet.bitcoinkit.WrongNetworkException"])
-    {
+    } else if ([exceptionClass isEqual:@"com.hivewallet.bitcoinkit.WrongNetworkException"]) {
         return kHIBitcoinManagerPaymentRequestWrongNetworkError;
-    }
-    else if ([exceptionClass isEqual:@"com.hivewallet.bitcoinkit.SendingDustException"])
-    {
+    } else if ([exceptionClass isEqual:@"com.hivewallet.bitcoinkit.SendingDustException"]) {
         return kHIBitcoinManagerSendingDustError;
-    }
-    else
-    {
+    } else {
         return kHIBitcoinManagerUnexpectedError;
     }
 }
 
-- (NSString *)getJavaExceptionClassName:(jthrowable)exception
-{
+- (NSString *)getJavaExceptionClassName:(jthrowable)exception {
     jclass exceptionClass = (*_jniEnv)->GetObjectClass(_jniEnv, exception);
     jmethodID getClassMethod = (*_jniEnv)->GetMethodID(_jniEnv, exceptionClass, "getClass", "()Ljava/lang/Class;");
     jobject classObject = (*_jniEnv)->CallObjectMethod(_jniEnv, exception, getClassMethod);
@@ -477,39 +404,32 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     return NSStringFromJString(_jniEnv, name);
 }
 
-- (NSDictionary *)createUserInfoForJavaException:(jthrowable)exception
-{
+- (NSDictionary *)createUserInfoForJavaException:(jthrowable)exception {
     NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
     userInfo[NSLocalizedFailureReasonErrorKey] = [self getJavaExceptionMessage:exception] ?: @"Java VM raised an exception";
 
     NSString *stackTrace = [self getJavaExceptionStackTrace:exception];
-    if (stackTrace)
-    {
+    if (stackTrace) {
         userInfo[@"stackTrace"] = stackTrace;
     }
     return userInfo;
 }
 
-- (NSString *)getJavaExceptionMessage:(jthrowable)exception
-{
+- (NSString *)getJavaExceptionMessage:(jthrowable)exception {
     jclass exceptionClass = (*_jniEnv)->GetObjectClass(_jniEnv, exception);
 
-    if (exceptionClass)
-    {
+    if (exceptionClass) {
         jmethodID toStringMethod = (*_jniEnv)->GetMethodID(_jniEnv, exceptionClass, "toString", "()Ljava/lang/String;");
 
-        if (toStringMethod)
-        {
+        if (toStringMethod) {
             jstring description = (*_jniEnv)->CallObjectMethod(_jniEnv, exception, toStringMethod);
 
-            if ((*_jniEnv)->ExceptionCheck(_jniEnv))
-            {
+            if ((*_jniEnv)->ExceptionCheck(_jniEnv)) {
                 (*_jniEnv)->ExceptionDescribe(_jniEnv);
                 (*_jniEnv)->ExceptionClear(_jniEnv);
             }
 
-            if (description)
-            {
+            if (description) {
                 return NSStringFromJString(_jniEnv, description);
             }
         }
@@ -518,23 +438,19 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     return nil;
 }
 
-- (NSString *)getJavaExceptionStackTrace:(jthrowable)exception
-{
+- (NSString *)getJavaExceptionStackTrace:(jthrowable)exception {
     jmethodID stackTraceMethod = (*_jniEnv)->GetMethodID(_jniEnv, _managerClass, "getExceptionStackTrace",
                                                          "(Ljava/lang/Throwable;)Ljava/lang/String;");
 
-    if (stackTraceMethod)
-    {
+    if (stackTraceMethod) {
         jstring stackTrace = (*_jniEnv)->CallObjectMethod(_jniEnv, _managerObject, stackTraceMethod, exception);
 
-        if ((*_jniEnv)->ExceptionCheck(_jniEnv))
-        {
+        if ((*_jniEnv)->ExceptionCheck(_jniEnv)) {
             (*_jniEnv)->ExceptionDescribe(_jniEnv);
             (*_jniEnv)->ExceptionClear(_jniEnv);
         }
 
-        if (stackTrace)
-        {
+        if (stackTrace) {
             return NSStringFromJString(_jniEnv, stackTrace);
         }
     }
@@ -542,8 +458,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     return nil;
 }
 
-- (id)objectFromJSONString:(NSString *)JSONString
-{
+- (id)objectFromJSONString:(NSString *)JSONString {
     NSError *error = nil;
     NSData *data = [JSONString dataUsingEncoding:NSUTF8StringEncoding];
     id result = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
@@ -559,12 +474,10 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
 
 #pragma mark - Initialization
 
-- (instancetype)init
-{
+- (instancetype)init {
     self = [super init];
 
-    if (self)
-    {
+    if (self) {
         _dateFormatter = [[NSDateFormatter alloc] init];
         _dateFormatter.locale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en_GB"] autorelease];
         _dateFormatter.dateFormat = @"yyyy-MM-dd HH:mm:ss z";
@@ -704,8 +617,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     }
 }
 
-- (void)dealloc
-{
+- (void)dealloc {
     [self stop];
 
     [_dateFormatter release];
@@ -716,15 +628,13 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     [super dealloc];
 }
 
-- (BOOL)start:(NSError **)error
-{
+- (BOOL)start:(NSError **)error {
     [[NSFileManager defaultManager] createDirectoryAtURL:self.dataURL
                              withIntermediateDirectories:YES
                                               attributes:0
                                                    error:NULL];
     
-    if (_testingNetwork)
-    {
+    if (_testingNetwork) {
         [self callVoidMethodWithName:"setTestingNetwork" error:NULL signature:"(Z)V", true];
     }
     
@@ -735,8 +645,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     // We're ready! Let's start
     [self callVoidMethodWithName:"start" error:error signature:"()V"];
 
-    if (!error || !*error)
-    {
+    if (!error || !*error) {
         [self didStart];
         return YES;
     }
@@ -744,21 +653,18 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     return NO;
 }
 
-- (void)createWallet:(NSError **)error
-{
+- (void)createWallet:(NSError **)error {
     *error = nil;
 
     [self callVoidMethodWithName:"createWallet" error:error signature:"()V"];
 
-    if (!*error)
-    {
+    if (!*error) {
         [self didStart];
     }
 }
 
 - (void)createWalletWithPassword:(NSData *)password
-                           error:(NSError **)error
-{
+                           error:(NSError **)error {
     jarray charArray = JCharArrayFromNSData(_jniEnv, password);
 
     *error = nil;
@@ -768,16 +674,14 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
 
     [self zeroCharArray:charArray size:(jsize)(password.length / sizeof(jchar))];
 
-    if (!*error)
-    {
+    if (!*error) {
         [self didStart];
     }
 }
 
 - (void)changeWalletPassword:(NSData *)fromPassword
                   toPassword:(NSData *)toPassword
-                       error:(NSError **)error
-{
+                       error:(NSError **)error {
     jarray fromCharArray = fromPassword ? JCharArrayFromNSData(_jniEnv, fromPassword) : NULL;
     jarray toCharArray = JCharArrayFromNSData(_jniEnv, toPassword);
 
@@ -785,8 +689,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
                            error:error
                        signature:"([C[C)V", fromCharArray, toCharArray];
 
-    if (fromCharArray)
-    {
+    if (fromCharArray) {
         [self zeroCharArray:fromCharArray size:(jsize)(fromPassword.length / sizeof(jchar))];
     }
 
@@ -795,8 +698,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
 
 - (NSString *)signMessage:(NSString *)message
              withPassword:(NSData *)password
-                    error:(NSError **)error
-{
+                    error:(NSError **)error {
     jarray passwordCharArray = password ? JCharArrayFromNSData(_jniEnv, password) : NULL;
     jstring messageJString = JStringFromNSString(_jniEnv, message);
 
@@ -805,8 +707,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
                                              signature:"(Ljava/lang/String;[C)Ljava/lang/String;",
                          messageJString, passwordCharArray];
 
-    if (passwordCharArray)
-    {
+    if (passwordCharArray) {
         [self zeroCharArray:passwordCharArray size:(jsize)(password.length / sizeof(jchar))];
     }
 
@@ -817,8 +718,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     }
 }
 
-- (BOOL)isPasswordCorrect:(NSData *)password
-{
+- (BOOL)isPasswordCorrect:(NSData *)password {
     jarray charArray = JCharArrayFromNSData(_jniEnv, password);
 
     BOOL result = [self callBooleanMethodWithName:"isPasswordCorrect" signature:"([C)Z", charArray];
@@ -834,8 +734,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     (*_jniEnv)->SetCharArrayRegion(_jniEnv, charArray, 0, size, zero);
 }
 
-- (void)didStart
-{
+- (void)didStart {
     [self willChangeValueForKey:@"isRunning"];
     _isRunning = YES;
     [self didChangeValueForKey:@"isRunning"];
@@ -846,33 +745,28 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     [self didChangeValueForKey:@"walletAddress"];
 }
 
-- (NSString *)walletAddress
-{
+- (NSString *)walletAddress {
     jstring address = [self callObjectMethodWithName:"getWalletAddress" error:NULL signature:"()Ljava/lang/String;"];
     return NSStringFromJString(_jniEnv, address);
 }
 
-- (NSString *)checkpointsFilePath
-{
+- (NSString *)checkpointsFilePath {
     jstring path = [self callObjectMethodWithName:"getCheckpointsFilePath" error:NULL signature:"()Ljava/lang/String;"];
     return NSStringFromJString(_jniEnv, path);
 }
 
-- (void)setCheckpointsFilePath:(NSString *)checkpointsFilePath
-{
+- (void)setCheckpointsFilePath:(NSString *)checkpointsFilePath {
     [self callVoidMethodWithName:"setCheckpointsFilePath"
                            error:NULL
                        signature:"(Ljava/lang/String;)V",
      JStringFromNSString(_jniEnv, checkpointsFilePath)];
 }
 
-- (void)stop
-{
+- (void)stop {
     [_balanceChecker invalidate];
     _balanceChecker = nil;
 
-    if (_managerObject)
-    {
+    if (_managerObject) {
         [self callVoidMethodWithName:"stop" error:NULL signature:"()V"];
     }
 
@@ -883,18 +777,15 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     [[NSNotificationCenter defaultCenter] postNotificationName:kHIBitcoinManagerStoppedNotification object:self];
 }
 
-- (void)deleteBlockchainDataFile:(NSError **)error
-{
+- (void)deleteBlockchainDataFile:(NSError **)error {
     [self callVoidMethodWithName:"deleteBlockchainDataFile" error:error signature:"()V"];
 }
 
-- (void)resetBlockchain:(NSError **)error
-{
+- (void)resetBlockchain:(NSError **)error {
     [self callVoidMethodWithName:"resetBlockchain" error:error signature:"()V"];
 }
 
-- (NSDictionary *)modifiedTransactionForTransaction:(NSDictionary *)transaction
-{
+- (NSDictionary *)modifiedTransactionForTransaction:(NSDictionary *)transaction {
     if (!transaction) {
         return nil;
     }
@@ -902,28 +793,23 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     NSMutableDictionary *d = [NSMutableDictionary dictionaryWithDictionary:transaction];
     NSDate *date = [_dateFormatter dateFromString:transaction[@"time"]];
 
-    if (date)
-    {
+    if (date) {
         d[@"time"] = date;
-    }
-    else
-    {
+    } else {
         d[@"time"] = [NSDate date];
     }
 
     return d;
 }
 
-- (NSDictionary *)transactionForHash:(NSString *)hash
-{
+- (NSDictionary *)transactionForHash:(NSString *)hash {
     NSError *error = nil;
     jstring transactionJString = [self callObjectMethodWithName:"getTransaction"
                                                           error:&error
                                                        signature:"(Ljava/lang/String;)Ljava/lang/String;",
                                   JStringFromNSString(_jniEnv, hash)];
 
-    if (transactionJString && !error)
-    {
+    if (transactionJString && !error) {
         NSDictionary *transactionData = [self objectFromJSONString:NSStringFromJString(_jniEnv, transactionJString)];
         return [self modifiedTransactionForTransaction:transactionData];
     }
@@ -931,14 +817,12 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     return nil;
 }
 
-- (NSDictionary *)transactionAtIndex:(NSUInteger)index
-{
+- (NSDictionary *)transactionAtIndex:(NSUInteger)index {
     jstring transactionJString = [self callObjectMethodWithName:"getTransaction"
                                                           error:NULL
                                                       signature:"(I)Ljava/lang/String;", index];
 
-    if (transactionJString)
-    {
+    if (transactionJString) {
         NSDictionary *transactionData = [self objectFromJSONString:NSStringFromJString(_jniEnv, transactionJString)];
         return [self modifiedTransactionForTransaction:transactionData];
     }
@@ -946,14 +830,12 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     return nil;
 }
 
-- (NSArray *)allTransactions
-{
+- (NSArray *)allTransactions {
     jstring transactionsJString = [self callObjectMethodWithName:"getAllTransactions"
                                                            error:NULL
                                                        signature:"()Ljava/lang/String;"];
 
-    if (transactionsJString)
-    {
+    if (transactionsJString) {
         NSArray *transactionJSONs = [self objectFromJSONString:NSStringFromJString(_jniEnv, transactionsJString)];
         if (!transactionJSONs) {
             return nil;
@@ -961,8 +843,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
 
         NSMutableArray *transactions = [NSMutableArray arrayWithCapacity:transactionJSONs.count];
 
-        for (NSDictionary *JSON in transactionJSONs)
-        {
+        for (NSDictionary *JSON in transactionJSONs) {
             [transactions addObject:[self modifiedTransactionForTransaction:JSON]];
         }
 
@@ -972,15 +853,13 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     return nil;
 }
 
-- (NSArray *)transactionsWithRange:(NSRange)range
-{
+- (NSArray *)transactionsWithRange:(NSRange)range {
     jstring transactionsJString = [self callObjectMethodWithName:"getTransaction"
                                                            error:NULL
                                                        signature:"(II)Ljava/lang/String;",
                                    range.location, range.length];
 
-    if (transactionsJString)
-    {
+    if (transactionsJString) {
         NSArray *transactionJSONs = [self objectFromJSONString:NSStringFromJString(_jniEnv, transactionsJString)];
         if (!transactionJSONs) {
             return nil;
@@ -988,8 +867,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
 
         NSMutableArray *transactions = [NSMutableArray arrayWithCapacity:transactionJSONs.count];
 
-        for (NSDictionary *JSON in transactionJSONs)
-        {
+        for (NSDictionary *JSON in transactionJSONs) {
             [transactions addObject:[self modifiedTransactionForTransaction:JSON]];
         }
         
@@ -999,20 +877,17 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     return nil;
 }
 
-- (NSString *)walletDebuggingInfo
-{
+- (NSString *)walletDebuggingInfo {
     jstring info = [self callObjectMethodWithName:"getWalletDebuggingInfo" error:NULL signature:"()Ljava/lang/String;"];
     return NSStringFromJString(_jniEnv, info);
 }
 
-- (BOOL)isAddressValid:(NSString *)address
-{
+- (BOOL)isAddressValid:(NSString *)address {
     return [self callBooleanMethodWithName:"isAddressValid" signature:"(Ljava/lang/String;)Z",
             JStringFromNSString(_jniEnv, address)];
 }
 
-- (uint64_t)calculateTransactionFeeForSendingCoins:(uint64_t)coins toRecipient:(NSString *)recipient
-{
+- (uint64_t)calculateTransactionFeeForSendingCoins:(uint64_t)coins toRecipient:(NSString *)recipient {
     jstring fee =
         [self callObjectMethodWithName:"feeForSendingCoins"
                                  error:NULL
@@ -1028,12 +903,9 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
           comment:(NSString *)comment
          password:(NSData *)password
             error:(NSError **)error
-       completion:(void(^)(NSString *hash))completion
-{
-    if (_sending)
-    {
-        if (completion)
-        {
+       completion:(void(^)(NSString *hash))completion {
+    if (_sending) {
+        if (completion) {
             completion(nil);
         }
 
@@ -1048,8 +920,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     jstring jAmount = JStringFromNSString(_jniEnv, [NSString stringWithFormat:@"%lld", coins]);
     jstring jRecipient = JStringFromNSString(_jniEnv, recipient);
     *error = nil;
-    if (password)
-    {
+    if (password) {
         jarray jPassword = JCharArrayFromNSData(_jniEnv, password);
 
         [self callVoidMethodWithName:"sendCoins"
@@ -1057,16 +928,13 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
                            signature:"(Ljava/lang/String;Ljava/lang/String;[C)V", jAmount, jRecipient, jPassword];
 
         [self zeroCharArray:jPassword size:(jsize)(password.length / sizeof(jchar))];
-    }
-    else
-    {
+    } else {
         [self callVoidMethodWithName:"sendCoins"
                                error:error
                            signature:"(Ljava/lang/String;Ljava/lang/String;)V", jAmount, jRecipient];
     }
 
-    if (*error)
-    {
+    if (*error) {
         [self endSending];
     }
 }
@@ -1074,14 +942,12 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
 - (BOOL)sendPaymentRequest:(int)sessionId
                   password:(NSData *)password
                      error:(NSError **)outError
-                  callback:(void(^)(NSError*, NSDictionary*))callback
-{
+                  callback:(void(^)(NSError*, NSDictionary*))callback {
     jarray jPassword = nil;
     NSError *error = nil;
     NSUInteger callbackId = [self storeCallback:callback];
 
-    if (password)
-    {
+    if (password) {
         jPassword = JCharArrayFromNSData(_jniEnv, password);
     }
 
@@ -1089,8 +955,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
                            error:&error
                        signature:"(I[CI)V", sessionId, jPassword, callbackId];
 
-    if (jPassword)
-    {
+    if (jPassword) {
         [self zeroCharArray:jPassword size:(jsize)(password.length / sizeof(jchar))];
     }
 
@@ -1164,56 +1029,46 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     return [self callBooleanMethodWithName:"isWalletEncrypted" signature:"()Z"];
 }
 
-- (void)exportWalletTo:(NSURL *)exportURL error:(NSError **)error
-{
+- (void)exportWalletTo:(NSURL *)exportURL error:(NSError **)error {
     jstring path = JStringFromNSString(_jniEnv, exportURL.path);
     [self callVoidMethodWithName:"exportWallet" error:error signature:"(Ljava/lang/String;)V", path];
 }
 
-- (uint64_t)availableBalance
-{
+- (uint64_t)availableBalance {
     return [self callLongMethodWithName:"getAvailableBalance" signature:"()J"];
 }
 
-- (uint64_t)estimatedBalance
-{
+- (uint64_t)estimatedBalance {
     return [self callLongMethodWithName:"getEstimatedBalance" signature:"()J"];
 }
 
-- (void)verifyBalance:(NSTimer *)timer
-{
+- (void)verifyBalance:(NSTimer *)timer {
     // This shouldn't be necessary, but let's check if we missed anything.
-    if (self.availableBalance != _lastAvailableBalance)
-    {
+    if (self.availableBalance != _lastAvailableBalance) {
         HILogError(@"BitcoinKit missed a change notification. This is a bug.");
         [self onAvailableBalanceChanged];
     }
 
-    if (self.estimatedBalance != _lastEstimatedBalance)
-    {
+    if (self.estimatedBalance != _lastEstimatedBalance) {
         HILogError(@"BitcoinKit missed a change notification. This is a bug.");
         [self onEstimatedBalanceChanged];
     }
 }
 
-- (NSDate *)lastWalletChangeDate
-{
+- (NSDate *)lastWalletChangeDate {
     long timestamp = [self callLongMethodWithName:"getLastWalletChangeTimestamp" signature:"()J"];
     return (timestamp > 0) ? [NSDate dateWithTimeIntervalSince1970:(timestamp / 1000.0)] : nil;
 }
 
-- (NSUInteger)transactionCount
-{
+- (NSUInteger)transactionCount {
     return [self callIntegerMethodWithName:"getTransactionCount" signature:"()I"];
 }
 
-- (void)setLogLevel:(HILoggerLevel)level
-{
+- (void)setLogLevel:(HILoggerLevel)level {
     jclass loggerClass = [self jClassForClass:@"org/slf4j/impl/CocoaLogger"];
     jmethodID method = (*_jniEnv)->GetStaticMethodID(_jniEnv, loggerClass, "setGlobalLevel", "(I)V");
 
-    if (!method)
-    {
+    if (!method) {
         @throw [NSException exceptionWithName:@"Java exception"
                                        reason:@"Method not found: setLevel"
                                      userInfo:nil];
@@ -1224,26 +1079,22 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     [self handleJavaExceptions:NULL];
 }
 
-- (void)setIsSyncing:(BOOL)isSyncing
-{
-    if (_isSyncing != isSyncing)
-    {
+- (void)setIsSyncing:(BOOL)isSyncing {
+    if (_isSyncing != isSyncing) {
         [self willChangeValueForKey:@"isSyncing"];
         _isSyncing = isSyncing;
         [self didChangeValueForKey:@"isSyncing"];
     }
 }
 
-- (BOOL)isConnected
-{
+- (BOOL)isConnected {
     return (_peerCount > 0);
 }
 
 
 #pragma mark - Callbacks
 
-- (void)onAvailableBalanceChanged
-{
+- (void)onAvailableBalanceChanged {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self willChangeValueForKey:@"availableBalance"];
         _lastAvailableBalance = self.availableBalance;
@@ -1251,8 +1102,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     });
 }
 
-- (void)onEstimatedBalanceChanged
-{
+- (void)onEstimatedBalanceChanged {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self willChangeValueForKey:@"estimatedBalance"];
         _lastEstimatedBalance = self.estimatedBalance;
@@ -1265,23 +1115,20 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
         BOOL statusChange = (_peerCount > 0 && peerCount == 0) || (_peerCount == 0 && peerCount > 0);
 
         [self willChangeValueForKey:@"peerCount"];
-        if (statusChange)
-        {
+        if (statusChange) {
             [self willChangeValueForKey:@"isConnected"];
         }
 
         _peerCount = peerCount;
 
         [self didChangeValueForKey:@"peerCount"];
-        if (statusChange)
-        {
+        if (statusChange) {
             [self didChangeValueForKey:@"isConnected"];
         }
     });
 }
 
-- (void)onSynchronizationChanged:(float)percent
-{
+- (void)onSynchronizationChanged:(float)percent {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self willChangeValueForKey:@"syncProgress"];
         _syncProgress = percent;
@@ -1291,19 +1138,16 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     });
 }
 
-- (void)onTransactionChanged:(NSString *)txid
-{
+- (void)onTransactionChanged:(NSString *)txid {
     dispatch_async(dispatch_get_main_queue(), ^{
         [[NSNotificationCenter defaultCenter] postNotificationName:kHIBitcoinManagerTransactionChangedNotification
                                                             object:txid];
     });
 }
 
-- (void)onTransactionSuccess:(NSString *)txid
-{
+- (void)onTransactionSuccess:(NSString *)txid {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (sendCompletionBlock)
-        {
+        if (sendCompletionBlock) {
             sendCompletionBlock(txid);
         }
 
@@ -1311,11 +1155,9 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     });
 }
 
-- (void)onTransactionFailed
-{
+- (void)onTransactionFailed {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (sendCompletionBlock)
-        {
+        if (sendCompletionBlock) {
             sendCompletionBlock(nil);
         }
 

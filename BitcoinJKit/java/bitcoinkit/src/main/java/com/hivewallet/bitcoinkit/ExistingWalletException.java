@@ -1,19 +1,15 @@
 package com.hivewallet.bitcoinkit;
 
-public class ExistingWalletException extends Exception
-{
-    public ExistingWalletException(String message)
-    {
+public class ExistingWalletException extends Exception {
+    public ExistingWalletException(String message) {
         super(message);
     }
 
-    public ExistingWalletException(String message, Throwable cause)
-    {
+    public ExistingWalletException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public ExistingWalletException(Throwable cause)
-    {
+    public ExistingWalletException(Throwable cause) {
         super(cause);
     }
 }

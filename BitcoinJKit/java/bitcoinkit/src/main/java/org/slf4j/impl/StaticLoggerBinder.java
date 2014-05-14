@@ -5,13 +5,11 @@ import org.slf4j.spi.LoggerFactoryBinder;
 
 // based on http://javaeenotes.blogspot.com/2011/12/custom-slf4j-logger-adapter.html
 
-public class StaticLoggerBinder implements LoggerFactoryBinder
-{
+public class StaticLoggerBinder implements LoggerFactoryBinder {
 
     private static final StaticLoggerBinder SINGLETON = new StaticLoggerBinder();
 
-    public static final StaticLoggerBinder getSingleton()
-    {
+    public static final StaticLoggerBinder getSingleton() {
         return SINGLETON;
     }
 
@@ -33,18 +31,15 @@ public class StaticLoggerBinder implements LoggerFactoryBinder
      */
     private final ILoggerFactory loggerFactory;
 
-    private StaticLoggerBinder()
-    {
+    private StaticLoggerBinder() {
         loggerFactory = new CocoaLoggerFactory();
     }
 
-    public ILoggerFactory getLoggerFactory()
-    {
+    public ILoggerFactory getLoggerFactory() {
         return loggerFactory;
     }
 
-    public String getLoggerFactoryClassStr()
-    {
+    public String getLoggerFactoryClassStr() {
         return loggerFactoryClassStr;
     }
 }

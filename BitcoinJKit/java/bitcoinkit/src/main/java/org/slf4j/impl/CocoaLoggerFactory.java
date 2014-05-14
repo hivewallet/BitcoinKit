@@ -8,22 +8,17 @@ import java.util.Map;
 
 // based on http://javaeenotes.blogspot.com/2011/12/custom-slf4j-logger-adapter.html
 
-public class CocoaLoggerFactory implements ILoggerFactory
-{
+public class CocoaLoggerFactory implements ILoggerFactory {
     private Map<String, CocoaLogger> loggerMap;
 
-    public CocoaLoggerFactory()
-    {
+    public CocoaLoggerFactory() {
         loggerMap = new HashMap<String, CocoaLogger>();
     }
 
     @Override
-    public Logger getLogger(String name)
-    {
-        synchronized (loggerMap)
-        {
-            if (!loggerMap.containsKey(name))
-            {
+    public Logger getLogger(String name) {
+        synchronized (loggerMap) {
+            if (!loggerMap.containsKey(name)) {
                 loggerMap.put(name, new CocoaLogger(name));
             }
 
