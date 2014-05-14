@@ -238,6 +238,45 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;
             error:(NSError **)error
        completion:(void(^)(NSString *hash))completion;
 
+/** Loads a Payment Protocol compatible payment request from a local file.
+ *
+ * @param filename Path to the .bitcoinpaymentrequest file
+ * @param outError Returned error if the payment request file can't be opened
+ * @param callback Block that will be called when the request is loaded or an error occurs;
+ *                 returns: error (if any), session id (to be returned later), request data dictionary
+ * @return true if the request file was opened
+ */
+- (BOOL)openPaymentRequestFromFile:(NSString *)filename
+                             error:(NSError **)outError
+                          callback:(void(^)(NSError*, int, NSDictionary*))callback;
+
+/** Loads a Payment Protocol compatible payment request from a remote URL.
+ *
+ * @param URL Location of the payment request resource
+ * @param outError Returned error if the URL is empty or invalid
+ * @param callback Block that will be called when the request is loaded or an error occurs;
+ *                 returns: error (if any), session id (to be returned later), request data dictionary
+ * @return true if the URL was valid and the request is being loaded
+ */
+- (BOOL)openPaymentRequestFromURL:(NSString *)URL
+                            error:(NSError **)outError
+                         callback:(void(^)(NSError*, int, NSDictionary*))callback;
+
+/** Submits a payment using Payment Protocol.
+ *
+ * @param sessionId session id returned from one of the openPaymentRequest* methods
+ * @param password wallet password, if any
+ * @param outError Returned error if the transaction can't be completed
+ * @param callback Block that will be called when the payment is accepted or an error occurs;
+ *                 returns: error (if any), ack response data dictionary
+ * @return true if the transaction was prepared successfully and the payment was submitted
+                (though not necessarily confirmed)
+ */
+- (BOOL)sendPaymentRequest:(int)sessionId
+                  password:(NSData *)password
+                     error:(NSError **)outError
+                  callback:(void(^)(NSError*, NSDictionary*))callback;
+
 /** Exports (backs up) the wallet to given file URL.
  *
  * @param exportURL NSURL to local file where the wallet file should be copied to
