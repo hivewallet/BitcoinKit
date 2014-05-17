@@ -78,96 +78,94 @@ char * CharsFromString(NSString *string) {
 #pragma mark - JNI callback functions
 
 JNIEXPORT void JNICALL onBalanceChanged(JNIEnv *env, jobject thisobject) {
-    NSAutoreleasePool *pool = [NSAutoreleasePool new];
-    [[HIBitcoinManager defaultManager] onAvailableBalanceChanged];
-    [[HIBitcoinManager defaultManager] onEstimatedBalanceChanged];
-    [pool release];
+    @autoreleasepool {
+        [[HIBitcoinManager defaultManager] onAvailableBalanceChanged];
+        [[HIBitcoinManager defaultManager] onEstimatedBalanceChanged];
+    }
 }
 
 JNIEXPORT void JNICALL onPeerCountChanged(JNIEnv *env, jobject thisobject, jint peerCount) {
-    NSAutoreleasePool *pool = [NSAutoreleasePool new];
-    [[HIBitcoinManager defaultManager] onPeerCountChanged:peerCount];
-    [pool release];
+    @autoreleasepool {
+        [[HIBitcoinManager defaultManager] onPeerCountChanged:peerCount];
+    }
 }
 
 JNIEXPORT void JNICALL onSynchronizationUpdate(JNIEnv *env, jobject thisobject, jfloat percent) {
-    NSAutoreleasePool *pool = [NSAutoreleasePool new];
-    [[HIBitcoinManager defaultManager] onSynchronizationChanged:(float)percent];
-    [pool release];
+    @autoreleasepool {
+        [[HIBitcoinManager defaultManager] onSynchronizationChanged:(float)percent];
+    }
 }
 
 JNIEXPORT void JNICALL onTransactionChanged(JNIEnv *env, jobject thisobject, jstring txid) {
-    NSAutoreleasePool *pool = [NSAutoreleasePool new];
-
-    if (txid) {
-        [[HIBitcoinManager defaultManager] onTransactionChanged:NSStringFromJString(env, txid)];
+    @autoreleasepool {
+        if (txid) {
+            [[HIBitcoinManager defaultManager] onTransactionChanged:NSStringFromJString(env, txid)];
+        }
     }
-    
-    [pool release];
 }
 
 JNIEXPORT void JNICALL onTransactionSuccess(JNIEnv *env, jobject thisobject, jstring txid) {
-    NSAutoreleasePool *pool = [NSAutoreleasePool new];
-
-    if (txid) {
-        [[HIBitcoinManager defaultManager] onTransactionSuccess:NSStringFromJString(env, txid)];
+    @autoreleasepool {
+        if (txid) {
+            [[HIBitcoinManager defaultManager] onTransactionSuccess:NSStringFromJString(env, txid)];
+        }
     }
-    
-    [pool release];
 }
 
 JNIEXPORT void JNICALL onTransactionFailed(JNIEnv *env, jobject thisobject) {
-    NSAutoreleasePool *pool = [NSAutoreleasePool new];
-    [[HIBitcoinManager defaultManager] onTransactionFailed];
-    [pool release];
+    @autoreleasepool {
+        [[HIBitcoinManager defaultManager] onTransactionFailed];
+    }
 }
 
 JNIEXPORT void JNICALL onException(JNIEnv *env, jobject thisobject, jthrowable jexception) {
-    NSAutoreleasePool *pool = [NSAutoreleasePool new];
-    [[HIBitcoinManager defaultManager] handleJavaException:jexception useExceptionHandler:YES error:NULL];
-    [pool release];
+    @autoreleasepool {
+        [[HIBitcoinManager defaultManager] handleJavaException:jexception useExceptionHandler:YES error:NULL];
+    }
 }
 
 JNIEXPORT void JNICALL onPaymentRequestLoaded(JNIEnv *env, jobject thisobject,
                                               jint callbackId, jint sessionId, jstring requestDetails) {
-    NSAutoreleasePool *pool = [NSAutoreleasePool new];
-    [[HIBitcoinManager defaultManager] onPaymentRequestLoaded:sessionId
-                                                      details:requestDetails
-                                                     callback:callbackId];
-    [pool release];
+    @autoreleasepool {
+        [[HIBitcoinManager defaultManager] onPaymentRequestLoaded:sessionId
+                                                          details:requestDetails
+                                                         callback:callbackId];
+    }
 }
 
 JNIEXPORT void JNICALL onPaymentRequestLoadFailed(JNIEnv *env, jobject thisobject, jint callbackId, jthrowable error) {
-    NSAutoreleasePool *pool = [NSAutoreleasePool new];
-    [[HIBitcoinManager defaultManager] onPaymentRequestLoadFailedWithError:error
-                                                                  callback:callbackId];
-    [pool release];
+    @autoreleasepool {
+        [[HIBitcoinManager defaultManager] onPaymentRequestLoadFailedWithError:error
+                                                                      callback:callbackId];
+    }
 }
 
 JNIEXPORT void JNICALL onPaymentRequestProcessed(JNIEnv *env, jobject thisobject, jint callbackId, jstring details) {
-    NSAutoreleasePool *pool = [NSAutoreleasePool new];
-    [[HIBitcoinManager defaultManager] onPaymentRequestProcessed:details callback:callbackId];
-    [pool release];
+    @autoreleasepool {
+        [[HIBitcoinManager defaultManager] onPaymentRequestProcessed:details callback:callbackId];
+    }
 }
 
 JNIEXPORT void JNICALL onPaymentRequestProcessingFailed(JNIEnv *env, jobject thisobject,
                                                         jint callbackId, jthrowable error) {
-    NSAutoreleasePool *pool = [NSAutoreleasePool new];
-    [[HIBitcoinManager defaultManager] onPaymentRequestProcessingFailedWithError:error callback:callbackId];
-    [pool release];
+    @autoreleasepool {
+        [[HIBitcoinManager defaultManager] onPaymentRequestProcessingFailedWithError:error
+                                                                            callback:callbackId];
+    }
 }
 
 JNIEXPORT void JNICALL receiveLogFromJVM(JNIEnv *env, jobject thisobject, jstring fileName, jstring methodName,
                                          int lineNumber, jint level, jstring msg) {
-    NSAutoreleasePool *pool = [NSAutoreleasePool new];
-    const char *fileNameString = (*env)->GetStringUTFChars(env, fileName, NULL);
-    const char *methodNameString = (*env)->GetStringUTFChars(env, methodName, NULL);
+    @autoreleasepool {
+        const char *fileNameString = (*env)->GetStringUTFChars(env, fileName, NULL);
+        const char *methodNameString = (*env)->GetStringUTFChars(env, methodName, NULL);
 
-    HILoggerLog(fileNameString, methodNameString, lineNumber, level, @"%@", NSStringFromJString(env, msg));
+        HILoggerLog(fileNameString, methodNameString, lineNumber, level, @"%@",
+                    NSStringFromJString(env, msg));
 
-    (*env)->ReleaseStringUTFChars(env, fileName, fileNameString);
-    (*env)->ReleaseStringUTFChars(env, methodName, methodNameString);
-    [pool release];
+        (*env)->ReleaseStringUTFChars(env, fileName, fileNameString);
+        (*env)->ReleaseStringUTFChars(env, methodName, methodNameString);
+    }
 }
 
 
@@ -479,7 +477,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
 
     if (self) {
         _dateFormatter = [[NSDateFormatter alloc] init];
-        _dateFormatter.locale = [[[NSLocale alloc] initWithLocaleIdentifier:@"en_GB"] autorelease];
+        _dateFormatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_GB"];
         _dateFormatter.dateFormat = @"yyyy-MM-dd HH:mm:ss z";
         _sending = NO;
         _syncProgress = 0;
@@ -620,12 +618,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
 - (void)dealloc {
     [self stop];
 
-    [_dateFormatter release];
-    [sendCompletionBlock release];
-    self.dataURL = nil;
-    self.exceptionHandler = nil;
 
-    [super dealloc];
 }
 
 - (BOOL)start:(NSError **)error {
@@ -925,7 +918,6 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     
     _sending = YES;
 
-    [sendCompletionBlock release];
     sendCompletionBlock = [completion copy];
 
     jstring jAmount = JStringFromNSString(_jniEnv, [NSString stringWithFormat:@"%lld", coins]);
@@ -989,7 +981,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
 - (id)retrieveCallback:(NSUInteger)callbackId {
     id callback = _callbacks[@(callbackId)];
     [_callbacks removeObjectForKey:@(callbackId)];
-    return [callback autorelease];
+    return callback;
 }
 
 - (BOOL)openPaymentRequestFromFile:(NSString *)filename
@@ -1227,7 +1219,6 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
 
 - (void)endSending {
     _sending = NO;
-    [sendCompletionBlock release];
     sendCompletionBlock = nil;
 }
 
