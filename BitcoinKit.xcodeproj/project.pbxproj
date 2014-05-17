@@ -14,9 +14,7 @@
 		58BE670D185B3DB3001AAB50 /* HIBitcoinErrorCodes.h in Headers */ = {isa = PBXBuildFile; fileRef = 58BE670A185B3DB3001AAB50 /* HIBitcoinErrorCodes.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		58BE670E185B3DB3001AAB50 /* HIBitcoinErrorCodes.m in Sources */ = {isa = PBXBuildFile; fileRef = 58BE670B185B3DB3001AAB50 /* HIBitcoinErrorCodes.m */; };
 		58BE670F185B3DB3001AAB50 /* HIBitcoinManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 58BE670C185B3DB3001AAB50 /* HIBitcoinManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		D901F49917AF9DAB0071780D /* JavaVM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D901F49817AF9DAA0071780D /* JavaVM.framework */; };
 		D901F50017B279EA0071780D /* boot.jar in Resources */ = {isa = PBXBuildFile; fileRef = D901F49A17AF9DDB0071780D /* boot.jar */; };
-		D958B09E17A29B0500B0EDD5 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D91FE4F1178EB1F1001B37D8 /* Cocoa.framework */; };
 		D958B0AF17A29CE200B0EDD5 /* jni_md.h in Headers */ = {isa = PBXBuildFile; fileRef = D958B0AD17A29CE200B0EDD5 /* jni_md.h */; };
 		D958B0B017A29CE200B0EDD5 /* jni.h in Headers */ = {isa = PBXBuildFile; fileRef = D958B0AE17A29CE200B0EDD5 /* jni.h */; };
 		D958B0BC17A2A40600B0EDD5 /* HIBitcoinManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D958B0BA17A2A40600B0EDD5 /* HIBitcoinManager.m */; };
@@ -31,14 +29,8 @@
 		58BE670A185B3DB3001AAB50 /* HIBitcoinErrorCodes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HIBitcoinErrorCodes.h; sourceTree = "<group>"; };
 		58BE670B185B3DB3001AAB50 /* HIBitcoinErrorCodes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HIBitcoinErrorCodes.m; sourceTree = "<group>"; };
 		58BE670C185B3DB3001AAB50 /* HIBitcoinManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HIBitcoinManager.h; sourceTree = "<group>"; };
-		D901F49817AF9DAA0071780D /* JavaVM.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaVM.framework; path = System/Library/Frameworks/JavaVM.framework; sourceTree = SDKROOT; };
 		D901F49A17AF9DDB0071780D /* boot.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = boot.jar; sourceTree = SOURCE_ROOT; };
 		D901F4EC17B2479C0071780D /* BitcoinManager.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; name = BitcoinManager.java; path = java/bitcoinkit/src/main/java/com/hivewallet/bitcoinkit/BitcoinManager.java; sourceTree = "<group>"; };
-		D91FE4F1178EB1F1001B37D8 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
-		D91FE4F4178EB1F1001B37D8 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
-		D91FE4F5178EB1F1001B37D8 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
-		D91FE4F6178EB1F1001B37D8 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		D91FE6CA178EB53A001B37D8 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		D958B09D17A29B0500B0EDD5 /* BitcoinJKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = BitcoinJKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D958B0A117A29B0500B0EDD5 /* BitcoinJKit-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "BitcoinJKit-Info.plist"; sourceTree = "<group>"; };
 		D958B0A517A29B0500B0EDD5 /* BitcoinJKit-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "BitcoinJKit-Prefix.pch"; sourceTree = "<group>"; };
@@ -53,8 +45,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D901F49917AF9DAB0071780D /* JavaVM.framework in Frameworks */,
-				D958B09E17A29B0500B0EDD5 /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,7 +55,6 @@
 			isa = PBXGroup;
 			children = (
 				D958B09F17A29B0500B0EDD5 /* BitcoinJKit */,
-				D91FE4F0178EB1F1001B37D8 /* Frameworks */,
 				D91FE4EF178EB1F1001B37D8 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -76,27 +65,6 @@
 				D958B09D17A29B0500B0EDD5 /* BitcoinJKit.framework */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		D91FE4F0178EB1F1001B37D8 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				D901F49817AF9DAA0071780D /* JavaVM.framework */,
-				D91FE6CA178EB53A001B37D8 /* libsqlite3.dylib */,
-				D91FE4F1178EB1F1001B37D8 /* Cocoa.framework */,
-				D91FE4F3178EB1F1001B37D8 /* Other Frameworks */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		D91FE4F3178EB1F1001B37D8 /* Other Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				D91FE4F4178EB1F1001B37D8 /* AppKit.framework */,
-				D91FE4F5178EB1F1001B37D8 /* CoreData.framework */,
-				D91FE4F6178EB1F1001B37D8 /* Foundation.framework */,
-			);
-			name = "Other Frameworks";
 			sourceTree = "<group>";
 		};
 		D958B09F17A29B0500B0EDD5 /* BitcoinJKit */ = {
@@ -243,6 +211,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
@@ -275,6 +244,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;

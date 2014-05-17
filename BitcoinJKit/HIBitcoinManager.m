@@ -11,6 +11,7 @@
 #import "HIBitcoinErrorCodes.h"
 #import "HIBitcoinInternalErrorCodes.h"
 #import "HILogger.h"
+#import "jni_md.h"
 
 @interface HIBitcoinManager () {
     JNIEnv *_jniEnv;
