@@ -26,6 +26,8 @@ profile
 # SourceTree (Mac) Configuration Files
 sourcetreeconfig
 
+bitcoinj
+
 # bitcoinj/aviary compilation temps
 boot-jar.o
 boot.jar
