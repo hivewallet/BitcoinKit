@@ -732,7 +732,10 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
 
             wallet.completeTx(request);
 
-            ListenableFuture<PaymentSession.Ack> fack = session.sendPayment(ImmutableList.of(request.tx), null, null);
+            Address refundAddress = wallet.getKeys().get(0).toAddress(networkParams);
+            List<Transaction> transactions = ImmutableList.of(request.tx);
+
+            ListenableFuture<PaymentSession.Ack> fack = session.sendPayment(transactions, refundAddress, null);
 
             if (fack != null) {
                 Futures.addCallback(fack, new FutureCallback<PaymentSession.Ack>() {
