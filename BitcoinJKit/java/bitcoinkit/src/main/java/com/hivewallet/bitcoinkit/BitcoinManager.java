@@ -16,6 +16,7 @@ import com.google.bitcoin.store.SPVBlockStore;
 import com.google.bitcoin.store.UnreadableWalletException;
 import com.google.bitcoin.store.WalletProtobufSerializer;
 import com.google.bitcoin.utils.Threading;
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -869,8 +870,14 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
     public String getExceptionStackTrace(Throwable exception) {
         StringBuilder buffer = new StringBuilder();
 
-        for (StackTraceElement line : exception.getStackTrace()) {
-            buffer.append("at " + line.toString() + "\n");
+        for (Throwable e : Throwables.getCausalChain(exception)) {
+            if (e != exception) {
+                buffer.append("\ncaused by: " + e + "\n");
+            }
+
+            for (StackTraceElement line : e.getStackTrace()) {
+                buffer.append("at " + line.toString() + "\n");
+            }
         }
 
         return buffer.toString();
