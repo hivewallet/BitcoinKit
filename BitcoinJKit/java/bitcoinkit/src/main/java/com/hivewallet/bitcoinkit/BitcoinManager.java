@@ -571,21 +571,17 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
     }
 
     public void sendCoins(String amount, final String sendToAddressString)
-            throws WrongPasswordException, SendingDustException, AddressFormatException, InsufficientMoneyException {
+            throws WrongPasswordException, AddressFormatException, InsufficientMoneyException {
         sendCoins(amount, sendToAddressString, null);
     }
 
     public void sendCoins(String amount, final String sendToAddressString, char[] utf16Password)
-            throws WrongPasswordException, SendingDustException, AddressFormatException, InsufficientMoneyException {
+            throws WrongPasswordException, AddressFormatException, InsufficientMoneyException {
         KeyParameter aesKey = null;
         try {
             BigInteger aToSend = new BigInteger(amount);
             Address sendToAddress = new Address(networkParams, sendToAddressString);
             final Wallet.SendRequest request = Wallet.SendRequest.to(sendToAddress, aToSend);
-
-            if (isDust(request)) {
-                throw new SendingDustException("Can't send dust amount: " + amount);
-            }
 
             if (utf16Password != null) {
                 aesKey = aesKeyForPassword(utf16Password);
@@ -608,15 +604,6 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         } finally {
             wipeAesKey(aesKey);
         }
-    }
-
-    private boolean isDust(Wallet.SendRequest req) {
-        for (TransactionOutput output : req.tx.getOutputs()) {
-            if (output.getValue().compareTo(Utils.CENT) < 0) {
-                return output.getValue().compareTo(output.getMinNonDustValue()) < 0;
-            }
-        }
-        return false;
     }
 
 
@@ -713,17 +700,12 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
     }
 
     public void sendPaymentRequest(final int sessionId, char[] utf16Password, final int callbackId)
-        throws WrongPasswordException, InsufficientMoneyException, PaymentRequestException, IOException,
-               SendingDustException {
+            throws WrongPasswordException, InsufficientMoneyException, PaymentRequestException, IOException {
         KeyParameter aesKey = null;
 
         try {
             PaymentSession session = paymentSessions.get(sessionId);
             final Wallet.SendRequest request = session.getSendRequest();
-
-            if (isDust(request)) {
-                throw new SendingDustException("Can't send dust amount");
-            }
 
             if (utf16Password != null) {
                 aesKey = aesKeyForPassword(utf16Password);

@@ -377,7 +377,11 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     } else if ([exceptionClass isEqual:@"java.io.FileNotFoundException"]) {
         return kHIFileNotFoundException;
     } else if ([exceptionClass isEqual:@"java.lang.IllegalArgumentException"]) {
-        return kHIIllegalArgumentException;
+        if ([exceptionMessage rangeOfString:@"Tried to send dust"].location != NSNotFound) {
+            return kHIBitcoinManagerSendingDustError;
+        } else {
+            return kHIIllegalArgumentException;
+        }
     } else if ([exceptionClass isEqual:@"com.hivewallet.bitcoinkit.NoWalletException"]) {
         return kHIBitcoinManagerNoWallet;
     } else if ([exceptionClass isEqual:@"com.hivewallet.bitcoinkit.ExistingWalletException"]) {
@@ -386,8 +390,6 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
         return kHIBitcoinManagerWrongPassword;
     } else if ([exceptionClass isEqual:@"com.hivewallet.bitcoinkit.WrongNetworkException"]) {
         return kHIBitcoinManagerPaymentRequestWrongNetworkError;
-    } else if ([exceptionClass isEqual:@"com.hivewallet.bitcoinkit.SendingDustException"]) {
-        return kHIBitcoinManagerSendingDustError;
     } else {
         return kHIBitcoinManagerUnexpectedError;
     }
