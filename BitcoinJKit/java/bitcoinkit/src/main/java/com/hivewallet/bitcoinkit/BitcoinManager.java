@@ -190,6 +190,8 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         //make wallet autosave
         wallet.autosaveToFile(walletFile, 1, TimeUnit.SECONDS, null);
 
+        log.info("Opening wallet " + getWalletAddress());
+
         wallet.addEventListener(new AbstractWalletEventListener() {
             // get notified when an incoming transaction is received
             @Override
