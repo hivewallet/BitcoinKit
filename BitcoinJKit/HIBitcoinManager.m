@@ -593,7 +593,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     */
 
     NSTask *task = [[NSTask alloc] init];
-    task.launchPath = @"/Library/Java/Home/bin/java";
+    task.launchPath = @"/System/Library/Frameworks/JavaVM.framework/Versions/Current/Commands/java";
     task.arguments = @[@"-cp", [self bootJarPath], @"ExtensionPathsReader"];
     task.standardOutput = [NSPipe pipe];
     task.standardError = [NSPipe pipe];
