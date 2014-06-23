@@ -370,6 +370,9 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
         }
     } else if ([exceptionClass isEqual:@"com.google.bitcoin.protocols.payments.PaymentRequestException$Expired"]) {
         return kHIBitcoinManagerPaymentRequestExpiredError;
+    } else if ([exceptionClass
+                isEqual:@"com.google.bitcoin.protocols.payments.PaymentRequestException$InvalidNetwork"]) {
+        return kHIBitcoinManagerPaymentRequestWrongNetworkError;
     } else if ([exceptionClass isEqual:@"com.google.bitcoin.core.InsufficientMoneyException"]) {
         return kHIBitcoinManagerInsufficientMoneyError;
     } else if ([exceptionClass isEqual:@"com.google.protobuf.InvalidProtocolBufferException"]) {

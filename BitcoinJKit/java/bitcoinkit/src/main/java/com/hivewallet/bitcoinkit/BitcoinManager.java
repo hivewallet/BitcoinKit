@@ -660,16 +660,7 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
     }
 
     private void validatePaymentRequest(PaymentSession session) throws PaymentRequestException {
-        org.bitcoin.protocols.payments.Protos.PaymentDetails paymentDetails = session.getPaymentDetails();
-
-        // this should really be done in bitcoinj (see https://code.google.com/p/bitcoinj/issues/detail?id=551)
-        NetworkParameters params;
-
-        if (paymentDetails.hasNetwork()) {
-            params = NetworkParameters.fromPmtProtocolID(paymentDetails.getNetwork());
-        } else {
-            params = MainNetParams.get();
-        }
+        NetworkParameters params = session.getNetworkParameters();
 
         if (params != networkParams) {
             throw new WrongNetworkException("This payment request is meant for a different Bitcoin network");
