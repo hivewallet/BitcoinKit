@@ -600,8 +600,9 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     */
 
     NSTask *task = [[NSTask alloc] init];
-    task.launchPath = @"/System/Library/Frameworks/JavaVM.framework/Versions/Current/Commands/java";
-    task.arguments = @[@"-cp", [self bootJarPath], @"com.hivewallet.bitcoinkit.ExtensionPathsReader"];
+    task.launchPath = @"/usr/libexec/java_home";
+    task.arguments = @[@"-t", @"JNI", @"--exec", @"java", @"-cp", [self bootJarPath],
+                       @"com.hivewallet.bitcoinkit.ExtensionPathsReader"];
     task.standardOutput = [NSPipe pipe];
     task.standardError = [NSPipe pipe];
 
@@ -627,8 +628,6 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
 
 - (void)dealloc {
     [self stop];
-
-
 }
 
 - (BOOL)start:(NSError **)error {
