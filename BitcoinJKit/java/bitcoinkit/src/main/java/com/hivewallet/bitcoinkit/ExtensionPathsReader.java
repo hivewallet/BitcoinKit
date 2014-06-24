@@ -1,3 +1,5 @@
+package com.hivewallet.bitcoinkit;
+
 class ExtensionPathsReader {
     public static void main(String[] args) {
         String[] paths = System.getProperty("java.ext.dirs").split(":");
