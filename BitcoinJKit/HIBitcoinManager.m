@@ -15,7 +15,6 @@
 
 @interface HIBitcoinManager () {
     JNIEnv *_jniEnv;
-    JavaVMInitArgs _vmArgs;
     jobject _managerObject;
     jclass _managerClass;
     NSDateFormatter *_dateFormatter;
@@ -73,6 +72,26 @@ jarray JCharArrayFromNSData(JNIEnv *env, NSData *data) {
 
 char * CharsFromString(NSString *string) {
     return (char *) [string UTF8String];
+}
+
+JavaVMInitArgs JavaVMInitArgsCreateFromOptions(NSArray *args) {
+    JavaVMInitArgs vmArgs;
+    JavaVMOption *options = malloc(args.count * sizeof(JavaVMOption));
+
+    for (NSInteger i = 0; i < args.count; i++) {
+        options[i].optionString = CharsFromString(args[i]);
+    }
+
+    vmArgs.version = JNI_VERSION_1_2;
+    vmArgs.nOptions = (jint) args.count;
+    vmArgs.ignoreUnrecognized = JNI_TRUE;
+    vmArgs.options = options;
+
+    return vmArgs;
+}
+
+void JavaVMInitArgsRelease(JavaVMInitArgs vmArgs) {
+    free(vmArgs.options);
 }
 
 
@@ -492,54 +511,32 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
         _callbacks = [[NSMutableDictionary alloc] init];
         _callbackId = 0;
 
-        NSArray *applicationSupport = [[NSFileManager defaultManager] URLsForDirectory:NSApplicationSupportDirectory
-                                                                             inDomains:NSUserDomainMask];
-        self.dataURL = [[applicationSupport lastObject] URLByAppendingPathComponent:BitcoinJKitBundleIdentifier];
+        self.dataURL = [self defaultDataDirectoryURL];
 
-        int numOptions = 1;
+        NSMutableArray *options = [NSMutableArray array];
+        [options addObject:[NSString stringWithFormat:@"-Djava.class.path=%@", [self bootJarPath]]];
+
+        NSString *extensionPaths = [self javaExtensionPaths];
+        if (extensionPaths) {
+            [options addObject:[NSString stringWithFormat:@"-Djava.ext.dirs=%@", extensionPaths]];
+        }
 
 #ifdef DEBUG
         const char *debugPort = getenv("HIVE_JAVA_DEBUG_PORT");
         BOOL doDebug = debugPort && debugPort[0];
         if (doDebug) {
-            numOptions++;
+            [options addObject:[NSString stringWithFormat:
+                                @"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=%s",
+                                debugPort]];
         }
 #endif
 
-        NSString *extensionPaths = [self javaExtensionPaths];
-        if (extensionPaths) {
-            numOptions++;
-        }
-
-        JavaVMOption options[numOptions];
-
-        options[0].optionString = CharsFromString([NSString stringWithFormat:@"-Djava.class.path=%@",
-                                                     [self bootJarPath]]);
-
-        if (extensionPaths) {
-            options[1].optionString = CharsFromString([NSString stringWithFormat:@"-Djava.ext.dirs=%@",
-                                                         extensionPaths]);
-        }
-
-#ifdef DEBUG
-        if (doDebug) {
-            NSString *debugOptionString = [NSString stringWithFormat:
-                                           @"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=%s",
-                                           debugPort];
-
-            options[numOptions - 1].optionString = CharsFromString(debugOptionString);
-        }
-#endif
-
-        _vmArgs.version = JNI_VERSION_1_2;
-        _vmArgs.nOptions = numOptions;
-        _vmArgs.ignoreUnrecognized = JNI_TRUE;
-        _vmArgs.options = options;
-
-        JavaVM *vm;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated"
-        JNI_CreateJavaVM(&vm, (void *) &_jniEnv, &_vmArgs);
+        JavaVMInitArgs vmArgs = JavaVMInitArgsCreateFromOptions(options);
+        JavaVM *vm;
+        JNI_CreateJavaVM(&vm, (void *) &_jniEnv, &vmArgs);
+        JavaVMInitArgsRelease(vmArgs);
 #pragma clang diagnostic pop
 
 #ifdef DEBUG
@@ -578,6 +575,13 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     }
 
     return self;
+}
+
+- (NSURL *)defaultDataDirectoryURL {
+    NSArray *applicationSupport = [[NSFileManager defaultManager] URLsForDirectory:NSApplicationSupportDirectory
+                                                                         inDomains:NSUserDomainMask];
+
+    return [[applicationSupport lastObject] URLByAppendingPathComponent:BitcoinJKitBundleIdentifier];
 }
 
 - (NSString *)bootJarPath {
