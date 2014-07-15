@@ -534,10 +534,14 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated"
         JavaVMInitArgs vmArgs = JavaVMInitArgsCreateFromOptions(options);
-        JavaVM *vm;
+        JavaVM *vm = NULL;
         JNI_CreateJavaVM(&vm, (void *) &_jniEnv, &vmArgs);
         JavaVMInitArgsRelease(vmArgs);
 #pragma clang diagnostic pop
+
+        [self handleJavaExceptions:NULL];
+        NSAssert(vm != NULL, @"JavaVM *vm should not be NULL");
+        NSAssert(_jniEnv != NULL, @"JNIEnv *_jniEnv should not be NULL");
 
 #ifdef DEBUG
         // Optionally wait here to give the Java debugger a chance to attach before anything happens.
@@ -549,9 +553,11 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
         }
 #endif
 
-        // We need to create the manager object
         _managerClass = [self jClassForClass:@"com/hivewallet/bitcoinkit/BitcoinManager"];
+        NSAssert(_managerClass != NULL, @"jclass _managerClass should not be NULL");
+
         (*_jniEnv)->RegisterNatives(_jniEnv, _managerClass, methods, sizeof(methods)/sizeof(methods[0]));
+        [self handleJavaExceptions:NULL];
 
         JNINativeMethod loggerMethod;
         loggerMethod.name = "receiveLogFromJVM";
@@ -559,10 +565,17 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
         loggerMethod.fnPtr = &receiveLogFromJVM;
 
         jclass loggerClass = [self jClassForClass:@"org/slf4j/impl/CocoaLogger"];
+        NSAssert(loggerClass != NULL, @"jclass loggerClass should not be NULL");
+
         (*_jniEnv)->RegisterNatives(_jniEnv, loggerClass, &loggerMethod, 1);
+        [self handleJavaExceptions:NULL];
 
         jmethodID constructorMethod = [self jMethodWithName:"<init>" signature:"()V"];
+        NSAssert(constructorMethod != NULL, @"jmethodID constructorMethod should not be NULL");
+
         _managerObject = (*_jniEnv)->NewObject(_jniEnv, _managerClass, constructorMethod);
+        [self handleJavaExceptions:NULL];
+        NSAssert(_managerObject != NULL, @"jobject _managerObject should not be NULL");
 
         _balanceChecker = [NSTimer scheduledTimerWithTimeInterval:1.0
                                                            target:self
