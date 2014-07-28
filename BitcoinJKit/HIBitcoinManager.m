@@ -64,10 +64,14 @@ jstring JStringFromNSString(JNIEnv *env, NSString *string) {
 }
 
 jarray JCharArrayFromNSData(JNIEnv *env, NSData *data) {
-    jsize length = (jsize)(data.length / sizeof(jchar));
-    jcharArray charArray = (*env)->NewCharArray(env, length);
-    (*env)->SetCharArrayRegion(env, charArray, 0, length, data.bytes);
-    return charArray;
+    if (data) {
+        jsize length = (jsize)(data.length / sizeof(jchar));
+        jcharArray charArray = (*env)->NewCharArray(env, length);
+        (*env)->SetCharArrayRegion(env, charArray, 0, length, data.bytes);
+        return charArray;
+    } else {
+        return NULL;
+    }
 }
 
 char * CharsFromString(NSString *string) {
@@ -697,24 +701,21 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
 - (void)changeWalletPassword:(NSData *)fromPassword
                   toPassword:(NSData *)toPassword
                        error:(NSError **)error {
-    jarray fromCharArray = fromPassword ? JCharArrayFromNSData(_jniEnv, fromPassword) : NULL;
+    jarray fromCharArray = JCharArrayFromNSData(_jniEnv, fromPassword);
     jarray toCharArray = JCharArrayFromNSData(_jniEnv, toPassword);
 
     [self callVoidMethodWithName:"changeWalletPassword"
                            error:error
                        signature:"([C[C)V", fromCharArray, toCharArray];
 
-    if (fromCharArray) {
-        [self zeroCharArray:fromCharArray size:(jsize)(fromPassword.length / sizeof(jchar))];
-    }
-
+    [self zeroCharArray:fromCharArray size:(jsize)(fromPassword.length / sizeof(jchar))];
     [self zeroCharArray:toCharArray size:(jsize)(toPassword.length / sizeof(jchar))];
 }
 
 - (NSString *)signMessage:(NSString *)message
              withPassword:(NSData *)password
                     error:(NSError **)error {
-    jarray passwordCharArray = password ? JCharArrayFromNSData(_jniEnv, password) : NULL;
+    jarray passwordCharArray = JCharArrayFromNSData(_jniEnv, password);
     jstring messageJString = JStringFromNSString(_jniEnv, message);
 
     jstring signature = [self callObjectMethodWithName:"signMessage"
@@ -722,9 +723,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
                                              signature:"(Ljava/lang/String;[C)Ljava/lang/String;",
                          messageJString, passwordCharArray];
 
-    if (passwordCharArray) {
-        [self zeroCharArray:passwordCharArray size:(jsize)(password.length / sizeof(jchar))];
-    }
+    [self zeroCharArray:passwordCharArray size:(jsize)(password.length / sizeof(jchar))];
 
     if (signature) {
         return NSStringFromJString(_jniEnv, signature);
@@ -744,9 +743,11 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
 }
 
 - (void)zeroCharArray:(jarray)charArray size:(jsize)size {
-    jchar zero[size];
-    memset(zero, 0, size * sizeof(jchar));
-    (*_jniEnv)->SetCharArrayRegion(_jniEnv, charArray, 0, size, zero);
+    if (charArray) {
+        jchar zero[size];
+        memset(zero, 0, size * sizeof(jchar));
+        (*_jniEnv)->SetCharArrayRegion(_jniEnv, charArray, 0, size, zero);
+    }
 }
 
 - (void)didStart {
@@ -930,6 +931,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
          password:(NSData *)password
             error:(NSError **)error
        completion:(void(^)(NSString *hash))completion {
+
     if (_sending) {
         if (completion) {
             completion(nil);
@@ -945,6 +947,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     jstring jAmount = JStringFromNSString(_jniEnv, [NSString stringWithFormat:@"%lld", coins]);
     jstring jRecipient = JStringFromNSString(_jniEnv, recipient);
     *error = nil;
+
     if (password) {
         jarray jPassword = JCharArrayFromNSData(_jniEnv, password);
 
@@ -968,21 +971,16 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
                   password:(NSData *)password
                      error:(NSError **)outError
                   callback:(void(^)(NSError*, NSDictionary*))callback {
-    jarray jPassword = nil;
+
+    jarray jPassword = JCharArrayFromNSData(_jniEnv, password);
     NSError *error = nil;
     NSUInteger callbackId = [self storeCallback:callback];
-
-    if (password) {
-        jPassword = JCharArrayFromNSData(_jniEnv, password);
-    }
 
     [self callVoidMethodWithName:"sendPaymentRequest"
                            error:&error
                        signature:"(I[CI)V", sessionId, jPassword, callbackId];
 
-    if (jPassword) {
-        [self zeroCharArray:jPassword size:(jsize)(password.length / sizeof(jchar))];
-    }
+    [self zeroCharArray:jPassword size:(jsize)(password.length / sizeof(jchar))];
 
     if (!error) {
         return YES;

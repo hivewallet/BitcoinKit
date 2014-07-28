@@ -149,11 +149,13 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         }
     }
 
-    public void createWallet() throws IOException, BlockStoreException, ExistingWalletException {
+    public void createWallet()
+            throws IOException, BlockStoreException, ExistingWalletException, WrongPasswordException {
         createWallet(null);
     }
 
-    public void createWallet(char[] utf16Password) throws IOException, BlockStoreException, ExistingWalletException {
+    public void createWallet(char[] utf16Password)
+            throws IOException, BlockStoreException, ExistingWalletException, WrongPasswordException {
         if (walletFile == null) {
             throw new IllegalStateException("createWallet cannot be called before start");
         } else if (walletFile.exists()) {
@@ -764,13 +766,21 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
 
     private KeyParameter aesKeyForPassword(char[] utf16Password) throws WrongPasswordException {
         KeyCrypter keyCrypter = wallet.getKeyCrypter();
+
         if (keyCrypter == null) {
             throw new WrongPasswordException("Wallet is not protected.");
         }
+
         return deriveKeyAndWipePassword(utf16Password, keyCrypter);
     }
 
-    private KeyParameter deriveKeyAndWipePassword(char[] utf16Password, KeyCrypter keyCrypter) {
+    private KeyParameter deriveKeyAndWipePassword(char[] utf16Password, KeyCrypter keyCrypter)
+            throws WrongPasswordException {
+
+        if (utf16Password == null) {
+            throw new WrongPasswordException("No password provided.");
+        }
+
         try {
             return keyCrypter.deriveKey(CharBuffer.wrap(utf16Password));
         } finally {
@@ -802,17 +812,26 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
     }
 
     public void changeWalletPassword(char[] oldUtf16Password, char[] newUtf16Password) throws WrongPasswordException {
+        // check if aes key for new password can be generated before decrypting
+        KeyCrypterScrypt keyCrypter = new KeyCrypterScrypt();
+        KeyParameter aesKey = deriveKeyAndWipePassword(newUtf16Password, keyCrypter);
+
         updateLastWalletChange(wallet);
 
         if (isWalletEncrypted()) {
             decryptWallet(oldUtf16Password);
         }
 
-        encryptWallet(newUtf16Password, wallet);
+        try {
+            wallet.encrypt(keyCrypter, aesKey);
+        } finally {
+            wipeAesKey(aesKey);
+        }
     }
 
     private void decryptWallet(char[] oldUtf16Password) throws WrongPasswordException {
         KeyParameter oldAesKey = aesKeyForPassword(oldUtf16Password);
+
         try {
             wallet.decrypt(oldAesKey);
         } catch (KeyCrypterException e) {
@@ -822,9 +841,10 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         }
     }
 
-    private void encryptWallet(char[] utf16Password, Wallet wallet) {
+    private void encryptWallet(char[] utf16Password, Wallet wallet) throws WrongPasswordException {
         KeyCrypterScrypt keyCrypter = new KeyCrypterScrypt();
         KeyParameter aesKey = deriveKeyAndWipePassword(utf16Password, keyCrypter);
+
         try {
             wallet.encrypt(keyCrypter, aesKey);
         } finally {
