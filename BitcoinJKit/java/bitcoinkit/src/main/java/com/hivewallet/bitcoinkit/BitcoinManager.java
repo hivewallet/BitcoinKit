@@ -415,7 +415,8 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
 
         int connCount = 0;
 
-        TransactionConfidence.ConfidenceType confidenceType = tx.getConfidence().getConfidenceType();
+        TransactionConfidence txConfidence = tx.getConfidence();
+        TransactionConfidence.ConfidenceType confidenceType = txConfidence.getConfidenceType();
         String confidence;
 
         if (confidenceType == TransactionConfidence.ConfidenceType.BUILDING) {
@@ -471,6 +472,8 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         result.put("txid", tx.getHashAsString());
         result.put("time", dateFormat.format(tx.getUpdateTime()));
         result.put("confidence", confidence);
+        result.put("peers", txConfidence.numBroadcastPeers());
+        result.put("confirmations", txConfidence.getDepthInBlocks());
         result.put("details", conns);
 
         return result.toString();
