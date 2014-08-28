@@ -277,7 +277,7 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;
 - (BOOL)sendPaymentRequest:(int)sessionId
                   password:(NSData *)password
                      error:(NSError **)outError
-                  callback:(void(^)(NSError*, NSDictionary*))callback;
+                  callback:(void(^)(NSError*, NSDictionary*, NSString*))callback;
 
 /** Exports (backs up) the wallet to given file URL.
  *

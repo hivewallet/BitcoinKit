@@ -36,7 +36,7 @@
 - (void)onTransactionFailed;
 - (void)onPaymentRequestLoaded:(jint)sessionId details:(jstring)details callback:(NSUInteger)callbackId;
 - (void)onPaymentRequestLoadFailedWithError:(jthrowable)error callback:(NSUInteger)callbackId;
-- (void)onPaymentRequestProcessed:(jstring)details callback:(NSUInteger)callbackId;
+- (void)onPaymentRequestProcessed:(jstring)details callback:(NSUInteger)callbackId transactionId:(NSString *)txid;
 - (void)onPaymentRequestProcessingFailedWithError:(jthrowable)error callback:(NSUInteger)callbackId;
 - (void)handleJavaException:(jthrowable)exception useExceptionHandler:(BOOL)useHandler error:(NSError **)returnedError;
 
@@ -164,9 +164,12 @@ JNIEXPORT void JNICALL onPaymentRequestLoadFailed(JNIEnv *env, jobject thisobjec
     }
 }
 
-JNIEXPORT void JNICALL onPaymentRequestProcessed(JNIEnv *env, jobject thisobject, jint callbackId, jstring details) {
+JNIEXPORT void JNICALL onPaymentRequestProcessed(JNIEnv *env, jobject thisobject,
+                                                 jint callbackId, jstring txid, jstring details) {
     @autoreleasepool {
-        [[HIBitcoinManager defaultManager] onPaymentRequestProcessed:details callback:callbackId];
+        [[HIBitcoinManager defaultManager] onPaymentRequestProcessed:details
+                                                            callback:callbackId
+                                                       transactionId:NSStringFromJString(env, txid)];
     }
 }
 
@@ -201,7 +204,7 @@ static JNINativeMethod methods[] = {
     {"onTransactionFailed",     "()V",                                     (void *)&onTransactionFailed},
     {"onPaymentRequestLoaded",  "(IILjava/lang/String;)V",                 (void *)&onPaymentRequestLoaded},
     {"onPaymentRequestLoadFailed", "(ILjava/lang/Throwable;)V",            (void *)&onPaymentRequestLoadFailed},
-    {"onPaymentRequestProcessed", "(ILjava/lang/String;)V",                (void *)&onPaymentRequestProcessed},
+    {"onPaymentRequestProcessed", "(ILjava/lang/String;Ljava/lang/String;)V", (void *)&onPaymentRequestProcessed},
     {"onPaymentRequestProcessingFailed", "(ILjava/lang/Throwable;)V",      (void *)&onPaymentRequestProcessingFailed},
     {"onSynchronizationUpdate", "(F)V",                                    (void *)&onSynchronizationUpdate},
     {"onException",             "(Ljava/lang/Throwable;)V",                (void *)&onException}
@@ -970,7 +973,7 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
 - (BOOL)sendPaymentRequest:(int)sessionId
                   password:(NSData *)password
                      error:(NSError **)outError
-                  callback:(void(^)(NSError*, NSDictionary*))callback {
+                  callback:(void(^)(NSError*, NSDictionary*, NSString*))callback {
 
     jarray jPassword = JCharArrayFromNSData(_jniEnv, password);
     NSError *error = nil;
@@ -1213,26 +1216,26 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     };
 }
 
-- (void)onPaymentRequestProcessed:(jstring)details callback:(NSUInteger)callbackId {
-    void (^callback)(NSError*, NSDictionary*) = [self retrieveCallback:callbackId];
+- (void)onPaymentRequestProcessed:(jstring)details callback:(NSUInteger)callbackId transactionId:(NSString *)txid {
+    void (^callback)(NSError*, NSDictionary*, NSString*) = [self retrieveCallback:callbackId];
 
     if (callback) {
         [self runSynchronouslyOnMainThread:^{
             NSDictionary *data = [self objectFromJSONString:NSStringFromJString(_jniEnv, details)];
-            callback(nil, data);
+            callback(nil, data, txid);
         }];
     }
 }
 
 - (void)onPaymentRequestProcessingFailedWithError:(jthrowable)exception callback:(NSUInteger)callbackId {
-    void (^callback)(NSError*, NSDictionary*) = [self retrieveCallback:callbackId];
+    void (^callback)(NSError*, NSDictionary*, NSString*) = [self retrieveCallback:callbackId];
 
     if (callback) {
         [self runSynchronouslyOnMainThread:^{
             NSError *error = [NSError errorWithDomain:@"BitcoinKit"
                                                  code:[self errorCodeForJavaException:exception]
                                              userInfo:[self createUserInfoForJavaException:exception]];
-            callback(error, nil);
+            callback(error, nil, nil);
         }];
     }
 }

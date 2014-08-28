@@ -713,8 +713,9 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
 
             wallet.completeTx(request);
 
+            final Transaction tx = request.tx;
             Address refundAddress = wallet.getKeys().get(0).toAddress(networkParams);
-            List<Transaction> transactions = ImmutableList.of(request.tx);
+            List<Transaction> transactions = ImmutableList.of(tx);
 
             ListenableFuture<PaymentSession.Ack> fack = session.sendPayment(transactions, refundAddress, null);
 
@@ -722,9 +723,11 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
                 Futures.addCallback(fack, new FutureCallback<PaymentSession.Ack>() {
                     public void onSuccess(PaymentSession.Ack ack) {
                         try {
-                            wallet.commitTx(request.tx);
+                            wallet.commitTx(tx);
                             paymentSessions.remove(sessionId);
-                            onPaymentRequestProcessed(callbackId, getPaymentRequestAckDetails(ack));
+                            
+                            String ackDetails = getPaymentRequestAckDetails(ack);
+                            onPaymentRequestProcessed(callbackId, tx.getHashAsString(), ackDetails);
                         } catch (JSONException e) {
                             onPaymentRequestProcessingFailed(callbackId, e);
                         }
@@ -737,13 +740,13 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
             } else {
                 // no payment_url - we just need to broadcast the transaction as with a normal send
 
-                wallet.commitTx(request.tx);
-                ListenableFuture<Transaction> broadcastComplete = peerGroup.broadcastTransaction(request.tx);
+                wallet.commitTx(tx);
+                ListenableFuture<Transaction> broadcastComplete = peerGroup.broadcastTransaction(tx);
 
                 Futures.addCallback(broadcastComplete, new FutureCallback<Transaction>() {
                     public void onSuccess(Transaction transaction) {
                         paymentSessions.remove(sessionId);
-                        onPaymentRequestProcessed(callbackId, "{}");
+                        onPaymentRequestProcessed(callbackId, tx.getHashAsString(), "{}");
                     }
 
                     public void onFailure(Throwable throwable) {
@@ -1029,6 +1032,6 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
     public native void onPaymentRequestLoaded(int callbackId, int sessionId, String requestDetails);
     public native void onPaymentRequestLoadFailed(int callbackId, Throwable error);
 
-    public native void onPaymentRequestProcessed(int callbackId, String ackDetails);
+    public native void onPaymentRequestProcessed(int callbackId, String txid, String ackDetails);
     public native void onPaymentRequestProcessingFailed(int callbackId, Throwable error);
 }
