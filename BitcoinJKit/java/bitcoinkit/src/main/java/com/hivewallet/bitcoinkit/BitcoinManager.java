@@ -725,7 +725,9 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
                         try {
                             wallet.commitTx(tx);
                             paymentSessions.remove(sessionId);
-                            
+
+                            onNewTransaction(tx);
+
                             String ackDetails = getPaymentRequestAckDetails(ack);
                             onPaymentRequestProcessed(callbackId, tx.getHashAsString(), ackDetails);
                         } catch (JSONException e) {
