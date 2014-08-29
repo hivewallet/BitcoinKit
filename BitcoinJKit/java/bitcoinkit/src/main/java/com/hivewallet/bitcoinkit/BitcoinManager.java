@@ -944,7 +944,15 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         if (!trackedTransactions.contains(tx)) {
             // update the UI
             onBalanceChanged();
-            onTransactionChanged(tx.getHashAsString());
+
+            String json = null;
+            try {
+                json = getJSONFromTransaction(tx);
+            } catch (JSONException e) {
+                // shouldn't happen
+            }
+
+            onTransactionChanged(tx.getHashAsString(), json);
 
             // get notified when transaction is confirmed
             if (tx.isPending()) {
@@ -964,7 +972,15 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
 
         // update the UI
         onBalanceChanged();
-        onTransactionChanged(tx.getHashAsString());
+
+        String json = null;
+        try {
+            json = getJSONFromTransaction(tx);
+        } catch (JSONException e) {
+            // shouldn't happen
+        }
+
+        onTransactionChanged(tx.getHashAsString(), json);
     }
 
 
@@ -1015,7 +1031,7 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
 
 	/* Native callbacks to pass data to the Cocoa side when something happens */
 
-    public native void onTransactionChanged(String txid);
+    public native void onTransactionChanged(String txid, String json);
 
     public native void onTransactionFailed();
 

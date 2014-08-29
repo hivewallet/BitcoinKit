@@ -31,7 +31,7 @@
 - (void)onEstimatedBalanceChanged;
 - (void)onPeerCountChanged:(NSUInteger)peerCount;
 - (void)onSynchronizationChanged:(float)percent;
-- (void)onTransactionChanged:(NSString *)txid;
+- (void)onTransactionChanged:(NSString *)txid transactionData:(NSString *)json;
 - (void)onTransactionSuccess:(NSString *)txid;
 - (void)onTransactionFailed;
 - (void)onPaymentRequestLoaded:(jint)sessionId details:(jstring)details callback:(NSUInteger)callbackId;
@@ -120,10 +120,11 @@ JNIEXPORT void JNICALL onSynchronizationUpdate(JNIEnv *env, jobject thisobject, 
     }
 }
 
-JNIEXPORT void JNICALL onTransactionChanged(JNIEnv *env, jobject thisobject, jstring txid) {
+JNIEXPORT void JNICALL onTransactionChanged(JNIEnv *env, jobject thisobject, jstring txid, jstring json) {
     @autoreleasepool {
         if (txid) {
-            [[HIBitcoinManager defaultManager] onTransactionChanged:NSStringFromJString(env, txid)];
+            [[HIBitcoinManager defaultManager] onTransactionChanged:NSStringFromJString(env, txid)
+                                                    transactionData:NSStringFromJString(env, json)];
         }
     }
 }
@@ -199,7 +200,7 @@ JNIEXPORT void JNICALL receiveLogFromJVM(JNIEnv *env, jobject thisobject, jstrin
 static JNINativeMethod methods[] = {
     {"onBalanceChanged",        "()V",                                     (void *)&onBalanceChanged},
     {"onPeerCountChanged",      "(I)V",                                    (void *)&onPeerCountChanged},
-    {"onTransactionChanged",    "(Ljava/lang/String;)V",                   (void *)&onTransactionChanged},
+    {"onTransactionChanged",    "(Ljava/lang/String;Ljava/lang/String;)V", (void *)&onTransactionChanged},
     {"onTransactionSuccess",    "(Ljava/lang/String;)V",                   (void *)&onTransactionSuccess},
     {"onTransactionFailed",     "()V",                                     (void *)&onTransactionFailed},
     {"onPaymentRequestLoaded",  "(IILjava/lang/String;)V",                 (void *)&onPaymentRequestLoaded},
@@ -1164,10 +1165,18 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     });
 }
 
-- (void)onTransactionChanged:(NSString *)txid {
+- (void)onTransactionChanged:(NSString *)txid transactionData:(NSString *)json {
     dispatch_async(dispatch_get_main_queue(), ^{
+        NSDictionary *userInfo = nil;
+
+        if (json) {
+            NSDictionary *transactionData = [self objectFromJSONString:json];
+            userInfo = @{@"json": [self modifiedTransactionForTransaction:transactionData]};
+        }
+
         [[NSNotificationCenter defaultCenter] postNotificationName:kHIBitcoinManagerTransactionChangedNotification
-                                                            object:txid];
+                                                            object:txid
+                                                          userInfo:userInfo];
     });
 }
 
