@@ -728,6 +728,10 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
 
                             onNewTransaction(tx);
 
+                            // we broadcast the transaction on our side anyway in case the server forgets to do it
+                            // but we don't need to wait for any responses in this case
+                            peerGroup.broadcastTransaction(tx);
+
                             String ackDetails = getPaymentRequestAckDetails(ack);
                             onPaymentRequestProcessed(callbackId, tx.getHashAsString(), ackDetails);
                         } catch (JSONException e) {
