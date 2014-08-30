@@ -971,6 +971,11 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
     /* --- TransactionConfidence.Listener --- */
 
     public void onConfidenceChanged(final Transaction tx, TransactionConfidence.Listener.ChangeReason reason) {
+        if (reason != TransactionConfidence.Listener.ChangeReason.TYPE) {
+            // we don't need to notify the UI of peer count or confirmation amount changes
+            return;
+        }
+
         if (!tx.isPending()) {
             // coins were confirmed (appeared in a block) - we don't need to listen anymore
             stopTrackingTransaction(tx);
