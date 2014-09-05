@@ -430,6 +430,16 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         for (TransactionInput input : tx.getInputs()) {
             JSONObject inputData = new JSONObject();
 
+            if (!input.isCoinBase()) {
+                try {
+                    Script scriptSig = input.getScriptSig();
+                    Address fromAddress = new Address(networkParams, Utils.sha256hash160(scriptSig.getPubKey()));
+                    inputData.put("address", fromAddress);
+                } catch (ScriptException e) {
+                    // can't parse script, give up
+                }
+            }
+
             TransactionOutput source = input.getConnectedOutput();
             if (source != null) {
                 inputData.put("amount", source.getValue());
