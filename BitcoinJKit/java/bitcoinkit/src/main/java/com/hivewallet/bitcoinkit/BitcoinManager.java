@@ -411,10 +411,6 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
             return null;
         }
 
-        JSONArray conns = new JSONArray();
-
-        int connCount = 0;
-
         TransactionConfidence txConfidence = tx.getConfidence();
         TransactionConfidence.ConfidenceType confidenceType = txConfidence.getConfidenceType();
         String confidence;
@@ -429,38 +425,49 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
             confidence = "unknown";
         }
 
-        if (tx.getInputs().size() > 0 && tx.getValue(wallet).compareTo(BigInteger.ZERO) > 0) {
-            TransactionInput in = tx.getInput(0);
+        JSONArray inputs = new JSONArray();
 
-            JSONObject transaction = new JSONObject();
-            transaction.put("category", "received");
+        for (TransactionInput input : tx.getInputs()) {
+            JSONObject inputData = new JSONObject();
 
-            conns.put(transaction);
-            connCount++;
+            TransactionOutput source = input.getConnectedOutput();
+            if (source != null) {
+                inputData.put("amount", source.getValue());
+            }
+
+            inputs.put(inputData);
         }
 
-        if (tx.getOutputs().size() > 0 && tx.getValue(wallet).compareTo(BigInteger.ZERO) < 0) {
-            TransactionOutput out = tx.getOutput(0);
+        JSONArray outputs = new JSONArray();
+
+        for (TransactionOutput output : tx.getOutputs()) {
+            JSONObject outputData = new JSONObject();
 
             try {
-                JSONObject transaction = new JSONObject();
+                Script scriptPubKey = output.getScriptPubKey();
 
-                Script scriptPubKey = out.getScriptPubKey();
-
-                try {
+                if (scriptPubKey.isSentToAddress() || scriptPubKey.isPayToScriptHash()) {
                     Address toAddress = scriptPubKey.getToAddress(networkParams);
-                    transaction.put("address", toAddress);
-                } catch (ScriptException e) {
-                    // non-standard target, there's no address or we can't figure it out
+                    outputData.put("address", toAddress);
+
+                    if (toAddress.toString().equals(getWalletAddress())) {
+                        outputData.put("type", "own");
+                    } else {
+                        outputData.put("type", "external");
+                    }
+                } else if (scriptPubKey.isSentToRawPubKey()) {
+                    outputData.put("type", "pubkey");
+                } else if (scriptPubKey.isSentToMultiSig()) {
+                    outputData.put("type", "multisig");
+                } else {
+                    outputData.put("type", "unknown");
                 }
-
-                transaction.put("category", "sent");
-
-                conns.put(transaction);
-                connCount++;
-            } catch (Exception e) {
-
+            } catch (ScriptException e) {
+                // can't parse script, give up
             }
+
+            outputData.put("amount", output.getValue());
+            outputs.put(outputData);
         }
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
@@ -474,7 +481,8 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         result.put("confidence", confidence);
         result.put("peers", txConfidence.numBroadcastPeers());
         result.put("confirmations", txConfidence.getDepthInBlocks());
-        result.put("details", conns);
+        result.put("inputs", inputs);
+        result.put("outputs", outputs);
 
         return result.toString();
     }
