@@ -7,7 +7,8 @@ import org.bitcoinj.crypto.KeyCrypterScrypt;
 import org.bitcoinj.net.discovery.DnsDiscovery;
 import org.bitcoinj.params.MainNetParams;
 import org.bitcoinj.params.TestNet3Params;
-import org.bitcoinj.protocols.payments.PaymentRequestException;
+import org.bitcoinj.protocols.payments.PaymentProtocol;
+import org.bitcoinj.protocols.payments.PaymentProtocolException;
 import org.bitcoinj.protocols.payments.PaymentSession;
 import org.bitcoinj.script.Script;
 import org.bitcoinj.store.BlockStore;
@@ -655,12 +656,12 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         } catch (JSONException e) {
             // this should never happen
             onPaymentRequestLoadFailed(callbackId, e);
-        } catch (PaymentRequestException e) {
+        } catch (PaymentProtocolException e) {
             onPaymentRequestLoadFailed(callbackId, e);
         }
     }
 
-    public void openPaymentRequestFromURL(String url, final int callbackId) throws PaymentRequestException {
+    public void openPaymentRequestFromURL(String url, final int callbackId) throws PaymentProtocolException {
         ListenableFuture<PaymentSession> future = PaymentSession.createFromUrl(url, false);
 
         Futures.addCallback(future, new FutureCallback<PaymentSession>() {
@@ -682,7 +683,7 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         });
     }
 
-    private void validatePaymentRequest(PaymentSession session) throws PaymentRequestException {
+    private void validatePaymentRequest(PaymentSession session) throws PaymentProtocolException {
         NetworkParameters params = session.getNetworkParameters();
 
         if (params != networkParams) {
@@ -690,12 +691,12 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         }
 
         if (session.isExpired()) {
-            throw new PaymentRequestException.Expired("PaymentRequest is expired");
+            throw new PaymentProtocolException.Expired("PaymentRequest is expired");
         }
 
         try {
             session.verifyPki();
-        } catch (PaymentRequestException e) {
+        } catch (PaymentProtocolException e) {
             // apparently we're supposed to just ignore these errors (?)
             log.warn("PKI Verification error: " + e);
         }
@@ -709,7 +710,7 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         request.put("paymentURL", session.getPaymentUrl());
 
         if (session.pkiVerificationData != null) {
-            request.put("pkiName", session.pkiVerificationData.name);
+            request.put("pkiName", session.pkiVerificationData.displayName);
             request.put("pkiRootAuthorityName", session.pkiVerificationData.rootAuthorityName);
         }
 
@@ -717,7 +718,7 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
     }
 
     public void sendPaymentRequest(final int sessionId, char[] utf16Password, final int callbackId)
-            throws WrongPasswordException, InsufficientMoneyException, PaymentRequestException, IOException {
+            throws WrongPasswordException, InsufficientMoneyException, PaymentProtocolException, IOException {
         KeyParameter aesKey = null;
 
         try {
@@ -735,11 +736,11 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
             Address refundAddress = wallet.getKeys().get(0).toAddress(networkParams);
             List<Transaction> transactions = ImmutableList.of(tx);
 
-            ListenableFuture<PaymentSession.Ack> fack = session.sendPayment(transactions, refundAddress, null);
+            ListenableFuture<PaymentProtocol.Ack> fack = session.sendPayment(transactions, refundAddress, null);
 
             if (fack != null) {
-                Futures.addCallback(fack, new FutureCallback<PaymentSession.Ack>() {
-                    public void onSuccess(PaymentSession.Ack ack) {
+                Futures.addCallback(fack, new FutureCallback<PaymentProtocol.Ack>() {
+                    public void onSuccess(PaymentProtocol.Ack ack) {
                         try {
                             wallet.commitTx(tx);
                             paymentSessions.remove(sessionId);
@@ -785,7 +786,7 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         }
     }
 
-    private String getPaymentRequestAckDetails(PaymentSession.Ack ack) throws JSONException {
+    private String getPaymentRequestAckDetails(PaymentProtocol.Ack ack) throws JSONException {
         JSONObject json = new JSONObject();
         json.put("memo", ack.getMemo());
         return json.toString();
