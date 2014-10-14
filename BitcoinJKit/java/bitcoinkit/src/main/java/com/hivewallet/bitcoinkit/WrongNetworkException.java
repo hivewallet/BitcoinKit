@@ -1,6 +1,6 @@
 package com.hivewallet.bitcoinkit;
 
-import com.google.bitcoin.protocols.payments.PaymentRequestException;
+import org.bitcoinj.protocols.payments.PaymentRequestException;
 
 public class WrongNetworkException extends PaymentRequestException {
     public WrongNetworkException(String message) {

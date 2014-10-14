@@ -387,20 +387,20 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     NSString *exceptionClass = [self getJavaExceptionClassName:exception];
     NSString *exceptionMessage = [self getJavaExceptionMessage:exception];
 
-    if ([exceptionClass isEqual:@"com.google.bitcoin.store.UnreadableWalletException"]) {
+    if ([exceptionClass isEqual:@"org.bitcoinj.store.UnreadableWalletException"]) {
         return kHIBitcoinManagerUnreadableWallet;
-    } else if ([exceptionClass isEqual:@"com.google.bitcoin.store.BlockStoreException"]) {
+    } else if ([exceptionClass isEqual:@"org.bitcoinj.store.BlockStoreException"]) {
         if ([exceptionMessage rangeOfString:@"Store file is already locked"].location != NSNotFound) {
             return kHIBitcoinManagerBlockStoreLockError;
         } else {
             return kHIBitcoinManagerBlockStoreReadError;
         }
-    } else if ([exceptionClass isEqual:@"com.google.bitcoin.protocols.payments.PaymentRequestException$Expired"]) {
+    } else if ([exceptionClass isEqual:@"org.bitcoinj.protocols.payments.PaymentRequestException$Expired"]) {
         return kHIBitcoinManagerPaymentRequestExpiredError;
     } else if ([exceptionClass
-                isEqual:@"com.google.bitcoin.protocols.payments.PaymentRequestException$InvalidNetwork"]) {
+                isEqual:@"org.bitcoinj.protocols.payments.PaymentRequestException$InvalidNetwork"]) {
         return kHIBitcoinManagerPaymentRequestWrongNetworkError;
-    } else if ([exceptionClass isEqual:@"com.google.bitcoin.core.InsufficientMoneyException"]) {
+    } else if ([exceptionClass isEqual:@"org.bitcoinj.core.InsufficientMoneyException"]) {
         return kHIBitcoinManagerInsufficientMoneyError;
     } else if ([exceptionClass isEqual:@"com.google.protobuf.InvalidProtocolBufferException"]) {
         return kHIBitcoinManagerInvalidProtocolBufferError;

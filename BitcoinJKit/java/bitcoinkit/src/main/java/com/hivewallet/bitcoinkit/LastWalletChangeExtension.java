@@ -1,7 +1,7 @@
 package com.hivewallet.bitcoinkit;
 
-import com.google.bitcoin.core.Wallet;
-import com.google.bitcoin.core.WalletExtension;
+import org.bitcoinj.core.Wallet;
+import org.bitcoinj.core.WalletExtension;
 import java.nio.ByteBuffer;
 import java.util.Date;
 import org.slf4j.Logger;
