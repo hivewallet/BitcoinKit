@@ -383,6 +383,33 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         wallet.saveToFile(backupFile);
     }
 
+    public String exportPrivateKey(char[] utf16Password) throws WrongPasswordException {
+        KeyParameter aesKey = null;
+        ECKey decryptedKey = null;
+        DumpedPrivateKey dumpedKey = null;
+
+        try {
+            ECKey ecKey = wallet.getKeys().get(0);
+            Date creationDate = new Date(ecKey.getCreationTimeSeconds() * 1000);
+
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            format.setTimeZone(TimeZone.getTimeZone("UTC"));
+            String timestamp = format.format(creationDate);
+
+            aesKey = aesKeyForPassword(utf16Password);
+            decryptedKey = ecKey.decrypt(wallet.getKeyCrypter(), aesKey);
+            return decryptedKey.getPrivateKeyEncoded(networkParams).toString() + "\t" + timestamp;
+        } catch (KeyCrypterException e) {
+            throw new WrongPasswordException(e);
+        } finally {
+            wipeAesKey(aesKey);
+
+            if (decryptedKey != null) {
+                decryptedKey.clearPrivateKey();
+            }
+        }
+    }
+
 
     /* --- Reading wallet data --- */
 

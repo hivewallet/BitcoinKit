@@ -1061,6 +1061,23 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     [self callVoidMethodWithName:"exportWallet" error:error signature:"(Ljava/lang/String;)V", path];
 }
 
+- (NSString *)exportPrivateKeyWithPassword:(NSData *)password
+                                     error:(NSError **)error {
+    jarray passwordCharArray = JCharArrayFromNSData(_jniEnv, password);
+
+    jstring privateKey = [self callObjectMethodWithName:"exportPrivateKey"
+                                                 error:error
+                                             signature:"([C)Ljava/lang/String;", passwordCharArray];
+
+    [self zeroCharArray:passwordCharArray size:(jsize)(password.length / sizeof(jchar))];
+
+    if (privateKey) {
+        return NSStringFromJString(_jniEnv, privateKey);
+    } else {
+        return NULL;
+    }
+}
+
 - (uint64_t)availableBalance {
     return [self callLongMethodWithName:"getAvailableBalance" signature:"()J"];
 }

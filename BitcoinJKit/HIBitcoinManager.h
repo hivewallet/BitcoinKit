@@ -287,4 +287,14 @@ extern NSString * const kHIBitcoinManagerStoppedNotification;
  */
 - (void)exportWalletTo:(NSURL *)exportURL error:(NSError **)error;
 
+/** Exports the wallet's private key to a string to be saved in a file.
+ *
+ * @param password wallet password
+ * @param error reference to error variable where error info will be written if export fails
+ * @return wallet private key (in WIF format with a createdAt timestamp)
+ *
+ */
+- (NSString *)exportPrivateKeyWithPassword:(NSData *)password
+                                     error:(NSError **)error;
+
 @end
