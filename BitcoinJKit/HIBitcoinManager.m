@@ -952,19 +952,13 @@ static NSString * const BitcoinJKitBundleIdentifier = @"com.hivewallet.BitcoinJK
     jstring jRecipient = JStringFromNSString(_jniEnv, recipient);
     *error = nil;
 
-    if (password) {
-        jarray jPassword = JCharArrayFromNSData(_jniEnv, password);
+    jarray jPassword = JCharArrayFromNSData(_jniEnv, password);
 
-        [self callVoidMethodWithName:"sendCoins"
-                               error:error
-                           signature:"(Ljava/lang/String;Ljava/lang/String;[C)V", jAmount, jRecipient, jPassword];
+    [self callVoidMethodWithName:"sendCoins"
+                           error:error
+                       signature:"(Ljava/lang/String;Ljava/lang/String;[C)V", jAmount, jRecipient, jPassword];
 
-        [self zeroCharArray:jPassword size:(jsize)(password.length / sizeof(jchar))];
-    } else {
-        [self callVoidMethodWithName:"sendCoins"
-                               error:error
-                           signature:"(Ljava/lang/String;Ljava/lang/String;)V", jAmount, jRecipient];
-    }
+    [self zeroCharArray:jPassword size:(jsize)(password.length / sizeof(jchar))];
 
     if (*error) {
         [self endSending];

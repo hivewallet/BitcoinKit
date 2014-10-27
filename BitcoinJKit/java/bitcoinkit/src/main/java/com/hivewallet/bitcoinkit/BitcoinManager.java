@@ -623,23 +623,18 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         }
     }
 
-    public void sendCoins(String amount, final String sendToAddressString)
-            throws WrongPasswordException, AddressFormatException, InsufficientMoneyException {
-        sendCoins(amount, sendToAddressString, null);
-    }
-
     public void sendCoins(String amount, final String sendToAddressString, char[] utf16Password)
             throws WrongPasswordException, AddressFormatException, InsufficientMoneyException {
+
         KeyParameter aesKey = null;
+
         try {
             BigInteger aToSend = new BigInteger(amount);
             Address sendToAddress = new Address(networkParams, sendToAddressString);
             final Wallet.SendRequest request = Wallet.SendRequest.to(sendToAddress, aToSend);
 
-            if (utf16Password != null) {
-                aesKey = aesKeyForPassword(utf16Password);
-                request.aesKey = aesKey;
-            }
+            aesKey = aesKeyForPassword(utf16Password);
+            request.aesKey = aesKey;
 
             final Wallet.SendResult sendResult = wallet.sendCoins(peerGroup, request);
             Futures.addCallback(sendResult.broadcastComplete, new FutureCallback<Transaction>() {
@@ -916,13 +911,9 @@ public class BitcoinManager implements Thread.UncaughtExceptionHandler, Transact
         try {
             ECKey ecKey = wallet.getKeys().get(0);
 
-            if (utf16Password != null) {
-                aesKey = aesKeyForPassword(utf16Password);
-                decryptedKey = ecKey.decrypt(wallet.getKeyCrypter(), aesKey);
-                return decryptedKey.signMessage(message);
-            } else {
-                return ecKey.signMessage(message);
-            }
+            aesKey = aesKeyForPassword(utf16Password);
+            decryptedKey = ecKey.decrypt(wallet.getKeyCrypter(), aesKey);
+            return decryptedKey.signMessage(message);
         } catch (KeyCrypterException e) {
             throw new WrongPasswordException(e);
         } finally {
